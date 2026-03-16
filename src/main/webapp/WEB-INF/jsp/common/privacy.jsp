@@ -1,0 +1,238 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Parkiyo | Privacy Policy</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { primary: "#1f68f9", "background-dark": "#020617" },
+                    fontFamily: { display: ["Public Sans", "sans-serif"] },
+                    borderRadius: { squircle: "14px", xl: "1.5rem", "2xl": "2rem", "3xl": "3rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .premium-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .bg-subtle-radial { background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 70%); }
+        .glass-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); }
+        .prose-dark p { color: #94a3b8; line-height: 1.8; font-size: 0.9rem; font-weight: 500; margin-bottom: 1rem; }
+        .prose-dark h3 { color: white; font-size: 1.1rem; font-weight: 900; margin-bottom: 0.75rem; margin-top: 2rem; }
+        .prose-dark ul { list-style: none; padding: 0; }
+        .prose-dark ul li { color: #94a3b8; font-size: 0.9rem; font-weight: 500; padding: 0.35rem 0; padding-left: 1.5rem; position: relative; }
+        .prose-dark ul li::before { content: '·'; position: absolute; left: 0; color: #1f68f9; font-weight: 900; font-size: 1.2rem; line-height: 1.4; }
+        ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display antialiased bg-subtle-radial">
+<header class="sticky top-0 z-50 w-full border-b border-white/5 bg-background-dark/75 premium-blur">
+    <div class="container mx-auto flex h-20 items-center justify-between px-6 lg:px-12">
+        <a href="home.html" class="flex items-center gap-4">
+            <div class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]">
+                <span class="material-symbols-outlined font-bold">local_parking</span>
+            </div>
+            <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+        </a>
+        <nav class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
+            <a class="hover:text-primary transition-colors" href="home.html">Home</a>
+            <a class="hover:text-primary transition-colors" href="features.html">Features</a>
+            <a class="hover:text-primary transition-colors" href="solutions.html">Solutions</a>
+            <a class="hover:text-primary transition-colors" href="analytics.html">Analytics</a>
+            <a class="hover:text-primary transition-colors" href="faq.html">Support</a>
+        </nav>
+        <div class="flex items-center gap-6">
+            <a href="login.html" class="text-sm font-bold text-slate-300 hover:text-white">Login</a>
+            <a href="register.html" class="bg-primary text-white text-sm font-bold px-7 py-3 rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/30">Get Started</a>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="container mx-auto px-6 lg:px-12 pt-24 pb-20">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-[0.22em] mb-6">Legal</div>
+                <h1 class="text-5xl lg:text-6xl font-black text-white tracking-tight mb-4">Privacy Policy</h1>
+                <p class="text-slate-500 text-sm font-bold uppercase tracking-widest">Last updated: January 2026</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- TOC -->
+                <div class="lg:col-span-1">
+                    <div class="glass-card rounded-[2rem] p-6 sticky top-28">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-5">Contents</p>
+                        <ul class="space-y-3">
+                            <li><a href="#overview" class="text-sm text-slate-400 hover:text-primary transition-colors font-bold">Overview</a></li>
+                            <li><a href="#collected" class="text-sm text-slate-400 hover:text-primary transition-colors font-bold">Data Collected</a></li>
+                            <li><a href="#usage" class="text-sm text-slate-400 hover:text-primary transition-colors font-bold">How We Use Data</a></li>
+                            <li><a href="#account" class="text-sm text-slate-400 hover:text-primary transition-colors font-bold">Account Data</a></li>
+                            <li><a href="#parking" class="text-sm text-slate-400 hover:text-primary transition-colors font-bold">Parking Data</a></li>
+                            <li><a href="#payment" class="text-sm text-slate-400 hover:text-primary transition-colors font-bold">Payment Data</a></li>
+                            <li><a href="#security" class="text-sm text-slate-400 hover:text-primary transition-colors font-bold">Security</a></li>
+                            <li><a href="#retention" class="text-sm text-slate-400 hover:text-primary transition-colors font-bold">Retention</a></li>
+                            <li><a href="#contact" class="text-sm text-slate-400 hover:text-primary transition-colors font-bold">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="lg:col-span-3 space-y-6">
+                    <div id="overview" class="glass-card rounded-[2rem] p-10 prose-dark">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="h-12 w-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-primary">info</span>
+                            </div>
+                            <h2 class="text-2xl font-black text-white">Overview</h2>
+                        </div>
+                        <p>Parkiyo ("we", "our", "the platform") is a premium parking management system. This Privacy Policy explains what information we collect, how we use it, and how we protect it. By using Parkiyo, you agree to the practices described in this policy.</p>
+                        <p>We are committed to data minimisation — we collect only what is necessary to operate the platform effectively and securely.</p>
+                    </div>
+
+                    <div id="collected" class="glass-card rounded-[2rem] p-10 prose-dark">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="h-12 w-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-emerald-400">database</span>
+                            </div>
+                            <h2 class="text-2xl font-black text-white">Data We Collect</h2>
+                        </div>
+                        <p>We collect information you provide when registering and using the system, as well as data generated automatically during platform use.</p>
+                        <h3>Account Information</h3>
+                        <ul>
+                            <li>Full name, email address, phone number</li>
+                            <li>Gender (for profile records)</li>
+                            <li>Encrypted password (never stored in plain text)</li>
+                            <li>Account role (admin or user)</li>
+                        </ul>
+                        <h3>Operational Data</h3>
+                        <ul>
+                            <li>Vehicle plate numbers entered into the system</li>
+                            <li>Slot assignments and parking session records</li>
+                            <li>Entry and exit timestamps</li>
+                            <li>Reservation records</li>
+                        </ul>
+                        <h3>Payment Data</h3>
+                        <ul>
+                            <li>Payment amounts and transaction records</li>
+                            <li>Wallet balance and transaction history</li>
+                            <li>Receipt identifiers and payment status</li>
+                        </ul>
+                    </div>
+
+                    <div id="usage" class="glass-card rounded-[2rem] p-10 prose-dark">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="h-12 w-12 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-violet-400">analytics</span>
+                            </div>
+                            <h2 class="text-2xl font-black text-white">How We Use Your Data</h2>
+                        </div>
+                        <p>We use collected data to operate, maintain, and improve the Parkiyo platform. Specific uses include:</p>
+                        <ul>
+                            <li>Authenticating users and managing access control</li>
+                            <li>Processing vehicle entry, exit, and parking sessions</li>
+                            <li>Calculating fees and processing payments</li>
+                            <li>Generating parking receipts and records</li>
+                            <li>Providing administrators with operational reports and analytics</li>
+                            <li>Maintaining audit logs for security and compliance</li>
+                            <li>Sending system notifications relevant to your account</li>
+                        </ul>
+                        <p>We do not sell your data to third parties. We do not use your data for advertising purposes.</p>
+                    </div>
+
+                    <div id="security" class="glass-card rounded-[2rem] p-10 prose-dark">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="h-12 w-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-rose-400">shield</span>
+                            </div>
+                            <h2 class="text-2xl font-black text-white">Security</h2>
+                        </div>
+                        <p>Parkiyo implements industry-standard security measures to protect all user and operational data. These include:</p>
+                        <ul>
+                            <li>Encrypted password storage using secure hashing</li>
+                            <li>Role-based access control preventing unauthorised data access</li>
+                            <li>Audit logging of all sensitive system actions</li>
+                            <li>System health monitoring with real-time alerts</li>
+                        </ul>
+                        <p>Despite these measures, no digital system is completely invulnerable. We encourage users to use strong passwords and log out from shared terminals after use.</p>
+                    </div>
+
+                    <div id="retention" class="glass-card rounded-[2rem] p-10 prose-dark">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="h-12 w-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-amber-400">schedule</span>
+                            </div>
+                            <h2 class="text-2xl font-black text-white">Data Retention</h2>
+                        </div>
+                        <p>We retain data for as long as your account is active and as long as required for operational and compliance purposes. Payment and parking records are retained for a minimum period to support auditing and dispute resolution.</p>
+                        <p>Account data may be deleted upon request. Contact the administrator of your facility or Parkiyo support to initiate an account deletion request.</p>
+                    </div>
+
+                    <div id="contact" class="glass-card rounded-[2rem] p-10">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="h-12 w-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-primary">mail</span>
+                            </div>
+                            <h2 class="text-2xl font-black text-white">Contact Us</h2>
+                        </div>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">For privacy-related queries, data requests, or concerns about how your information is handled, reach out to our team.</p>
+                        <a href="mailto:privacy@parkiyo.com" class="inline-flex items-center gap-3 bg-primary text-white font-black px-8 py-4 rounded-2xl hover:scale-105 transition-all shadow-lg shadow-primary/20">
+                            privacy@parkiyo.com
+                            <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="border-t border-white/5 bg-background-dark pt-24 pb-12">
+    <div class="container mx-auto px-6 lg:px-12">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-16 mb-20">
+            <div class="col-span-2">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]"><span class="material-symbols-outlined font-bold text-2xl">local_parking</span></div>
+                    <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+                </div>
+                <p class="text-slate-500 max-w-sm leading-relaxed mb-8 text-sm font-medium">Premium parking management software for secure operations, cleaner workflows and real-time visibility across modern facilities.</p>
+            </div>
+            <div>
+                <h5 class="text-white font-black mb-8 text-[11px] uppercase tracking-[0.2em] opacity-80">Platform</h5>
+                <ul class="space-y-4 text-slate-500 text-sm font-bold">
+                    <li><a href="features.html" class="hover:text-primary transition-colors">Features</a></li>
+                    <li><a href="solutions.html" class="hover:text-primary transition-colors">Solutions</a></li>
+                    <li><a href="analytics.html" class="hover:text-primary transition-colors">Analytics</a></li>
+                    <li><a href="faq.html" class="hover:text-primary transition-colors">Support</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="text-white font-black mb-8 text-[11px] uppercase tracking-[0.2em] opacity-80">Company</h5>
+                <ul class="space-y-4 text-slate-500 text-sm font-bold">
+                    <li><a href="faq.html" class="hover:text-primary transition-colors">Help & FAQ</a></li>
+                    <li><a href="privacy.html" class="hover:text-primary transition-colors">Privacy</a></li>
+                    <li><a href="login.html" class="hover:text-primary transition-colors">Login</a></li>
+                    <li><a href="register.html" class="hover:text-primary transition-colors">Register</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+            <p class="text-slate-600 text-[9px] tracking-[0.3em] uppercase font-bold">© 2026 Parkiyo. All rights reserved.</p>
+            <div class="flex gap-8">
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="home.html">language</a></span>
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="privacy.html">shield_person</a></span>
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="faq.html">support_agent</a></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
