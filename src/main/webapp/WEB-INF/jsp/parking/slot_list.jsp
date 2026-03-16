@@ -1,0 +1,540 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Parkiyo | Slot List</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet" />
+    <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+            rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { primary: "#1f68f9", "background-dark": "#020617" },
+                    fontFamily: { display: ["Public Sans", "sans-serif"] },
+                    borderRadius: { squircle: "14px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: #020617;
+        }
+
+        .premium-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .bg-subtle-radial {
+            background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-container {
+            width: 80px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(2, 6, 23, 0.6);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .sidebar-container:hover {
+            width: 280px;
+            background: rgba(2, 6, 23, 0.95);
+        }
+
+        .nav-label {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            margin-left: 1rem;
+        }
+
+        .sidebar-container:hover .nav-label {
+            opacity: 1;
+        }
+
+        .input-glass {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: white;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .input-glass:focus {
+            border-color: rgba(31, 104, 249, 0.5);
+            box-shadow: 0 0 0 3px rgba(31, 104, 249, 0.1);
+        }
+
+        .input-glass::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        select.input-glass option {
+            background: #0f172a;
+        }
+
+        .status-available {
+            background: rgba(16, 185, 129, 0.1);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status-occupied {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .status-maintenance {
+            background: rgba(245, 158, 11, 0.1);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .status-disabled {
+            background: rgba(100, 116, 139, 0.12);
+            color: #94a3b8;
+            border: 1px solid rgba(100, 116, 139, 0.2);
+        }
+
+        .status-pill {
+            padding: 3px 11px;
+            border-radius: 9px;
+            font-size: 0.67rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .slot-row {
+            transition: background 0.15s;
+            cursor: pointer;
+        }
+
+        .slot-row:hover {
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            display: none;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+<div class="flex flex-1 overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
+        <div class="p-6 mb-4 flex items-center">
+            <div
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+                <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
+            </div>
+            <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+        </div>
+        <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+            <a href="dashboard_admin.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
+                    class="material-symbols-outlined shrink-0">dashboard</span><span
+                    class="nav-label text-sm">Dashboard</span></a>
+            <a href="entry.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
+                    class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle
+                        Entry</span></a>
+            <a href="exitvehicle.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
+                    class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle
+                        Exit</span></a>
+            <a href="Vehicle_List_Page.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
+                    class="material-symbols-outlined shrink-0">directions_car</span><span
+                    class="nav-label text-sm">Vehicles</span></a>
+            <a href="slot_list.html"
+               class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span
+                    class="material-symbols-outlined shrink-0">grid_view</span><span
+                    class="nav-label text-sm">Parking Slots</span></a>
+            <a href="usermanagement.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
+                    class="material-symbols-outlined shrink-0">group</span><span
+                    class="nav-label text-sm">Users</span></a>
+            <a href="paymenthistory.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
+                    class="material-symbols-outlined shrink-0">payments</span><span
+                    class="nav-label text-sm">Payments</span></a>
+            <a href="Repportshubpage.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
+                    class="material-symbols-outlined shrink-0">bar_chart</span><span
+                    class="nav-label text-sm">Reports</span></a>
+            <a href="accountsetting.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
+                    class="material-symbols-outlined shrink-0">settings</span><span
+                    class="nav-label text-sm">Settings</span></a>
+        </nav>
+        <div class="p-4 border-t border-white/5">
+            <button onclick="window.location.href='logout.html'"
+                    class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                    <span class="material-symbols-outlined shrink-0"><a
+                            href="logout.html">power_settings_new</a></span><span class="nav-label"><a
+                    href="logout.html">Logout</a></span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
+        <!-- TOPBAR -->
+        <header
+                class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
+            <div>
+                <h2 class="text-xl font-black text-white">Parking Slots</h2>
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Manage all slots
+                </p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="slot_overview.html"
+                   class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
+                    <span class="material-symbols-outlined text-lg">map</span> Grid View
+                </a>
+                <a href="batchslot_generate.html"
+                   class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
+                    <span class="material-symbols-outlined text-lg">auto_awesome</span> Batch Generate
+                </a>
+                <a href="add_slot.html"
+                   class="flex items-center gap-2 bg-primary text-white font-black px-5 py-2.5 rounded-xl hover:bg-primary/80 transition-all text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(31,104,249,0.3)]">
+                    <span class="material-symbols-outlined text-lg">add</span> Add Slot
+                </a>
+                <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-primary to-blue-400 p-[2px] ml-1">
+                    <div class="h-full w-full rounded-squircle bg-background-dark flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white/50">person</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-10">
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="glass-card p-6 rounded-3xl">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Total Slots</p>
+                    <h3 class="text-3xl font-black text-white">100</h3>
+                    <p class="text-slate-500 text-[10px] font-bold mt-1">Across all zones</p>
+                </div>
+                <div class="glass-card p-6 rounded-3xl">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Available</p>
+                    <h3 class="text-3xl font-black text-emerald-400">42</h3>
+                    <p class="text-slate-500 text-[10px] font-bold mt-1">Ready for entry</p>
+                </div>
+                <div class="glass-card p-6 rounded-3xl">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Occupied</p>
+                    <h3 class="text-3xl font-black text-rose-400">51</h3>
+                    <p class="text-slate-500 text-[10px] font-bold mt-1">Currently parked</p>
+                </div>
+                <div class="glass-card p-6 rounded-3xl">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Maintenance</p>
+                    <h3 class="text-3xl font-black text-amber-400">7</h3>
+                    <p class="text-slate-500 text-[10px] font-bold mt-1">Out of service</p>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="glass-card rounded-[2rem] p-5 mb-6 flex flex-wrap gap-4 items-center">
+                <div class="flex-1 min-w-[200px] relative">
+                        <span
+                                class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg">search</span>
+                    <input type="text" placeholder="Search slot code or zone…"
+                           class="bg-white/5 rounded-2xl px-4 h-12 w-full pl-10" />
+                </div>
+                <select class="input-glass rounded-2xl px-4 h-12">
+                    <option>All Zones</option>
+                    <option>Zone A</option>
+                    <option>Zone B</option>
+                    <option>Zone C</option>
+                    <option>Zone D</option>
+                </select>
+                <select class="input-glass rounded-2xl px-4 h-12">
+                    <option>All Statuses</option>
+                    <option>Available</option>
+                    <option>Occupied</option>
+                    <option>Maintenance</option>
+                    <option>Disabled</option>
+                </select>
+                <select class="input-glass rounded-2xl px-4 h-12">
+                    <option>All Types</option>
+                    <option>Standard</option>
+                    <option>Disabled</option>
+                    <option>EV Charging</option>
+                    <option>Oversized</option>
+                </select>
+            </div>
+
+            <!-- Table -->
+            <div class="glass-card rounded-[2.5rem] overflow-hidden">
+                <div class="p-8 border-b border-white/5 flex items-center justify-between">
+                    <h3 class="text-lg font-black text-white">All Slots</h3>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">100 slots
+                            total</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                        <tr
+                                class="text-slate-500 text-[10px] font-black uppercase tracking-widest border-b border-white/5">
+                            <th class="px-8 py-5">Slot Code</th>
+                            <th class="px-8 py-5">Zone</th>
+                            <th class="px-8 py-5">Floor</th>
+                            <th class="px-8 py-5">Type</th>
+                            <th class="px-8 py-5">Status</th>
+                            <th class="px-8 py-5">Current Vehicle</th>
+                            <th class="px-8 py-5">Utilisation</th>
+                            <th class="px-8 py-5">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody class="text-sm font-bold text-slate-300 divide-y divide-white/5">
+                        <tr class="slot-row" onclick="window.location.href='edit_slot.html'">
+                            <td class="px-8 py-5"><span
+                                    class="text-white font-black tracking-wider bg-white/5 px-3 py-1.5 rounded-lg text-xs">A-12</span>
+                            </td>
+                            <td class="px-8 py-5 opacity-70">Zone A</td>
+                            <td class="px-8 py-5 opacity-70">Ground</td>
+                            <td class="px-8 py-5 opacity-70">Standard</td>
+                            <td class="px-8 py-5"><span class="status-pill status-occupied">Occupied</span></td>
+                            <td class="px-8 py-5 text-white font-black tracking-wider text-xs">ABC-1234</td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2">
+                                    <div class="h-1.5 w-20 bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-rose-500 rounded-full" style="width:78%"></div>
+                                    </div>
+                                    <span class="text-xs opacity-60">78%</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2" onclick="event.stopPropagation()">
+                                    <a href="edit_slot.html"
+                                       class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/30 transition-all"
+                                       title="Edit"><span
+                                            class="material-symbols-outlined text-sm text-slate-400">edit</span></a>
+                                    <a href="slot_usage_history.html"
+                                       class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all"
+                                       title="History"><span
+                                            class="material-symbols-outlined text-sm text-slate-400">history</span></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="slot-row" onclick="window.location.href='edit_slot.html'">
+                            <td class="px-8 py-5"><span
+                                    class="text-white font-black tracking-wider bg-white/5 px-3 py-1.5 rounded-lg text-xs">A-05</span>
+                            </td>
+                            <td class="px-8 py-5 opacity-70">Zone A</td>
+                            <td class="px-8 py-5 opacity-70">Ground</td>
+                            <td class="px-8 py-5 opacity-70">Standard</td>
+                            <td class="px-8 py-5"><span class="status-pill status-available">Available</span>
+                            </td>
+                            <td class="px-8 py-5 opacity-40">—</td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2">
+                                    <div class="h-1.5 w-20 bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-emerald-500 rounded-full" style="width:65%"></div>
+                                    </div>
+                                    <span class="text-xs opacity-60">65%</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2" onclick="event.stopPropagation()">
+                                    <a href="edit_slot.html"
+                                       class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/30 transition-all"
+                                       title="Edit"><span
+                                            class="material-symbols-outlined text-sm text-slate-400">edit</span></a>
+                                    <a href="slot_usage_history.html"
+                                       class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all"
+                                       title="History"><span
+                                            class="material-symbols-outlined text-sm text-slate-400">history</span></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="slot-row" onclick="window.location.href='edit_slot.html'">
+                            <td class="px-8 py-5"><span
+                                    class="text-amber-300 font-black tracking-wider bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-lg text-xs">B-03</span>
+                            </td>
+                            <td class="px-8 py-5 opacity-70">Zone B</td>
+                            <td class="px-8 py-5 opacity-70">Level 1</td>
+                            <td class="px-8 py-5 opacity-70">Standard</td>
+                            <td class="px-8 py-5"><span
+                                    class="status-pill status-maintenance">Maintenance</span></td>
+                            <td class="px-8 py-5 opacity-40">—</td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2">
+                                    <div class="h-1.5 w-20 bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-amber-500 rounded-full" style="width:55%"></div>
+                                    </div>
+                                    <span class="text-xs opacity-60">55%</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2" onclick="event.stopPropagation()">
+                                    <a href="edit_slot.html"
+                                       class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/30 transition-all"
+                                       title="Edit"><span
+                                            class="material-symbols-outlined text-sm text-slate-400">edit</span></a>
+                                    <a href="slot_usage_history.html"
+                                       class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all"
+                                       title="History"><span
+                                            class="material-symbols-outlined text-sm text-slate-400">history</span></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="slot-row" onclick="window.location.href='edit_slot.html'">
+                            <td class="px-8 py-5"><span
+                                    class="text-white font-black tracking-wider bg-white/5 px-3 py-1.5 rounded-lg text-xs">B-11</span>
+                            </td>
+                            <td class="px-8 py-5 opacity-70">Zone B</td>
+                            <td class="px-8 py-5 opacity-70">Level 1</td>
+                            <td class="px-8 py-5 opacity-70 flex items-center gap-1.5"><span
+                                    class="material-symbols-outlined text-emerald-400 text-base">electric_car</span>EV
+                                Charging</td>
+                            <td class="px-8 py-5"><span class="status-pill status-occupied">Occupied</span></td>
+                            <td class="px-8 py-5 text-white font-black tracking-wider text-xs">PQR-6641</td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2">
+                                    <div class="h-1.5 w-20 bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-rose-500 rounded-full" style="width:91%"></div>
+                                    </div>
+                                    <span class="text-xs opacity-60">91%</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2" onclick="event.stopPropagation()">
+                                    <a href="edit_slot.html"
+                                       class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/30 transition-all"
+                                       title="Edit"><span
+                                            class="material-symbols-outlined text-sm text-slate-400">edit</span></a>
+                                    <a href="slot_usage_history.html"
+                                       class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all"
+                                       title="History"><span
+                                            class="material-symbols-outlined text-sm text-slate-400">history</span></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="slot-row" onclick="window.location.href='edit_slot.html'">
+                            <td class="px-8 py-5"><span
+                                    class="text-slate-500 font-black tracking-wider bg-white/[0.02] border border-white/5 px-3 py-1.5 rounded-lg text-xs">C-07</span>
+                            </td>
+                            <td class="px-8 py-5 opacity-40">Zone C</td>
+                            <td class="px-8 py-5 opacity-40">Level 2</td>
+                            <td class="px-8 py-5 opacity-40 flex items-center gap-1.5"><span
+                                    class="material-symbols-outlined text-slate-500 text-base">accessible</span>Disabled
+                            </td>
+                            <td class="px-8 py-5"><span class="status-pill status-disabled">Disabled</span></td>
+                            <td class="px-8 py-5 opacity-40">—</td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2">
+                                    <div class="h-1.5 w-20 bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-slate-600 rounded-full" style="width:20%"></div>
+                                    </div>
+                                    <span class="text-xs opacity-40">20%</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2" onclick="event.stopPropagation()">
+                                    <a href="edit_slot.html"
+                                       class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/30 transition-all"
+                                       title="Edit"><span
+                                            class="material-symbols-outlined text-sm text-slate-400">edit</span></a>
+                                    <a href="slot_usage_history.html"
+                                       class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all"
+                                       title="History"><span
+                                            class="material-symbols-outlined text-sm text-slate-400">history</span></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="slot-row" onclick="window.location.href='edit_slot.html'">
+                            <td class="px-8 py-5"><span
+                                    class="text-white font-black tracking-wider bg-white/5 px-3 py-1.5 rounded-lg text-xs">D-02</span>
+                            </td>
+                            <td class="px-8 py-5 opacity-70">Zone D</td>
+                            <td class="px-8 py-5 opacity-70">Rooftop</td>
+                            <td class="px-8 py-5 opacity-70">Standard</td>
+                            <td class="px-8 py-5"><span class="status-pill status-available">Available</span>
+                            </td>
+                            <td class="px-8 py-5 opacity-40">—</td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2">
+                                    <div class="h-1.5 w-20 bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-emerald-500 rounded-full" style="width:38%"></div>
+                                    </div>
+                                    <span class="text-xs opacity-60">38%</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2" onclick="event.stopPropagation()">
+                                    <a href="edit_slot.html"
+                                       class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/30 transition-all"
+                                       title="Edit"><span
+                                            class="material-symbols-outlined text-sm text-slate-400">edit</span></a>
+                                    <a href="slot_usage_history.html"
+                                       class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all"
+                                       title="History"><span
+                                            class="material-symbols-outlined text-sm text-slate-400">history</span></a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                <div class="px-8 py-5 border-t border-white/5 flex items-center justify-between">
+                    <p class="text-xs font-bold text-slate-500">Showing 6 of 100 slots · Page 1 of 17</p>
+                    <div class="flex items-center gap-2">
+                        <button
+                                class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-white/10 transition-all"
+                                disabled>
+                            <span class="material-symbols-outlined text-sm">chevron_left</span>
+                        </button>
+                        <button class="h-9 px-4 rounded-xl bg-primary text-white font-black text-xs">1</button>
+                        <button
+                                class="h-9 px-4 rounded-xl bg-white/5 border border-white/10 text-slate-400 font-black text-xs hover:bg-white/10 transition-all">2</button>
+                        <button
+                                class="h-9 px-4 rounded-xl bg-white/5 border border-white/10 text-slate-400 font-black text-xs hover:bg-white/10 transition-all">3</button>
+                        <span class="text-slate-500 text-xs font-bold px-1">…</span>
+                        <button
+                                class="h-9 px-4 rounded-xl bg-white/5 border border-white/10 text-slate-400 font-black text-xs hover:bg-white/10 transition-all">17</button>
+                        <button
+                                class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-white/10 transition-all">
+                            <span class="material-symbols-outlined text-sm">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+
+</html>
