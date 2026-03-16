@@ -1,0 +1,533 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Parkiyo | Vehicle Entry</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet" />
+    <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+            rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { primary: "#1f68f9", "background-dark": "#020617" },
+                    fontFamily: { display: ["Public Sans", "sans-serif"] },
+                    borderRadius: { squircle: "14px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: #020617;
+        }
+
+        .premium-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .bg-subtle-radial {
+            background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-container {
+            width: 80px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(2, 6, 23, 0.6);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .sidebar-container:hover {
+            width: 280px;
+            background: rgba(2, 6, 23, 0.95);
+        }
+
+        .nav-label {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            margin-left: 1rem;
+        }
+
+        .sidebar-container:hover .nav-label {
+            opacity: 1;
+        }
+
+        .plate-input {
+            background: rgba(255, 255, 255, 0.06);
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            border-radius: 16px;
+            padding: 18px 24px;
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            text-align: center;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            outline: none;
+            width: 100%;
+        }
+
+        .plate-input:focus {
+            border-color: #1f68f9;
+            box-shadow: 0 0 0 4px rgba(31, 104, 249, 0.15);
+        }
+
+        .plate-input::placeholder {
+            color: rgba(255, 255, 255, 0.1);
+            font-size: 1.5rem;
+            letter-spacing: 0.1em;
+        }
+
+        .input-glass {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: white;
+            border-radius: 12px;
+            padding: 11px 16px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            outline: none;
+            width: 100%;
+        }
+
+        .input-glass:focus {
+            border-color: rgba(31, 104, 249, 0.5);
+            box-shadow: 0 0 0 3px rgba(31, 104, 249, 0.1);
+        }
+
+        select.input-glass option {
+            background: #0f172a;
+        }
+
+        label.field-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #64748b;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .slot-chip {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .slot-chip:hover {
+            border-color: rgba(31, 104, 249, 0.4);
+            background: rgba(31, 104, 249, 0.06);
+        }
+
+        .slot-chip.selected {
+            border-color: #1f68f9;
+            background: rgba(31, 104, 249, 0.12);
+        }
+
+        .slot-chip p.code {
+            font-size: 0.8rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            color: white;
+        }
+
+        .slot-chip p.zone {
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .slot-chip.selected p.code {
+            color: #60a5fa;
+        }
+
+        .notify-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 14px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            display: none;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+<div class="flex flex-1 overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
+        <div class="p-6 mb-4 flex items-center">
+            <div
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+                <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
+            </div>
+            <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+        </div>
+        <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+            <a href="dashboard_admin.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">dashboard</span>
+                <span class="nav-label text-sm">Dashboard</span>
+            </a>
+            <a href="entry_admin.html"
+               class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
+                <span class="material-symbols-outlined shrink-0">login</span>
+                <span class="nav-label text-sm">Vehicle Entry</span>
+            </a>
+            <a href="exitvehicle_admin.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">logout</span>
+                <span class="nav-label text-sm">Vehicle Exit</span>
+            </a>
+            <a href="slot_overview.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">grid_view</span>
+                <span class="nav-label text-sm">Parking Slots</span>
+            </a>
+            <a href="Vehicle_List_Page.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">directions_car</span>
+                <span class="nav-label text-sm">Vehicles</span>
+            </a>
+            <a href="usermanagement.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">group</span>
+                <span class="nav-label text-sm">Users</span>
+            </a>
+            <a href="paymenthistory.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">payments</span>
+                <span class="nav-label text-sm">Payments</span>
+            </a>
+            <a href="Repportshubpage.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">bar_chart</span>
+                <span class="nav-label text-sm">Reports</span>
+            </a>
+            <a href="notification.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">notifications</span>
+                <span class="nav-label text-sm">Notifications</span>
+            </a>
+            <a href="systemstatuspage.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">monitor_heart</span>
+                <span class="nav-label text-sm">System Status</span>
+            </a>
+            <a href="accountsetting.html"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">settings</span>
+                <span class="nav-label text-sm">Settings</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-white/5">
+            <button onclick="window.location.href='logout.html'"
+                    class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                <span class="material-symbols-outlined shrink-0"><a href="logout.html">power_settings_new</a></span><span
+                    class="nav-label"><a href="logout.html">Logout</a></span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
+        <!-- TOPBAR -->
+        <header
+                class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
+            <div>
+                <h2 class="text-xl font-black text-white">Vehicle Entry</h2>
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Register a vehicle
+                    entering the facility</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden xl:block">
+                    <p class="text-xs font-black text-white uppercase tracking-widest">Maria Santos</p>
+                    <p class="text-[10px] text-primary font-bold uppercase tracking-tighter">Admin</p>
+                </div>
+                <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-emerald-400 to-primary p-[2px]">
+                    <div class="h-full w-full rounded-squircle bg-background-dark flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white/50">person</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-10">
+            <div class="max-w-2xl mx-auto space-y-8">
+
+                <!-- Availability strip -->
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="glass-card p-5 rounded-2xl flex items-center gap-3">
+                        <span class="h-2.5 w-2.5 rounded-full bg-emerald-400 shrink-0"></span>
+                        <div>
+                            <p class="text-xl font-black text-emerald-400">42</p>
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Available Now
+                            </p>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl flex items-center gap-3">
+                        <span class="h-2.5 w-2.5 rounded-full bg-rose-400 shrink-0"></span>
+                        <div>
+                            <p class="text-xl font-black text-rose-400">51</p>
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Occupied</p>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl flex items-center gap-3">
+                        <span class="h-2.5 w-2.5 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
+                        <div>
+                            <p class="text-xl font-black text-white" id="clock">—</p>
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Current Time
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 1: Plate lookup -->
+                <div class="glass-card rounded-[2.5rem] p-8" id="step1">
+                    <h3 class="text-base font-black text-white mb-2">Step 1 — Enter Plate Number</h3>
+                    <p class="text-[11px] text-slate-500 font-bold mb-6">Scan QR or type the license plate to look
+                        up the vehicle.</p>
+                    <div class="relative mb-4">
+                        <input id="plateField" type="text" placeholder="e.g. ABC-1234"
+                               class="text-center pt-3 plate-input bg-white/5 backdrop-blur-md border border-white/20 text-lg justify-center rounded-3xl"
+                               oninput="this.value=this.value.toUpperCase()"
+                               onkeydown="if(event.key==='Enter')lookupPlate()" />
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="lookupPlate()"
+                                class="flex-1 flex items-center justify-center gap-2 bg-primary text-white font-black py-3.5 rounded-2xl hover:bg-primary/80 transition-all text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(31,104,249,0.25)]">
+                            <span class="material-symbols-outlined text-lg">search</span> Look Up
+                        </button>
+                        <button
+                                class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-3.5 rounded-2xl hover:bg-white/10 transition-all text-sm">
+                            <span class="material-symbols-outlined text-lg">qr_code_scanner</span> Scan QR
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Vehicle found card (hidden initially) -->
+                <div class="glass-card rounded-[2.5rem] p-8 hidden border border-emerald-500/15 bg-emerald-500/5"
+                     id="vehicleCard">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-base font-black text-white">Step 2 — Vehicle Found</h3>
+                        <span
+                                class="flex items-center gap-1 text-[10px] font-black text-emerald-400 uppercase tracking-wider"><span
+                                class="material-symbols-outlined text-sm">check_circle</span>Registered</span>
+                    </div>
+                    <div class="flex items-center gap-5 p-5 rounded-2xl bg-black/20 border border-white/5 mb-6">
+                        <div
+                                class="h-12 w-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-primary text-xl">directions_car</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-2xl font-black text-white tracking-widest" id="foundPlate">ABC-1234</p>
+                            <p class="text-slate-400 text-sm font-bold" id="foundDetails">Toyota Prius · Silver ·
+                                Kamal Perera</p>
+                        </div>
+                        <span
+                                class="text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-lg">Active</span>
+                    </div>
+
+                    <!-- Slot selection -->
+                    <h4 class="text-sm font-black text-white mb-3">Step 3 — Assign Slot</h4>
+                    <p class="text-[11px] text-slate-500 font-bold mb-4">Select an available slot or let the system
+                        auto-assign.</p>
+                    <div class="grid grid-cols-5 gap-2 mb-4" id="slotGrid">
+                        <div class="slot-chip selected" onclick="selectSlot(this,'A-02')">
+                            <p class="code">A-02</p>
+                            <p class="zone">Zone A</p>
+                        </div>
+                        <div class="slot-chip" onclick="selectSlot(this,'A-05')">
+                            <p class="code">A-05</p>
+                            <p class="zone">Zone A</p>
+                        </div>
+                        <div class="slot-chip" onclick="selectSlot(this,'A-07')">
+                            <p class="code">A-07</p>
+                            <p class="zone">Zone A</p>
+                        </div>
+                        <div class="slot-chip" onclick="selectSlot(this,'A-10')">
+                            <p class="code">A-10</p>
+                            <p class="zone">Zone A</p>
+                        </div>
+                        <div class="slot-chip" onclick="selectSlot(this,'B-01')">
+                            <p class="code">B-01</p>
+                            <p class="zone">Zone B</p>
+                        </div>
+                        <div class="slot-chip" onclick="selectSlot(this,'B-02')">
+                            <p class="code">B-02</p>
+                            <p class="zone">Zone B</p>
+                        </div>
+                        <div class="slot-chip" onclick="selectSlot(this,'B-05')">
+                            <p class="code">B-05</p>
+                            <p class="zone">Zone B</p>
+                        </div>
+                        <div class="slot-chip" onclick="selectSlot(this,'B-06')">
+                            <p class="code">B-06</p>
+                            <p class="zone">Zone B</p>
+                        </div>
+                        <div class="slot-chip" onclick="selectSlot(this,'B-08')">
+                            <p class="code">B-08</p>
+                            <p class="zone">Zone B</p>
+                        </div>
+                        <div class="slot-chip" onclick="selectSlot(this,'D-01')">
+                            <p class="code">D-01</p>
+                            <p class="zone">Zone D</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 mb-6 text-xs font-bold text-slate-500">
+                        <span class="material-symbols-outlined text-primary text-base">info</span>
+                        Selected: <span class="text-white font-black" id="selectedSlotLabel">A-02 (Zone A · Ground
+                                Floor)</span>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="mb-6">
+                        <label class="field-label">Entry Notes (optional)</label>
+                        <input type="text" placeholder="e.g. VIP, reservation, daily pass…"
+                               class="input-glass px-4 h-12 rounded-2xl" />
+                    </div>
+
+                    <!-- Confirm -->
+                    <button onclick="confirmEntry()"
+                            class="w-full flex items-center justify-center gap-3 bg-primary text-white font-black py-4 rounded-2xl hover:bg-primary/80 transition-all text-base shadow-[0_0_25px_rgba(31,104,249,0.3)]">
+                        <span class="material-symbols-outlined text-xl">login</span> Confirm Entry
+                    </button>
+                </div>
+
+                <!-- Success state (hidden) -->
+                <div id="successCard" class="hidden">
+                    <div class="glass-card rounded-[2.5rem] p-8 border border-emerald-500/20 bg-emerald-500/5">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div
+                                    class="h-14 w-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center shrink-0">
+                                    <span
+                                            class="material-symbols-outlined text-emerald-400 text-3xl">check_circle</span>
+                            </div>
+                            <div>
+                                <p class="text-xl font-black text-white">Entry Confirmed!</p>
+                                <p class="text-emerald-400 text-sm font-bold mt-0.5">Vehicle checked in successfully
+                                </p>
+                            </div>
+                            <span class="ml-auto text-[10px] font-black uppercase tracking-widest text-slate-500"
+                                  id="entryTime"></span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="p-4 rounded-2xl bg-black/20 border border-white/5">
+                                <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">Plate
+                                </p>
+                                <p class="text-white font-black tracking-widest">ABC-1234</p>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-black/20 border border-white/5">
+                                <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">Slot
+                                </p>
+                                <p class="text-white font-black" id="confirmedSlot">A-02</p>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-black/20 border border-white/5">
+                                <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">
+                                    Operator</p>
+                                <p class="text-white font-black">Maria Santos</p>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-black/20 border border-white/5">
+                                <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">
+                                    Session ID</p>
+                                <p class="text-slate-400 font-black font-mono text-xs">SES-20260309-092</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <a href="parkingticket.html"
+                               class="flex-1 flex items-center justify-center gap-2 bg-primary/10 border border-primary/20 text-primary font-black py-3 rounded-2xl hover:bg-primary/20 transition-all text-sm">
+                                <span class="material-symbols-outlined text-base">receipt</span> Print Ticket
+                            </a>
+                            <button onclick="resetForm()"
+                                    class="flex-1 flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black py-3 rounded-2xl hover:bg-white/10 transition-all text-sm">
+                                <span class="material-symbols-outlined text-base">add</span> New Entry
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    // Clock
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    setInterval(updateClock, 1000); updateClock();
+
+    let selectedSlot = 'A-02';
+
+    function lookupPlate() {
+        const val = document.getElementById('plateField').value.trim();
+        if (!val) return;
+        document.getElementById('vehicleCard').classList.remove('hidden');
+        document.getElementById('foundPlate').textContent = val || 'ABC-1234';
+        document.getElementById('vehicleCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function selectSlot(el, code) {
+        document.querySelectorAll('.slot-chip').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedSlot = code;
+        document.getElementById('selectedSlotLabel').textContent = `${code} (Zone ${code.charAt(0)} · ${code.charAt(0) === 'D' ? 'Rooftop' : code.charAt(0) === 'C' ? 'Level 2' : code.charAt(0) === 'B' ? 'Level 1' : 'Ground Floor'})`;
+    }
+
+    function confirmEntry() {
+        document.getElementById('vehicleCard').classList.add('hidden');
+        document.getElementById('successCard').classList.remove('hidden');
+        document.getElementById('confirmedSlot').textContent = selectedSlot;
+        const now = new Date();
+        document.getElementById('entryTime').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('successCard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function resetForm() {
+        document.getElementById('plateField').value = '';
+        document.getElementById('vehicleCard').classList.add('hidden');
+        document.getElementById('successCard').classList.add('hidden');
+        document.getElementById('plateField').focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+</body>
+
+</html>

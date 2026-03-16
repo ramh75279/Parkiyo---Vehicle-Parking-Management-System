@@ -1,0 +1,297 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Parkiyo | Signing Out</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet" />
+    <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+            rel="stylesheet" />
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#1f68f9", "background-dark": "#020617" }, fontFamily: { display: ["Public Sans", "sans-serif"] } } } }</script>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: #020617;
+        }
+
+        .bg-subtle-radial {
+            background: radial-gradient(circle at 50% 40%, #0f1f3d 0%, #020617 65%);
+        }
+
+        /* Logo animation */
+        .logo-wrap {
+            animation: logo-drop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes logo-drop {
+            from {
+                opacity: 0;
+                transform: translateY(-24px) scale(0.8)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1)
+            }
+        }
+
+        /* Fade-in stagger for children */
+        .fade-in {
+            opacity: 0;
+            animation: fade-up 0.5s ease forwards;
+        }
+
+        @keyframes fade-up {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 3px solid rgba(31, 104, 249, 0.15);
+            border-top-color: #1f68f9;
+            animation: spin 0.9s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        /* Progress bar */
+        .progress {
+            height: 3px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #1f68f9, #60a5fa);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* Particle dots */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particle-fade 2s ease-out forwards;
+        }
+
+        @keyframes particle-fade {
+            0% {
+                opacity: 0.7;
+                transform: translate(0, 0)
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(var(--px), var(--py))
+            }
+        }
+
+        /* Checkmark swap */
+        .check-circle {
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .check-circle.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+    </style>
+</head>
+
+<body class="text-slate-100 font-display antialiased min-h-screen flex flex-col bg-subtle-radial overflow-hidden">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+
+<!-- Particle layer -->
+<div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
+
+<div class="flex-1 flex items-center justify-center p-8 relative z-10">
+    <div class="w-full max-w-sm text-center space-y-8">
+
+        <!-- Logo -->
+        <div class="logo-wrap flex items-center justify-center gap-3">
+            <div
+                    class="h-12 w-12 rounded-[16px] bg-primary flex items-center justify-center shadow-[0_0_30px_rgba(31,104,249,0.5)]">
+                <span class="material-symbols-outlined text-white text-2xl">local_parking</span>
+            </div>
+            <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+        </div>
+
+        <!-- Card -->
+        <div class="fade-in" style="animation-delay:0.15s">
+            <div
+                    style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:2rem;padding:2.5rem 2rem;">
+
+                <!-- Spinner / check swap -->
+                <div class="flex items-center justify-center mb-6 relative h-16">
+                    <div class="spinner absolute" id="spinnerEl"></div>
+                    <div class="check-circle absolute h-14 w-14 rounded-full bg-emerald-500/12 border-2 border-emerald-500 flex items-center justify-center"
+                         id="checkEl" style="background:rgba(16,185,129,0.1)">
+                        <span class="material-symbols-outlined text-emerald-400 text-3xl">check</span>
+                    </div>
+                </div>
+
+                <h2 class="text-xl font-black text-white mb-2" id="titleEl">Signing you out…</h2>
+                <p class="text-slate-500 font-bold text-sm mb-6" id="subEl">Please wait while we securely end your
+                    session.</p>
+
+                <!-- Progress bar -->
+                <div class="progress mb-6">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <!-- Step list -->
+                <div class="space-y-3 text-left mb-6" id="stepList">
+                    <div class="flex items-center gap-3" id="s1">
+                        <div class="h-6 w-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0"
+                             id="s1dot">
+                            <span class="text-slate-600 text-[10px] font-black">1</span>
+                        </div>
+                        <p class="text-xs font-bold text-slate-500" id="s1text">Saving session state</p>
+                    </div>
+                    <div class="flex items-center gap-3 opacity-40" id="s2">
+                        <div class="h-6 w-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0"
+                             id="s2dot">
+                            <span class="text-slate-600 text-[10px] font-black">2</span>
+                        </div>
+                        <p class="text-xs font-bold text-slate-500" id="s2text">Clearing credentials</p>
+                    </div>
+                    <div class="flex items-center gap-3 opacity-40" id="s3">
+                        <div class="h-6 w-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0"
+                             id="s3dot">
+                            <span class="text-slate-600 text-[10px] font-black">3</span>
+                        </div>
+                        <p class="text-xs font-bold text-slate-500" id="s3text">Redirecting to login</p>
+                    </div>
+                </div>
+
+                <!-- Action buttons (hidden until done) -->
+                <div id="actionBtns" class="hidden space-y-3">
+                    <a href="login.html"
+                       class="w-full flex items-center justify-center gap-2 bg-primary text-white font-black py-3.5 rounded-2xl hover:bg-primary/80 transition-all text-sm shadow-[0_0_20px_rgba(31,104,249,0.3)]">
+                        <span class="material-symbols-outlined text-base">login</span> Sign In Again
+                    </a>
+                    <a href="home.html"
+                       class="w-full flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-sm">
+                        <span class="material-symbols-outlined text-base">home</span> Back to Home
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Session summary -->
+        <div class="fade-in" style="animation-delay:0.3s">
+            <div
+                    style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:1.5rem;padding:1.25rem 1.5rem;">
+                <p class="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-3">Session Summary</p>
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div>
+                        <p class="text-base font-black text-white">5</p>
+                        <p class="text-[9px] font-black uppercase tracking-wider text-slate-600 mt-0.5">Entries</p>
+                    </div>
+                    <div>
+                        <p class="text-base font-black text-emerald-400">$87.25</p>
+                        <p class="text-[9px] font-black uppercase tracking-wider text-slate-600 mt-0.5">Collected
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-base font-black text-white">2h 14m</p>
+                        <p class="text-[9px] font-black uppercase tracking-wider text-slate-600 mt-0.5">On Shift</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="fade-in text-[10px] text-slate-700 font-bold" style="animation-delay:0.4s">
+            © 2026 Parkiyo · All rights reserved
+        </p>
+    </div>
+</div>
+
+<script>
+    // Spawn particles
+    const colors = ['#1f68f9', '#3b82f6', '#10b981', '#6366f1'];
+    for (let i = 0; i < 20; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = 4 + Math.random() * 6;
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
+        const px = (Math.random() - 0.5) * 200;
+        const py = (Math.random() - 0.5) * 200;
+        p.style.cssText = `width:${size}px;height:${size}px;left:${x}px;top:${y}px;background:${colors[i % colors.length]};--px:${px}px;--py:${py}px;animation-delay:${Math.random() * 1.5}s;opacity:0.4;`;
+        document.getElementById('particles').appendChild(p);
+    }
+
+    // Step completion helper
+    function completeStep(n) {
+        const dot = document.getElementById(`s${n}dot`);
+        const row = document.getElementById(`s${n}`);
+        dot.innerHTML = '<span class="material-symbols-outlined text-emerald-400" style="font-size:14px">check</span>';
+        dot.style.background = 'rgba(16,185,129,0.15)';
+        dot.style.borderColor = 'rgba(16,185,129,0.4)';
+        row.classList.remove('opacity-40');
+        document.getElementById(`s${n}text`).classList.remove('text-slate-500');
+        document.getElementById(`s${n}text`).classList.add('text-white');
+        if (n < 3) {
+            document.getElementById(`s${n + 1}`).classList.remove('opacity-40');
+        }
+    }
+
+    // Animate progress
+    const fill = document.getElementById('progressFill');
+    let prog = 0;
+    const interval = setInterval(() => {
+        prog += 1.8;
+        fill.style.width = Math.min(prog, 100) + '%';
+        if (prog >= 30) completeStep(1);
+        if (prog >= 65) completeStep(2);
+        if (prog >= 100) {
+            clearInterval(interval);
+            completeStep(3);
+            // Swap spinner → check
+            document.getElementById('spinnerEl').style.display = 'none';
+            document.getElementById('checkEl').classList.add('show');
+            document.getElementById('titleEl').textContent = 'Signed out successfully';
+            document.getElementById('titleEl').classList.add('text-emerald-400');
+            document.getElementById('titleEl').classList.remove('text-white');
+            document.getElementById('subEl').textContent = 'Your session has been securely closed.';
+            // Show action buttons
+            document.getElementById('actionBtns').classList.remove('hidden');
+            // Auto-redirect after 2.5s
+            setTimeout(() => window.location.href = 'login.html', 2500);
+        }
+    }, 50);
+</script>
+</body>
+
+</html>
