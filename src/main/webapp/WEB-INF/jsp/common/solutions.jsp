@@ -1,0 +1,185 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Parkiyo | Solutions</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { primary: "#1f68f9", "background-dark": "#020617" },
+                    fontFamily: { display: ["Public Sans", "sans-serif"] },
+                    borderRadius: { squircle: "14px", xl: "1.5rem", "2xl": "2rem", "3xl": "3rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .premium-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .bg-subtle-radial { background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 70%); }
+        .glass-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display antialiased bg-subtle-radial">
+<header class="sticky top-0 z-50 w-full border-b border-white/5 bg-background-dark/75 premium-blur">
+    <div class="container mx-auto flex h-20 items-center justify-between px-6 lg:px-12">
+        <a href="home.html" class="flex items-center gap-4">
+            <div class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]">
+                <span class="material-symbols-outlined font-bold">local_parking</span>
+            </div>
+            <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+        </a>
+        <nav class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
+            <a class="hover:text-primary" href="home.html">Home</a>
+            <a class="hover:text-primary" href="features.html">Features</a>
+            <a class="text-primary" href="solutions.html">Solutions</a>
+            <a class="hover:text-primary" href="analytics.html">Analytics</a>
+            <a class="hover:text-primary" href="faq.html">Support</a>
+        </nav>
+        <div class="flex items-center gap-6">
+            <a href="login.html" class="text-sm font-bold text-slate-300 hover:text-white">Login</a>
+            <a href="register.html" class="bg-primary text-white text-sm font-bold px-7 py-3 rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/30">Get Started</a>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="container mx-auto px-6 pt-24 pb-20 lg:px-12">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.2em] mb-6">
+                    Tailored Solutions
+                </div>
+                <h1 class="text-5xl lg:text-7xl font-black leading-[1.05] tracking-tight text-white">
+                    Built for every kind of parking environment.
+                </h1>
+                <p class="mt-8 text-lg text-slate-400 max-w-xl leading-relaxed">
+                    Whether you manage a campus, mall, private lot, hotel, or enterprise facility, Parkiyo gives you an elevated operating system for parking.
+                </p>
+            </div>
+            <div class="relative">
+                <div class="absolute -inset-4 rounded-[3rem] bg-gradient-to-tr from-primary/30 to-blue-600/10 blur-3xl opacity-50"></div>
+                <div class="relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl">
+                    <img src="https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&q=80&w=1400" alt="Luxury city parking" class="h-[460px] w-full object-cover"/>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-6 pb-24 lg:px-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="glass-card rounded-[2.5rem] p-10">
+                <p class="text-[10px] font-black uppercase tracking-[0.22em] text-primary mb-3">Shopping Malls</p>
+                <h3 class="text-3xl font-black text-white mb-4">Handle heavy vehicle flow with less friction.</h3>
+                <p class="text-slate-400 leading-relaxed">Improve slot visibility, receipt generation and queue handling during peak customer traffic.</p>
+            </div>
+
+            <div class="glass-card rounded-[2.5rem] p-10">
+                <p class="text-[10px] font-black uppercase tracking-[0.22em] text-primary mb-3">Hotels & Hospitality</p>
+                <h3 class="text-3xl font-black text-white mb-4">Deliver a more premium guest arrival experience.</h3>
+                <p class="text-slate-400 leading-relaxed">Make entry smoother, reservations clearer and parking operations more elegant for staff and visitors.</p>
+            </div>
+
+            <div class="glass-card rounded-[2.5rem] p-10">
+                <p class="text-[10px] font-black uppercase tracking-[0.22em] text-primary mb-3">Campuses</p>
+                <h3 class="text-3xl font-black text-white mb-4">Manage larger parking footprints with confidence.</h3>
+                <p class="text-slate-400 leading-relaxed">Track multiple areas, organize slot usage and support users with more controlled operations.</p>
+            </div>
+
+            <div class="glass-card rounded-[2.5rem] p-10">
+                <p class="text-[10px] font-black uppercase tracking-[0.22em] text-primary mb-3">Private Facilities</p>
+                <h3 class="text-3xl font-black text-white mb-4">Keep local operations simple and efficient.</h3>
+                <p class="text-slate-400 leading-relaxed">Use Parkiyo to manage daily entry, exit, payment and receipts without operational clutter.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-6 pb-28 lg:px-12">
+        <div class="glass-card rounded-[3rem] overflow-hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2">
+                <div class="p-10 lg:p-14">
+                    <p class="text-[10px] font-black uppercase tracking-[0.22em] text-primary mb-3">Why Teams Choose Parkiyo</p>
+                    <h2 class="text-4xl font-black text-white mb-6">Luxury visuals. Practical operations.</h2>
+                    <p class="text-slate-400 leading-relaxed">Parkiyo is designed to feel polished on the surface while solving real parking workflow problems underneath.</p>
+                </div>
+                <div class="bg-white/[0.02] p-10 lg:p-14 border-t lg:border-t-0 lg:border-l border-white/5">
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-primary">done_all</span>
+                            <p class="text-slate-300">Cleaner operator workflows</p>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-primary">done_all</span>
+                            <p class="text-slate-300">Better slot and payment visibility</p>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-primary">done_all</span>
+                            <p class="text-slate-300">Admin and user flow separation</p>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-primary">done_all</span>
+                            <p class="text-slate-300">A premium product feel throughout the system</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="border-t border-white/5 bg-background-dark pt-24 pb-12">
+    <div class="container mx-auto px-6 lg:px-12">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-16 mb-20">
+            <div class="col-span-2">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]">
+                        <span class="material-symbols-outlined font-bold text-2xl">local_parking</span>
+                    </div>
+                    <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+                </div>
+                <p class="text-slate-500 max-w-sm leading-relaxed mb-8 text-sm font-medium">
+                    Premium parking management software for secure operations, cleaner workflows and real-time visibility across modern facilities.
+                </p>
+            </div>
+
+            <div>
+                <h5 class="text-white font-black mb-8 text-[11px] uppercase tracking-[0.2em] opacity-80">Platform</h5>
+                <ul class="space-y-4 text-slate-500 text-sm font-bold">
+                    <li><a href="features.html" class="hover:text-primary transition-colors">Features</a></li>
+                    <li><a href="solutions.html" class="hover:text-primary transition-colors">Solutions</a></li>
+                    <li><a href="analytics.html" class="hover:text-primary transition-colors">Analytics</a></li>
+                    <li><a href="faq.html" class="hover:text-primary transition-colors">Support</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h5 class="text-white font-black mb-8 text-[11px] uppercase tracking-[0.2em] opacity-80">Company</h5>
+                <ul class="space-y-4 text-slate-500 text-sm font-bold">
+                    <li><a href="faq.html" class="hover:text-primary transition-colors">Help & FAQ</a></li>
+                    <li><a href="privacy.html" class="hover:text-primary transition-colors">Privacy</a></li>
+                    <li><a href="login.html" class="hover:text-primary transition-colors">Login</a></li>
+                    <li><a href="register.html" class="hover:text-primary transition-colors">Register</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+            <p class="text-slate-600 text-[9px] tracking-[0.3em] uppercase font-bold">© 2026 Parkiyo. All rights reserved.</p>
+            <div class="flex gap-8">
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="home.html">language</a></span>
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="privacy.html">shield_person</a></span>
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="faq.html">support_agent</a></span>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
