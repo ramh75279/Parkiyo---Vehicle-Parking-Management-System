@@ -1,0 +1,153 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Parkiyo | Payment Successful</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script>tailwind.config={darkMode:"class",theme:{extend:{colors:{primary:"#1f68f9","background-dark":"#020617"},fontFamily:{display:["Public Sans","sans-serif"]}}}}</script>
+    <style>
+        body{font-family:'Public Sans',sans-serif;background-color:#020617;}
+        .premium-blur{backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+        .bg-subtle-radial{background:radial-gradient(circle at 0% 0%,#1e293b 0%,#020617 100%);}
+        .glass-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);}
+        .meta-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+        .meta-row:last-child{border-bottom:none;}
+        .meta-lbl{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;}
+        .meta-val{font-size:0.85rem;font-weight:800;color:white;text-align:right;}
+
+        /* Confetti burst */
+        .confetti-dot{position:absolute;width:8px;height:8px;border-radius:50%;animation:confetti-fall 1.2s ease-out forwards;}
+        @keyframes confetti-fall{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0.3)}}
+
+        /* Glow ring */
+        .glow-ring{animation:glow-pulse 2s ease-in-out infinite;}
+        @keyframes glow-pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.3)}50%{box-shadow:0 0 0 20px rgba(16,185,129,0)}}
+
+        /* Ticket tear line */
+        .tear{height:1px;background:repeating-linear-gradient(90deg,transparent,transparent 8px,rgba(255,255,255,0.08) 8px,rgba(255,255,255,0.08) 16px);position:relative;margin:0 -4px;}
+        .tear::before,.tear::after{content:'';position:absolute;top:-10px;width:20px;height:20px;background:#020617;border-radius:50%;}
+        .tear::before{left:-14px;} .tear::after{right:-14px;}
+        ::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:10px;}
+    </style>
+</head>
+<body class="text-slate-100 font-display antialiased min-h-screen flex flex-col bg-subtle-radial">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+
+<div class="flex-1 flex items-center justify-center p-8 min-h-[calc(100vh-6px)]">
+    <div class="w-full max-w-md space-y-6">
+
+        <!-- Brand -->
+        <div class="flex items-center justify-center gap-3">
+            <div class="h-10 w-10 rounded-[14px] bg-primary flex items-center justify-center shadow-[0_0_20px_rgba(31,104,249,0.4)]">
+                <span class="material-symbols-outlined text-white text-xl">local_parking</span>
+            </div>
+            <span class="text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+        </div>
+
+        <!-- Success hero -->
+        <div class="glass-card rounded-[2.5rem] p-10 text-center border border-emerald-500/15 relative overflow-hidden" id="heroCard">
+            <!-- Subtle green glow bg -->
+            <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(circle at 50% 0%,rgba(16,185,129,0.06) 0%,transparent 70%)"></div>
+
+            <!-- Check icon with confetti anchor -->
+            <div class="flex items-center justify-center mb-6 relative" id="confettiAnchor">
+                <div class="h-20 w-20 rounded-full bg-emerald-500/12 border-2 border-emerald-500 flex items-center justify-center glow-ring" style="background:rgba(16,185,129,0.1)">
+                    <span class="material-symbols-outlined text-emerald-400 text-4xl">check_circle</span>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-black text-white mb-2">Payment Successful!</h2>
+            <p class="text-slate-400 font-bold text-sm mb-8">Your reservation is confirmed and slot is secured.</p>
+
+            <!-- Amount pill -->
+            <div class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 px-6 py-3 rounded-2xl mb-8">
+                <span class="material-symbols-outlined text-emerald-400 text-xl">payments</span>
+                <span class="text-2xl font-black">$16.50</span>
+                <span class="text-xs font-bold opacity-60 ml-1">paid</span>
+            </div>
+
+            <!-- Confirmation mini-ticket -->
+            <div class="bg-black/20 border border-white/5 rounded-2xl overflow-hidden mb-6">
+                <div class="p-5 bg-primary/5">
+                    <div class="flex items-center justify-between">
+                        <div class="text-left">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Reservation</p>
+                            <p class="font-mono text-xs text-slate-400">RES-20260311-047</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Transaction</p>
+                            <p class="font-mono text-xs text-slate-400">TXN-88291047</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="tear mx-4"></div>
+                <div class="p-5 grid grid-cols-2 gap-y-4 gap-x-6 text-left">
+                    <div><p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-0.5">Vehicle</p><p class="text-sm font-black text-white tracking-wider">XYZ-8899</p></div>
+                    <div><p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-0.5">Slot</p><p class="text-sm font-black text-primary">C-03</p></div>
+                    <div><p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-0.5">Date</p><p class="text-sm font-black text-white">11 Mar 2026</p></div>
+                    <div><p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-0.5">Time</p><p class="text-sm font-black text-white">09:00 – 12:00</p></div>
+                    <div><p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-0.5">Method</p><p class="text-sm font-black text-white">Parkiyo Wallet</p></div>
+                    <div><p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-0.5">Paid At</p><p class="text-sm font-black text-white" id="paidAt">—</p></div>
+                </div>
+            </div>
+
+            <p class="text-[10px] text-slate-600 font-bold">A confirmation email has been sent · Receipt available below</p>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="grid grid-cols-2 gap-3">
+            <a href="receipt.html" class="flex items-center justify-center gap-2 bg-primary text-white font-black py-4 rounded-2xl hover:bg-primary/80 transition-all text-sm shadow-[0_0_20px_rgba(31,104,249,0.3)]">
+                <span class="material-symbols-outlined text-base">receipt_long</span> Receipt
+            </a>
+            <a href="advancereservation.html" class="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black py-4 rounded-2xl hover:bg-white/10 transition-all text-sm">
+                <span class="material-symbols-outlined text-base">event_available</span> My Bookings
+            </a>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <a href="walletoverview.html" class="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-400 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-xs">
+                <span class="material-symbols-outlined text-base">account_balance_wallet</span> Wallet
+            </a>
+            <a href="dashboard_user.html" class="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-400 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-xs">
+                <span class="material-symbols-outlined text-base">home</span> Dashboard
+            </a>
+        </div>
+
+        <p class="text-center text-[10px] text-slate-600 font-bold flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-slate-600 text-sm">lock</span>
+            Secured by Parkiyo Pay · Reference: TXN-88291047
+        </p>
+    </div>
+</div>
+
+<script>
+    // Set paid time
+    const now = new Date();
+    document.getElementById('paidAt').textContent = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+
+    // Confetti burst on load
+    const anchor = document.getElementById('confettiAnchor');
+    const colors = ['#10b981','#1f68f9','#f59e0b','#a78bfa','#34d399','#60a5fa'];
+    for (let i = 0; i < 18; i++) {
+        const dot = document.createElement('div');
+        const angle = (i / 18) * 2 * Math.PI;
+        const dist = 55 + Math.random() * 40;
+        dot.className = 'confetti-dot';
+        dot.style.cssText = `
+            background:${colors[i % colors.length]};
+            --tx:${Math.cos(angle)*dist}px;
+            --ty:${Math.sin(angle)*dist - 20}px;
+            left:50%; top:50%;
+            transform:translate(-50%,-50%);
+            animation-delay:${Math.random()*0.2}s;
+            animation-duration:${0.9 + Math.random()*0.4}s;
+        `;
+        anchor.appendChild(dot);
+    }
+</script>
+</body>
+</html>
