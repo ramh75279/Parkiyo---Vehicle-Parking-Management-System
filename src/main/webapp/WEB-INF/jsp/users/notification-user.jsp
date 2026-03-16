@@ -212,7 +212,7 @@
                                         class="text-[10px] font-black text-primary hover:brightness-125 transition-all">Mark
                                     read</button>
                                 <span class="text-slate-700">·</span>
-                                <a href="edit_slot.html"
+                                <a href="edit-slot.html"
                                    class="text-[10px] font-black text-slate-400 hover:text-white transition-all">View
                                     slot</a>
                             </div>
@@ -268,7 +268,7 @@
                                         class="text-[10px] font-black text-primary hover:brightness-125 transition-all">Mark
                                     read</button>
                                 <span class="text-slate-700">·</span>
-                                <a href="slot_overview.html"
+                                <a href="slot-overview.html"
                                    class="text-[10px] font-black text-slate-400 hover:text-white transition-all">View
                                     map</a>
                             </div>
@@ -360,7 +360,7 @@
         }
     }
 
-    // ── Role-aware sidebar (matches dashboard_user.html reference exactly) ──
+    // ── Role-aware sidebar (matches dashboard-user.html reference exactly) ──
     (function buildSidebar() {
         const params = new URLSearchParams(window.location.search);
         let role = params.get('role') || localStorage.getItem('parkiyo_role') || 'user';
@@ -376,25 +376,25 @@
             `<a href="${href}" class="${isActive ? a : n}"><span class="material-symbols-outlined shrink-0">${icon}</span><span class="nav-label text-sm">${label}</span></a>`;
 
         const userLinks = [
-            lnk('dashboard_user.html', 'dashboard', 'Dashboard', false),
+            lnk('dashboard-user.html', 'dashboard', 'Dashboard', false),
             lnk('entry.html', 'login', 'Vehicle Entry', false),
             lnk('exitvehicle.html', 'logout', 'Vehicle Exit', false),
             lnk('parking.html', 'local_parking', 'Active Parking', false),
             lnk('advancereservation.html', 'event_available', 'Reservation', false),
-            lnk('paymenthistory_user.html', 'payments', 'Payments', false),
+            lnk('paymenthistory-user.html', 'payments', 'Payments', false),
             lnk('receipt.html', 'receipt_long', 'Receipts', false),
             lnk('walletoverview.html', 'account_balance_wallet', 'Wallet', false),
-            lnk('notification_user.html', 'notifications', 'Notifications', true),
-            lnk('accountsetting_user.html', 'settings', 'Account Settings', false),
+            lnk('notification-user.html', 'notifications', 'Notifications', true),
+            lnk('accountsetting-user.html', 'settings', 'Account Settings', false),
         ];
 
         const adminLinks = [
-            lnk('dashboard_admin.html', 'dashboard', 'Dashboard', false),
+            lnk('dashboard-admin.html', 'dashboard', 'Dashboard', false),
             lnk('entry.html', 'login', 'Vehicle Entry', false),
             lnk('exitvehicle.html', 'logout', 'Vehicle Exit', false),
-            lnk('slot_overview.html', 'grid_view', 'Parking Slots', false),
+            lnk('slot-overview.html', 'grid_view', 'Parking Slots', false),
             lnk('usermanagement.html', 'group', 'Users', false),
-            lnk('Repportshubpage.html', 'bar_chart', 'Reports', false),
+            lnk('repportshubpage.html', 'bar_chart', 'Reports', false),
             lnk('notification.html', 'notifications', 'Notifications', true),
             lnk('accountsetting.html', 'settings', 'Settings', false),
         ];

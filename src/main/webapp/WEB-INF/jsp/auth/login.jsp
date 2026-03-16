@@ -131,7 +131,7 @@
                                 <input type="checkbox" id="rememberMe" class="w-4 h-4 rounded accent-primary"/>
                                 <span class="text-sm text-slate-400 font-medium">Remember me</span>
                             </label>
-                            <a href="forgotpassword.html" class="text-sm font-bold text-primary hover:brightness-125 transition-all">Forgot password?</a>
+                            <a href="forgot-password.html" class="text-sm font-bold text-primary hover:brightness-125 transition-all">Forgot password?</a>
                         </div>
 
                         <div class="pt-2">
@@ -258,10 +258,10 @@
         // Demo role routing
         if (email === 'admin@parkiyo.com' && pw === 'admin123') {
             showMsg('success', 'Login successful. Redirecting to admin dashboard...');
-            setTimeout(() => window.location.href = 'dashboard_admin.html', 1200);
+            setTimeout(() => window.location.href = 'dashboard-admin.html', 1200);
         } else if (pw.length >= 6) {
             showMsg('success', 'Login successful. Redirecting...');
-            setTimeout(() => window.location.href = 'dashboard_user.html', 1200);
+            setTimeout(() => window.location.href = 'dashboard-user.html', 1200);
         } else {
             showMsg('error', 'Invalid credentials. Please check your email and password.');
         }

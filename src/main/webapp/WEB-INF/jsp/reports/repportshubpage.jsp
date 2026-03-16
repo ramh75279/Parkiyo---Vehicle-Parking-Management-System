@@ -103,27 +103,27 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a href="dashboard_admin.html"
+            <a href="dashboard-admin.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">dashboard</span>
                 <span class="nav-label text-sm">Dashboard</span>
             </a>
-            <a href="entry_admin.html"
+            <a href="entry-admin.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">login</span>
                 <span class="nav-label text-sm">Vehicle Entry</span>
             </a>
-            <a href="exitvehicle_admin.html"
+            <a href="exitvehicle-admin.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">logout</span>
                 <span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a href="slot_overview.html"
+            <a href="slot-overview.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">grid_view</span>
                 <span class="nav-label text-sm">Parking Slots</span>
             </a>
-            <a href="Vehicle_List_Page.html"
+            <a href="vehicle-list-page.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">directions_car</span>
                 <span class="nav-label text-sm">Vehicles</span>
@@ -138,7 +138,7 @@
                 <span class="material-symbols-outlined shrink-0">payments</span>
                 <span class="nav-label text-sm">Payments</span>
             </a>
-            <a href="Repportshubpage.html"
+            <a href="repportshubpage.html"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                 <span class="material-symbols-outlined shrink-0">bar_chart</span>
                 <span class="nav-label text-sm">Reports</span>
@@ -321,7 +321,7 @@
                 </div>
 
                 <div class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer"
-                     onclick="window.location.href='slot_usage_history.html'">
+                     onclick="window.location.href='slot-usage-history.html'">
                     <div
                             class="h-14 w-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined text-cyan-400 text-2xl">history</span>

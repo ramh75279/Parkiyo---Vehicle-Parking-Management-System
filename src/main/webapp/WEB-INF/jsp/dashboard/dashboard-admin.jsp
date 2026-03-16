@@ -96,23 +96,23 @@
         </div>
 
         <nav class="flex-1 px-3 space-y-2 overflow-y-auto">
-            <a href="dashboard_admin.html" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
+            <a href="dashboard-admin.html" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                 <span class="material-symbols-outlined shrink-0">dashboard</span>
                 <span class="nav-label text-sm">Dashboard</span>
             </a>
-            <a href="entry_admin.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a href="entry-admin.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">login</span>
                 <span class="nav-label text-sm">Vehicle Entry</span>
             </a>
-            <a href="exitvehicle_admin.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a href="exitvehicle-admin.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">logout</span>
                 <span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a href="slot_overview.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a href="slot-overview.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">grid_view</span>
                 <span class="nav-label text-sm">Parking Slots</span>
             </a>
-            <a href="Vehicle_List_Page.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a href="vehicle-list-page.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">directions_car</span>
                 <span class="nav-label text-sm">Vehicles</span>
             </a>
@@ -124,7 +124,7 @@
                 <span class="material-symbols-outlined shrink-0">payments</span>
                 <span class="nav-label text-sm">Payments</span>
             </a>
-            <a href="Repportshubpage.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a href="repportshubpage.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">bar_chart</span>
                 <span class="nav-label text-sm">Reports</span>
             </a>
@@ -354,13 +354,13 @@
                         <a href="createuser.html" class="rounded-2xl bg-white/5 border border-white/10 p-4 hover:bg-white/10 transition">
                             <p class="text-xs font-black uppercase tracking-widest text-white">Add User</p>
                         </a>
-                        <a href="add_slot.html" class="rounded-2xl bg-white/5 border border-white/10 p-4 hover:bg-white/10 transition">
+                        <a href="add-slot.html" class="rounded-2xl bg-white/5 border border-white/10 p-4 hover:bg-white/10 transition">
                             <p class="text-xs font-black uppercase tracking-widest text-white">Add Slot</p>
                         </a>
-                        <a href="Vehicle_Import_Page.html" class="rounded-2xl bg-white/5 border border-white/10 p-4 hover:bg-white/10 transition">
+                        <a href="vehicle-import-page.html" class="rounded-2xl bg-white/5 border border-white/10 p-4 hover:bg-white/10 transition">
                             <p class="text-xs font-black uppercase tracking-widest text-white">Import Vehicles</p>
                         </a>
-                        <a href="Repportshubpage.html" class="rounded-2xl bg-white/5 border border-white/10 p-4 hover:bg-white/10 transition">
+                        <a href="repportshubpage.html" class="rounded-2xl bg-white/5 border border-white/10 p-4 hover:bg-white/10 transition">
                             <p class="text-xs font-black uppercase tracking-widest text-white">View Reports</p>
                         </a>
                     </div>

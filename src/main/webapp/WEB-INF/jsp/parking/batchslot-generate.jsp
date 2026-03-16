@@ -150,7 +150,7 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a href="dashboard_admin.html"
+            <a href="dashboard-admin.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">dashboard</span><span
                     class="nav-label text-sm">Dashboard</span></a>
@@ -162,11 +162,11 @@
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle
                         Exit</span></a>
-            <a href="Vehicle_List_Page.html"
+            <a href="vehicle-list-page.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">directions_car</span><span
                     class="nav-label text-sm">Vehicles</span></a>
-            <a href="slot_list.html"
+            <a href="slot-list.html"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span
                     class="material-symbols-outlined shrink-0">grid_view</span><span
                     class="nav-label text-sm">Parking Slots</span></a>
@@ -178,7 +178,7 @@
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">payments</span><span
                     class="nav-label text-sm">Payments</span></a>
-            <a href="Repportshubpage.html"
+            <a href="repportshubpage.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">bar_chart</span><span
                     class="nav-label text-sm">Reports</span></a>
@@ -200,7 +200,7 @@
         <header
                 class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
             <div class="flex items-center gap-4">
-                <button onclick="window.location.href='slot_list.html'"
+                <button onclick="window.location.href='slot-list.html'"
                         class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
                     <span class="material-symbols-outlined text-slate-400">arrow_back</span>
                 </button>
@@ -332,11 +332,11 @@
 
                 <!-- Actions -->
                 <div class="flex items-center justify-between pb-4">
-                    <button onclick="window.location.href='slot_list.html'"
+                    <button onclick="window.location.href='slot-list.html'"
                             class="px-8 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-black text-sm hover:bg-white/10 transition-all">Cancel</button>
                     <div class="flex items-center gap-3">
                         <p class="text-xs text-slate-500 font-bold">Need one slot?</p>
-                        <a href="add_slot.html"
+                        <a href="add-slot.html"
                            class="text-primary text-xs font-black hover:brightness-125 transition-all">Single slot
                             →</a>
                         <button onclick="generate()"
@@ -358,10 +358,10 @@
                                 active in Zone A.</p>
                         </div>
                         <div class="flex gap-3">
-                            <a href="slot_overview.html"
+                            <a href="slot-overview.html"
                                class="bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-black px-4 py-2.5 rounded-xl text-xs hover:bg-emerald-500/30 transition-all">View
                                 Map →</a>
-                            <a href="slot_list.html"
+                            <a href="slot-list.html"
                                class="text-emerald-400/60 font-bold text-xs hover:text-emerald-400 transition-all py-2">Back
                                 to list</a>
                         </div>

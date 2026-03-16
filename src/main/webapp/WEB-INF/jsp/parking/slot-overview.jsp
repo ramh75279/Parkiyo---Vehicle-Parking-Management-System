@@ -207,27 +207,27 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a href="dashboard_admin.html"
+            <a href="dashboard-admin.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">dashboard</span>
                 <span class="nav-label text-sm">Dashboard</span>
             </a>
-            <a href="entry_admin.html"
+            <a href="entry-admin.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">login</span>
                 <span class="nav-label text-sm">Vehicle Entry</span>
             </a>
-            <a href="exitvehicle_admin.html"
+            <a href="exitvehicle-admin.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">logout</span>
                 <span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a href="slot_overview.html"
+            <a href="slot-overview.html"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                 <span class="material-symbols-outlined shrink-0">grid_view</span>
                 <span class="nav-label text-sm">Parking Slots</span>
             </a>
-            <a href="Vehicle_List_Page.html"
+            <a href="vehicle-list-page.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">directions_car</span>
                 <span class="nav-label text-sm">Vehicles</span>
@@ -242,7 +242,7 @@
                 <span class="material-symbols-outlined shrink-0">payments</span>
                 <span class="nav-label text-sm">Payments</span>
             </a>
-            <a href="Repportshubpage.html"
+            <a href="repportshubpage.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">bar_chart</span>
                 <span class="nav-label text-sm">Reports</span>
@@ -283,11 +283,11 @@
                 </p>
             </div>
             <div class="flex items-center gap-3">
-                <a href="slot_list.html"
+                <a href="slot-list.html"
                    class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
                     <span class="material-symbols-outlined text-lg">list</span> List View
                 </a>
-                <a href="add_slot.html"
+                <a href="add-slot.html"
                    class="flex items-center gap-2 bg-primary text-white font-black px-5 py-2.5 rounded-xl hover:bg-primary/80 transition-all text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(31,104,249,0.25)]">
                     <span class="material-symbols-outlined text-lg">add</span> Add Slot
                 </a>
@@ -366,27 +366,27 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-3">
-                    <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-rose-400 text-lg">directions_car</span><span
                             class="slot-code">A-01</span><span class="plate">ABC-1234</span>
                         <div class="slot-tooltip text-white">A-01 · Occupied<br>ABC-1234 · 2h 14m</div>
                     </div>
-                    <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-emerald-400 text-lg">check</span><span
                             class="slot-code">A-02</span>
                         <div class="slot-tooltip text-white">A-02 · Available</div>
                     </div>
-                    <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-rose-400 text-lg">directions_car</span><span
                             class="slot-code">A-03</span><span class="plate">XYZ-8899</span>
                         <div class="slot-tooltip text-white">A-03 · Occupied<br>XYZ-8899 · 1h 05m</div>
                     </div>
-                    <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-rose-400 text-lg">directions_car</span><span
                             class="slot-code">A-04</span><span class="plate">MNO-3310</span>
                         <div class="slot-tooltip text-white">A-04 · Occupied</div>
                     </div>
-                    <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-emerald-400 text-lg">check</span><span
                             class="slot-code">A-05</span>
                         <div class="slot-tooltip text-white">A-05 · Available</div>
@@ -396,37 +396,37 @@
                             class="slot-code">A-06</span>
                         <div class="slot-tooltip text-white">A-06 · Maintenance</div>
                     </div>
-                    <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-emerald-400 text-lg">check</span><span
                             class="slot-code">A-07</span>
                         <div class="slot-tooltip text-white">A-07 · Available</div>
                     </div>
-                    <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-rose-400 text-lg">directions_car</span><span
                             class="slot-code">A-08</span><span class="plate">GHI-7721</span>
                         <div class="slot-tooltip text-white">A-08 · Occupied</div>
                     </div>
-                    <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-rose-400 text-lg">directions_car</span><span
                             class="slot-code">A-09</span><span class="plate">KLM-9012</span>
                         <div class="slot-tooltip text-white">A-09 · Occupied</div>
                     </div>
-                    <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-emerald-400 text-lg">check</span><span
                             class="slot-code">A-10</span>
                         <div class="slot-tooltip text-white">A-10 · Available</div>
                     </div>
-                    <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-rose-400 text-lg">directions_car</span><span
                             class="slot-code">A-11</span><span class="plate">PQR-6641</span>
                         <div class="slot-tooltip text-white">A-11 · Occupied</div>
                     </div>
-                    <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-rose-400 text-lg">directions_car</span><span
                             class="slot-code">A-12</span><span class="plate">ABC-1234</span>
                         <div class="slot-tooltip text-white">A-12 · Occupied<br>ABC-1234 · 2h 14m</div>
                     </div>
-                    <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-emerald-400 text-lg">check</span><span
                             class="slot-code">A-13</span>
                         <div class="slot-tooltip text-white">A-13 · Available</div>
@@ -436,7 +436,7 @@
                             class="slot-code">A-14</span>
                         <div class="slot-tooltip text-white">A-14 · Maintenance</div>
                     </div>
-                    <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-rose-400 text-lg">directions_car</span><span
                             class="slot-code">A-15</span><span class="plate">TRK-5502</span>
                         <div class="slot-tooltip text-white">A-15 · Occupied</div>
@@ -457,12 +457,12 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-3">
-                    <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-emerald-400 text-lg">check</span><span
                             class="slot-code">B-01</span>
                         <div class="slot-tooltip text-white">B-01 · Available</div>
                     </div>
-                    <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-emerald-400 text-lg">check</span><span
                             class="slot-code">B-02</span>
                         <div class="slot-tooltip text-white">B-02 · Available</div>
@@ -472,42 +472,42 @@
                             class="slot-code">B-03</span>
                         <div class="slot-tooltip text-white">B-03 · Maintenance</div>
                     </div>
-                    <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-rose-400 text-lg">directions_car</span><span
                             class="slot-code">B-04</span><span class="plate">XYZ-8899</span>
                         <div class="slot-tooltip text-white">B-04 · Occupied</div>
                     </div>
-                    <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-emerald-400 text-lg">check</span><span
                             class="slot-code">B-05</span>
                         <div class="slot-tooltip text-white">B-05 · Available</div>
                     </div>
-                    <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-emerald-400 text-lg">check</span><span
                             class="slot-code">B-06</span>
                         <div class="slot-tooltip text-white">B-06 · Available</div>
                     </div>
-                    <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-rose-400 text-lg">directions_car</span><span
                             class="slot-code">B-07</span><span class="plate">BIK-3311</span>
                         <div class="slot-tooltip text-white">B-07 · Occupied</div>
                     </div>
-                    <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-emerald-400 text-lg">check</span><span
                             class="slot-code">B-08</span>
                         <div class="slot-tooltip text-white">B-08 · Available</div>
                     </div>
-                    <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-rose-400 text-lg">directions_car</span><span
                             class="slot-code">B-09</span><span class="plate">JKL-9988</span>
                         <div class="slot-tooltip text-white">B-09 · Occupied</div>
                     </div>
-                    <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-emerald-400 text-lg">check</span><span
                             class="slot-code">B-10</span>
                         <div class="slot-tooltip text-white">B-10 · Available</div>
                     </div>
-                    <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                    <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                             class="material-symbols-outlined text-rose-400 text-lg">directions_car</span><span
                             class="slot-code">B-11</span><span class="plate">PQR-6641</span>
                         <div class="slot-tooltip text-white">B-11 · Occupied</div>
@@ -534,37 +534,37 @@
                         </div>
                     </div>
                     <div class="flex flex-wrap gap-2.5">
-                        <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-rose-400 text-base">directions_car</span><span
                                 class="slot-code" style="font-size:0.6rem">C-01</span><span
                                 class="plate">MKL-0033</span></div>
-                        <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-emerald-400 text-base">check</span><span
                                 class="slot-code" style="font-size:0.6rem">C-02</span></div>
-                        <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-emerald-400 text-base">check</span><span
                                 class="slot-code" style="font-size:0.6rem">C-03</span></div>
-                        <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-rose-400 text-base">directions_car</span><span
                                 class="slot-code" style="font-size:0.6rem">C-04</span><span
                                 class="plate">GHI-7721</span></div>
                         <div class="slot-cell maintenance"><span
                                 class="material-symbols-outlined text-amber-400 text-base">build</span><span
                                 class="slot-code" style="font-size:0.6rem">C-05</span></div>
-                        <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-emerald-400 text-base">check</span><span
                                 class="slot-code" style="font-size:0.6rem">C-06</span></div>
                         <div class="slot-cell disabled"><span
                                 class="material-symbols-outlined text-slate-600 text-base">block</span><span
                                 class="slot-code" style="font-size:0.6rem">C-07</span></div>
-                        <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-rose-400 text-base">directions_car</span><span
                                 class="slot-code" style="font-size:0.6rem">C-08</span><span
                                 class="plate">TRK-5502</span></div>
-                        <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-emerald-400 text-base">check</span><span
                                 class="slot-code" style="font-size:0.6rem">C-09</span></div>
-                        <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-rose-400 text-base">directions_car</span><span
                                 class="slot-code" style="font-size:0.6rem">C-10</span><span
                                 class="plate">JKL-9988</span></div>
@@ -583,36 +583,36 @@
                         </div>
                     </div>
                     <div class="flex flex-wrap gap-2.5">
-                        <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-emerald-400 text-base">check</span><span
                                 class="slot-code" style="font-size:0.6rem">D-01</span></div>
-                        <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-emerald-400 text-base">check</span><span
                                 class="slot-code" style="font-size:0.6rem">D-02</span></div>
-                        <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-rose-400 text-base">directions_car</span><span
                                 class="slot-code" style="font-size:0.6rem">D-03</span><span
                                 class="plate">BIK-3311</span></div>
-                        <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-emerald-400 text-base">check</span><span
                                 class="slot-code" style="font-size:0.6rem">D-04</span></div>
-                        <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-emerald-400 text-base">check</span><span
                                 class="slot-code" style="font-size:0.6rem">D-05</span></div>
-                        <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-emerald-400 text-base">check</span><span
                                 class="slot-code" style="font-size:0.6rem">D-06</span></div>
-                        <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-rose-400 text-base">directions_car</span><span
                                 class="slot-code" style="font-size:0.6rem">D-07</span><span
                                 class="plate">MKL-0033</span></div>
-                        <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-emerald-400 text-base">check</span><span
                                 class="slot-code" style="font-size:0.6rem">D-08</span></div>
-                        <div class="slot-cell available" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell available" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-emerald-400 text-base">check</span><span
                                 class="slot-code" style="font-size:0.6rem">D-09</span></div>
-                        <div class="slot-cell occupied" onclick="window.location.href='edit_slot.html'"><span
+                        <div class="slot-cell occupied" onclick="window.location.href='edit-slot.html'"><span
                                 class="material-symbols-outlined text-rose-400 text-base">directions_car</span><span
                                 class="slot-code" style="font-size:0.6rem">D-10</span><span
                                 class="plate">ABC-1234</span></div>

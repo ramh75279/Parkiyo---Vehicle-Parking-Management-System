@@ -512,28 +512,28 @@
             `<a href="${href}" class="${active ? a : n}"><span class="material-symbols-outlined shrink-0">${icon}</span><span class="nav-label text-sm">${label}</span></a>`;
 
         const adminLinks = [
-            lnk('dashboard_admin.html', 'dashboard', 'Dashboard', false),
-            lnk('entry_admin.html', 'login', 'Vehicle Entry', false),
-            lnk('exitvehicle_admin.html', 'logout', 'Vehicle Exit', false),
-            lnk('slot_overview.html', 'grid_view', 'Parking Slots', false),
-            lnk('Vehicle_List_Page.html', 'directions_car', 'Vehicles', false),
+            lnk('dashboard-admin.html', 'dashboard', 'Dashboard', false),
+            lnk('entry-admin.html', 'login', 'Vehicle Entry', false),
+            lnk('exitvehicle-admin.html', 'logout', 'Vehicle Exit', false),
+            lnk('slot-overview.html', 'grid_view', 'Parking Slots', false),
+            lnk('vehicle-list-page.html', 'directions_car', 'Vehicles', false),
             lnk('usermanagement.html', 'group', 'Users', false),
             lnk('paymenthistory.html', 'payments', 'Payments', false),
-            lnk('Repportshubpage.html', 'bar_chart', 'Reports', false),
+            lnk('repportshubpage.html', 'bar_chart', 'Reports', false),
             lnk('notification.html', 'notifications', 'Notifications', false),
             lnk('systemstatuspage.html', 'monitor_heart', 'System Status', false),
             lnk('accountsetting.html', 'settings', 'Account Settings', true),
         ];
 
         const userLinks = [
-            lnk('dashboard_admin.html', 'dashboard', 'Dashboard', false),
-            lnk('entry_admin.html', 'login', 'Vehicle Entry', false),
-            lnk('exitvehicle_admin.html', 'logout', 'Vehicle Exit', false),
-            lnk('slot_overview.html', 'grid_view', 'Parking Slots', false),
-            lnk('Vehicle_List_Page.html', 'directions_car', 'Vehicles', false),
+            lnk('dashboard-admin.html', 'dashboard', 'Dashboard', false),
+            lnk('entry-admin.html', 'login', 'Vehicle Entry', false),
+            lnk('exitvehicle-admin.html', 'logout', 'Vehicle Exit', false),
+            lnk('slot-overview.html', 'grid_view', 'Parking Slots', false),
+            lnk('vehicle-list-page.html', 'directions_car', 'Vehicles', false),
             lnk('usermanagement.html', 'group', 'Users', false),
             lnk('paymenthistory.html', 'payments', 'Payments', false),
-            lnk('Repportshubpage.html', 'bar_chart', 'Reports', false),
+            lnk('repportshubpage.html', 'bar_chart', 'Reports', false),
             lnk('notification.html', 'notifications', 'Notifications', false),
             lnk('systemstatuspage.html', 'monitor_heart', 'System Status', false),
             lnk('accountsetting.html', 'settings', 'Account Settings', true),
@@ -565,16 +565,16 @@
         const lnk = (href, icon, label, isActive) =>
             `<a href="${href}" class="${isActive ? a : n}"><span class="material-symbols-outlined shrink-0">${icon}</span><span class="nav-label text-sm">${label}</span></a>`;
 
-        // ── USER SIDEBAR (exact from dashboard_user.html reference) ──
+        // ── USER SIDEBAR (exact from dashboard-user.html reference) ──
         const userLinks = [
-            lnk('dashboard_admin.html', 'dashboard', 'Dashboard', false),
-            lnk('entry_admin.html', 'login', 'Vehicle Entry', false),
-            lnk('exitvehicle_admin.html', 'logout', 'Vehicle Exit', false),
-            lnk('slot_overview.html', 'grid_view', 'Parking Slots', false),
-            lnk('Vehicle_List_Page.html', 'directions_car', 'Vehicles', false),
+            lnk('dashboard-admin.html', 'dashboard', 'Dashboard', false),
+            lnk('entry-admin.html', 'login', 'Vehicle Entry', false),
+            lnk('exitvehicle-admin.html', 'logout', 'Vehicle Exit', false),
+            lnk('slot-overview.html', 'grid_view', 'Parking Slots', false),
+            lnk('vehicle-list-page.html', 'directions_car', 'Vehicles', false),
             lnk('usermanagement.html', 'group', 'Users', false),
             lnk('paymenthistory.html', 'payments', 'Payments', false),
-            lnk('Repportshubpage.html', 'bar_chart', 'Reports', false),
+            lnk('repportshubpage.html', 'bar_chart', 'Reports', false),
             lnk('notification.html', 'notifications', 'Notifications', false),
             lnk('systemstatuspage.html', 'monitor_heart', 'System Status', false),
             lnk('accountsetting.html', 'settings', 'Account Settings', true),
@@ -582,12 +582,12 @@
 
         // ── ADMIN SIDEBAR ──
         const adminLinks = [
-            lnk('dashboard_admin.html', 'dashboard', 'Dashboard', false),
+            lnk('dashboard-admin.html', 'dashboard', 'Dashboard', false),
             lnk('entry.html', 'login', 'Vehicle Entry', false),
             lnk('exitvehicle.html', 'logout', 'Vehicle Exit', false),
-            lnk('slot_overview.html', 'grid_view', 'Parking Slots', false),
+            lnk('slot-overview.html', 'grid_view', 'Parking Slots', false),
             lnk('usermanagement.html', 'group', 'Users', false),
-            lnk('Repportshubpage.html', 'bar_chart', 'Reports', false),
+            lnk('repportshubpage.html', 'bar_chart', 'Reports', false),
             lnk('notification.html', 'notifications', 'Notifications', false),
             lnk('accountsetting.html', 'settings', 'Settings', true),
         ];

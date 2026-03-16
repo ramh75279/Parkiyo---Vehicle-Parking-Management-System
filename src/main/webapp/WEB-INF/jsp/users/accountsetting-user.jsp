@@ -512,20 +512,20 @@
             `<a href="${href}" class="${active ? a : n}"><span class="material-symbols-outlined shrink-0">${icon}</span><span class="nav-label text-sm">${label}</span></a>`;
 
         const adminLinks = [
-            lnk('dashboard_user.html', 'dashboard', 'Dashboard', false),
+            lnk('dashboard-user.html', 'dashboard', 'Dashboard', false),
             lnk('entry.html', 'login', 'Vehicle Entry', false),
             lnk('exitvehicle.html', 'logout', 'Vehicle Exit', false),
             lnk('parking.html', 'local_parking', 'Active Parking', false),
             lnk('advancereservation.html', 'event_available', 'Reservation', false),
-            lnk('paymenthistory_user.html', 'payments', 'Payments', false),
+            lnk('paymenthistory-user.html', 'payments', 'Payments', false),
             lnk('receipt.html', 'receipt_long', 'Receipts', false),
             lnk('walletoverview.html', 'account_balance_wallet', 'Wallet', false),
-            lnk('notification_user.html', 'notifications', 'Notifications', false),
-            lnk('accountsetting_user.html', 'settings', 'Account Settings', true),
+            lnk('notification-user.html', 'notifications', 'Notifications', false),
+            lnk('accountsetting-user.html', 'settings', 'Account Settings', true),
         ];
 
         const userLinks = [
-            lnk('dashboard_user.html', 'dashboard', 'Dashboard', false),
+            lnk('dashboard-user.html', 'dashboard', 'Dashboard', false),
             lnk('entry.html', 'login', 'Vehicle Entry', false),
             lnk('exitvehicle.html', 'logout', 'Vehicle Exit', false),
             lnk('parking.html', 'local_parking', 'Active Parking', false),
@@ -562,32 +562,32 @@
         const lnk = (href, icon, label, isActive) =>
             `<a href="${href}" class="${isActive ? a : n}"><span class="material-symbols-outlined shrink-0">${icon}</span><span class="nav-label text-sm">${label}</span></a>`;
 
-        // ── USER SIDEBAR (exact from dashboard_user.html reference) ──
+        // ── USER SIDEBAR (exact from dashboard-user.html reference) ──
         const userLinks = [
-            lnk('dashboard_user.html', 'dashboard', 'Dashboard', false),
+            lnk('dashboard-user.html', 'dashboard', 'Dashboard', false),
             lnk('entry.html', 'login', 'Vehicle Entry', false),
             lnk('exitvehicle.html', 'logout', 'Vehicle Exit', false),
             lnk('parking.html', 'local_parking', 'Active Parking', false),
             lnk('advancereservation.html', 'event_available', 'Reservation', false),
-            lnk('paymenthistory_user.html', 'payments', 'Payments', false),
+            lnk('paymenthistory-user.html', 'payments', 'Payments', false),
             lnk('receipt.html', 'receipt_long', 'Receipts', false),
             lnk('walletoverview.html', 'account_balance_wallet', 'Wallet', false),
-            lnk('notification_user.html', 'notifications', 'Notifications', false),
-            lnk('accountsetting_user.html', 'settings', 'Account Settings', true),
+            lnk('notification-user.html', 'notifications', 'Notifications', false),
+            lnk('accountsetting-user.html', 'settings', 'Account Settings', true),
         ];
 
         // ── ADMIN SIDEBAR ──
         const adminLinks = [
-            lnk('dashboard_user.html', 'dashboard', 'Dashboard', false),
+            lnk('dashboard-user.html', 'dashboard', 'Dashboard', false),
             lnk('entry.html', 'login', 'Vehicle Entry', false),
             lnk('exitvehicle.html', 'logout', 'Vehicle Exit', false),
             lnk('parking.html', 'local_parking', 'Active Parking', false),
             lnk('advancereservation.html', 'event_available', 'Reservation', false),
-            lnk('paymenthistory_user.html', 'payments', 'Payments', false),
+            lnk('paymenthistory-user.html', 'payments', 'Payments', false),
             lnk('receipt.html', 'receipt_long', 'Receipts', false),
             lnk('walletoverview.html', 'account_balance_wallet', 'Wallet', false),
-            lnk('notification_user.html', 'notifications', 'Notifications', false),
-            lnk('accountsetting_user.html', 'settings', 'Account Settings', true),
+            lnk('notification-user.html', 'notifications', 'Notifications', false),
+            lnk('accountsetting-user.html', 'settings', 'Account Settings', true),
         ];
 
         nav.innerHTML = (role === 'admin' ? adminLinks : userLinks).join('');

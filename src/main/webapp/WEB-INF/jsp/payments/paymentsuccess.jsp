@@ -112,7 +112,7 @@
             <a href="walletoverview.html" class="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-400 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-xs">
                 <span class="material-symbols-outlined text-base">account_balance_wallet</span> Wallet
             </a>
-            <a href="dashboard_user.html" class="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-400 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-xs">
+            <a href="dashboard-user.html" class="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-400 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-xs">
                 <span class="material-symbols-outlined text-base">home</span> Dashboard
             </a>
         </div>

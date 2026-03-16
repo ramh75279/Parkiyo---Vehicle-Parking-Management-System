@@ -58,14 +58,14 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a href="dashboard_admin.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">dashboard</span><span class="nav-label text-sm">Dashboard</span></a>
-            <a href="entry_admin.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle Entry</span></a>
-            <a href="exitvehicle_admin.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span></a>
-            <a href="Vehicle_List_Page.html" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span class="material-symbols-outlined shrink-0">directions_car</span><span class="nav-label text-sm">Vehicles</span></a>
-            <a href="slot_overview.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">grid_view</span><span class="nav-label text-sm">Parking Slots</span></a>
+            <a href="dashboard-admin.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">dashboard</span><span class="nav-label text-sm">Dashboard</span></a>
+            <a href="entry-admin.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle Entry</span></a>
+            <a href="exitvehicle-admin.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span></a>
+            <a href="vehicle-list-page.html" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span class="material-symbols-outlined shrink-0">directions_car</span><span class="nav-label text-sm">Vehicles</span></a>
+            <a href="slot-overview.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">grid_view</span><span class="nav-label text-sm">Parking Slots</span></a>
             <a href="usermanagement.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">group</span><span class="nav-label text-sm">Users</span></a>
             <a href="paymenthistory.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">payments</span><span class="nav-label text-sm">Payments</span></a>
-            <a href="Repportshubpage.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">bar_chart</span><span class="nav-label text-sm">Reports</span></a>
+            <a href="repportshubpage.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">bar_chart</span><span class="nav-label text-sm">Reports</span></a>
             <a href="accountsetting.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">settings</span><span class="nav-label text-sm">Settings</span></a>
         </nav>
         <div class="p-4 border-t border-white/5">
@@ -79,7 +79,7 @@
         <!-- TOPBAR -->
         <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
             <div class="flex items-center gap-4">
-                <button onclick="window.location.href='Vehicle_List_Page.html'" class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                <button onclick="window.location.href='vehicle-list-page.html'" class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
                     <span class="material-symbols-outlined text-slate-400">arrow_back</span>
                 </button>
                 <div>
@@ -88,7 +88,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <a href="Add_Vehicle_Page.html" class="flex items-center gap-2 bg-primary text-white font-black px-5 py-2.5 rounded-xl hover:bg-primary/80 transition-all text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(31,104,249,0.25)]">
+                <a href="add-vehicle-page.html" class="flex items-center gap-2 bg-primary text-white font-black px-5 py-2.5 rounded-xl hover:bg-primary/80 transition-all text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(31,104,249,0.25)]">
                     <span class="material-symbols-outlined text-lg">add</span> Add Vehicle
                 </a>
                 <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
@@ -155,7 +155,7 @@
             <!-- Vehicle grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" id="vehicleGrid">
 
-                <a href="Vehicle_Details_Page.html" class="veh-card" data-cat="car">
+                <a href="vehicle-details-page.html" class="veh-card" data-cat="car">
                     <div class="flex items-center justify-between mb-4">
                         <span class="material-symbols-outlined text-blue-400 text-3xl">directions_car</span>
                         <span class="status-pill status-parked">Parked</span>
@@ -168,7 +168,7 @@
                     </div>
                 </a>
 
-                <a href="Vehicle_Details_Page.html" class="veh-card" data-cat="car">
+                <a href="vehicle-details-page.html" class="veh-card" data-cat="car">
                     <div class="flex items-center justify-between mb-4">
                         <span class="material-symbols-outlined text-blue-400 text-3xl">directions_car</span>
                         <span class="status-pill status-active">Active</span>
@@ -181,7 +181,7 @@
                     </div>
                 </a>
 
-                <a href="Vehicle_Details_Page.html" class="veh-card" data-cat="motorcycle">
+                <a href="vehicle-details-page.html" class="veh-card" data-cat="motorcycle">
                     <div class="flex items-center justify-between mb-4">
                         <span class="material-symbols-outlined text-amber-400 text-3xl">two_wheeler</span>
                         <span class="status-pill status-active">Active</span>
@@ -194,7 +194,7 @@
                     </div>
                 </a>
 
-                <a href="Vehicle_Details_Page.html" class="veh-card" data-cat="van">
+                <a href="vehicle-details-page.html" class="veh-card" data-cat="van">
                     <div class="flex items-center justify-between mb-4">
                         <span class="material-symbols-outlined text-emerald-400 text-3xl">airport_shuttle</span>
                         <span class="status-pill status-disabled">Blocked</span>
@@ -207,7 +207,7 @@
                     </div>
                 </a>
 
-                <a href="Vehicle_Details_Page.html" class="veh-card" data-cat="car">
+                <a href="vehicle-details-page.html" class="veh-card" data-cat="car">
                     <div class="flex items-center justify-between mb-4">
                         <span class="material-symbols-outlined text-blue-400 text-3xl">directions_car</span>
                         <span class="status-pill status-parked">Parked</span>
@@ -220,7 +220,7 @@
                     </div>
                 </a>
 
-                <a href="Vehicle_Details_Page.html" class="veh-card" data-cat="truck">
+                <a href="vehicle-details-page.html" class="veh-card" data-cat="truck">
                     <div class="flex items-center justify-between mb-4">
                         <span class="material-symbols-outlined text-rose-400 text-3xl">local_shipping</span>
                         <span class="status-pill status-active">Active</span>
@@ -233,7 +233,7 @@
                     </div>
                 </a>
 
-                <a href="Vehicle_Details_Page.html" class="veh-card" data-cat="motorcycle">
+                <a href="vehicle-details-page.html" class="veh-card" data-cat="motorcycle">
                     <div class="flex items-center justify-between mb-4">
                         <span class="material-symbols-outlined text-amber-400 text-3xl">two_wheeler</span>
                         <span class="status-pill status-active">Active</span>
@@ -246,7 +246,7 @@
                     </div>
                 </a>
 
-                <a href="Vehicle_Details_Page.html" class="veh-card" data-cat="car">
+                <a href="vehicle-details-page.html" class="veh-card" data-cat="car">
                     <div class="flex items-center justify-between mb-4">
                         <span class="material-symbols-outlined text-blue-400 text-3xl">directions_car</span>
                         <span class="status-pill status-active">Active</span>

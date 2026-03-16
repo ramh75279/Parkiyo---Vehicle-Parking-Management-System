@@ -79,7 +79,7 @@ CREATE TABLE notifications (
                                type VARCHAR(50),
                                is_read BOOLEAN NOT NULL DEFAULT FALSE,
                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                               CONSTRAINT fk_notification_user FOREIGN KEY (user_id) REFERENCES users(id)
+                               CONSTRAINT fk_notification-user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE TABLE audit_logs (

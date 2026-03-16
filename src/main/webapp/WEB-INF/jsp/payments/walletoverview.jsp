@@ -181,7 +181,7 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-2 overflow-y-auto">
-            <a href="dashboard_user.html"
+            <a href="dashboard-user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">dashboard</span>
                 <span class="nav-label text-sm">Dashboard</span>
@@ -206,7 +206,7 @@
                 <span class="material-symbols-outlined shrink-0">event_available</span>
                 <span class="nav-label text-sm">Reservation</span>
             </a>
-            <a href="paymenthistory_user.html"
+            <a href="paymenthistory-user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">payments</span>
                 <span class="nav-label text-sm">Payments</span>
@@ -221,12 +221,12 @@
                 <span class="material-symbols-outlined shrink-0">account_balance_wallet</span>
                 <span class="nav-label text-sm">Wallet</span>
             </a>
-            <a href="notification_user.html"
+            <a href="notification-user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">notifications</span>
                 <span class="nav-label text-sm">Notifications</span>
             </a>
-            <a href="accountsetting_user.html"
+            <a href="accountsetting-user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">settings</span>
                 <span class="nav-label text-sm">Account Settings</span>

@@ -151,27 +151,27 @@
                 <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
             </div>
             <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-                <a href="dashboard_admin.html"
+                <a href="dashboard-admin.html"
                     class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                     <span class="material-symbols-outlined shrink-0">dashboard</span>
                     <span class="nav-label text-sm">Dashboard</span>
                 </a>
-                <a href="entry_admin.html"
+                <a href="entry-admin.html"
                     class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                     <span class="material-symbols-outlined shrink-0">login</span>
                     <span class="nav-label text-sm">Vehicle Entry</span>
                 </a>
-                <a href="exitvehicle_admin.html"
+                <a href="exitvehicle-admin.html"
                     class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                     <span class="material-symbols-outlined shrink-0">logout</span>
                     <span class="nav-label text-sm">Vehicle Exit</span>
                 </a>
-                <a href="slot_overview.html"
+                <a href="slot-overview.html"
                     class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                     <span class="material-symbols-outlined shrink-0">grid_view</span>
                     <span class="nav-label text-sm">Parking Slots</span>
                 </a>
-                <a href="Vehicle_List_Page.html"
+                <a href="vehicle-list-page.html"
                     class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                     <span class="material-symbols-outlined shrink-0">directions_car</span>
                     <span class="nav-label text-sm">Vehicles</span>
@@ -186,7 +186,7 @@
                     <span class="material-symbols-outlined shrink-0">payments</span>
                     <span class="nav-label text-sm">Payments</span>
                 </a>
-                <a href="Repportshubpage.html"
+                <a href="repportshubpage.html"
                     class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                     <span class="material-symbols-outlined shrink-0">bar_chart</span>
                     <span class="nav-label text-sm">Reports</span>
@@ -227,15 +227,15 @@
                         Vehicles</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="Quick_Register_by_Plate.html"
+                    <a href="quick-register-by-plate.html"
                         class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
                         <span class="material-symbols-outlined text-lg">bolt</span> Quick Register
                     </a>
-                    <a href="Vehicle_Import_Page.html"
+                    <a href="vehicle-import-page.html"
                         class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
                         <span class="material-symbols-outlined text-lg">upload_file</span> Import
                     </a>
-                    <a href="Add_Vehicle_Page.html"
+                    <a href="add-vehicle-page.html"
                         class="flex items-center gap-2 bg-primary text-white font-black px-5 py-2.5 rounded-xl hover:bg-primary/80 transition-all text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(31,104,249,0.3)]">
                         <span class="material-symbols-outlined text-lg">add</span> Add Vehicle
                     </a>
@@ -296,7 +296,7 @@
                         <option>Parked</option>
                         <option>Blocked</option>
                     </select>
-                    <a href="Browse_Vehicle_by_category.html"
+                    <a href="browse-vehicle-by-category.html"
                         class="text-primary font-black text-xs uppercase tracking-widest hover:brightness-125 transition-all flex items-center gap-1">
                         <span class="material-symbols-outlined text-sm">category</span> Browse by Category
                     </a>
@@ -325,7 +325,7 @@
                                 </tr>
                             </thead>
                             <tbody class="text-sm font-bold text-slate-300 divide-y divide-white/5">
-                                <tr class="veh-row" onclick="window.location.href='Vehicle_Details_Page.html'">
+                                <tr class="veh-row" onclick="window.location.href='vehicle-details-page.html'">
                                     <td class="px-8 py-5"><span
                                             class="text-white font-black tracking-widest bg-white/5 px-3 py-1.5 rounded-lg text-xs">ABC-1234</span>
                                     </td>
@@ -339,18 +339,18 @@
                                     <td class="px-8 py-5"><span class="status-pill status-parked">Parked</span></td>
                                     <td class="px-8 py-5">
                                         <div class="flex items-center gap-2" onclick="event.stopPropagation()">
-                                            <a href="Vehicle_Details_Page.html"
+                                            <a href="vehicle-details-page.html"
                                                 class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all"
                                                 title="View"><span
                                                     class="material-symbols-outlined text-sm text-slate-400">visibility</span></a>
-                                            <a href="Edit_Vehicle_Page.html"
+                                            <a href="edit-vehicle-page.html"
                                                 class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/30 transition-all"
                                                 title="Edit"><span
                                                     class="material-symbols-outlined text-sm text-slate-400">edit</span></a>
                                         </div>
                                     </td>
                                 </tr>
-                                <tr class="veh-row" onclick="window.location.href='Vehicle_Details_Page.html'">
+                                <tr class="veh-row" onclick="window.location.href='vehicle-details-page.html'">
                                     <td class="px-8 py-5"><span
                                             class="text-white font-black tracking-widest bg-white/5 px-3 py-1.5 rounded-lg text-xs">XYZ-8899</span>
                                     </td>
@@ -364,18 +364,18 @@
                                     <td class="px-8 py-5"><span class="status-pill status-active">Active</span></td>
                                     <td class="px-8 py-5">
                                         <div class="flex items-center gap-2" onclick="event.stopPropagation()">
-                                            <a href="Vehicle_Details_Page.html"
+                                            <a href="vehicle-details-page.html"
                                                 class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all"
                                                 title="View"><span
                                                     class="material-symbols-outlined text-sm text-slate-400">visibility</span></a>
-                                            <a href="Edit_Vehicle_Page.html"
+                                            <a href="edit-vehicle-page.html"
                                                 class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/30 transition-all"
                                                 title="Edit"><span
                                                     class="material-symbols-outlined text-sm text-slate-400">edit</span></a>
                                         </div>
                                     </td>
                                 </tr>
-                                <tr class="veh-row" onclick="window.location.href='Vehicle_Details_Page.html'">
+                                <tr class="veh-row" onclick="window.location.href='vehicle-details-page.html'">
                                     <td class="px-8 py-5"><span
                                             class="text-white font-black tracking-widest bg-white/5 px-3 py-1.5 rounded-lg text-xs">MKL-0033</span>
                                     </td>
@@ -389,18 +389,18 @@
                                     <td class="px-8 py-5"><span class="status-pill status-active">Active</span></td>
                                     <td class="px-8 py-5">
                                         <div class="flex items-center gap-2" onclick="event.stopPropagation()">
-                                            <a href="Vehicle_Details_Page.html"
+                                            <a href="vehicle-details-page.html"
                                                 class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all"
                                                 title="View"><span
                                                     class="material-symbols-outlined text-sm text-slate-400">visibility</span></a>
-                                            <a href="Edit_Vehicle_Page.html"
+                                            <a href="edit-vehicle-page.html"
                                                 class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/30 transition-all"
                                                 title="Edit"><span
                                                     class="material-symbols-outlined text-sm text-slate-400">edit</span></a>
                                         </div>
                                     </td>
                                 </tr>
-                                <tr class="veh-row" onclick="window.location.href='Vehicle_Details_Page.html'">
+                                <tr class="veh-row" onclick="window.location.href='vehicle-details-page.html'">
                                     <td class="px-8 py-5"><span
                                             class="text-white font-black tracking-widest bg-rose-500/10 border border-rose-500/20 px-3 py-1.5 rounded-lg text-xs text-rose-400">PQR-4410</span>
                                     </td>
@@ -414,18 +414,18 @@
                                     <td class="px-8 py-5"><span class="status-pill status-disabled">Blocked</span></td>
                                     <td class="px-8 py-5">
                                         <div class="flex items-center gap-2" onclick="event.stopPropagation()">
-                                            <a href="Vehicle_Details_Page.html"
+                                            <a href="vehicle-details-page.html"
                                                 class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all"
                                                 title="View"><span
                                                     class="material-symbols-outlined text-sm text-slate-400">visibility</span></a>
-                                            <a href="Edit_Vehicle_Page.html"
+                                            <a href="edit-vehicle-page.html"
                                                 class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/30 transition-all"
                                                 title="Edit"><span
                                                     class="material-symbols-outlined text-sm text-slate-400">edit</span></a>
                                         </div>
                                     </td>
                                 </tr>
-                                <tr class="veh-row" onclick="window.location.href='Vehicle_Details_Page.html'">
+                                <tr class="veh-row" onclick="window.location.href='vehicle-details-page.html'">
                                     <td class="px-8 py-5"><span
                                             class="text-white font-black tracking-widest bg-white/5 px-3 py-1.5 rounded-lg text-xs">GHI-7721</span>
                                     </td>
@@ -439,11 +439,11 @@
                                     <td class="px-8 py-5"><span class="status-pill status-parked">Parked</span></td>
                                     <td class="px-8 py-5">
                                         <div class="flex items-center gap-2" onclick="event.stopPropagation()">
-                                            <a href="Vehicle_Details_Page.html"
+                                            <a href="vehicle-details-page.html"
                                                 class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all"
                                                 title="View"><span
                                                     class="material-symbols-outlined text-sm text-slate-400">visibility</span></a>
-                                            <a href="Edit_Vehicle_Page.html"
+                                            <a href="edit-vehicle-page.html"
                                                 class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/30 transition-all"
                                                 title="Edit"><span
                                                     class="material-symbols-outlined text-sm text-slate-400">edit</span></a>

@@ -243,7 +243,7 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a href="dashboard_user.html"
+            <a href="dashboard-user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">dashboard</span><span
                     class="nav-label text-sm">Dashboard</span></a>
@@ -275,7 +275,7 @@
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span
                     class="material-symbols-outlined shrink-0">smart_toy</span><span class="nav-label text-sm">AI
                         Assistant</span></a>
-            <a href="accountsetting_user.html"
+            <a href="accountsetting-user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">settings</span><span
                     class="nav-label text-sm">Settings</span></a>
@@ -447,7 +447,7 @@
 
                 <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Quick Links</h3>
                 <div class="space-y-2">
-                    <a href="slot_overview.html" class="action-card text-xs"><span
+                    <a href="slot-overview.html" class="action-card text-xs"><span
                             class="material-symbols-outlined text-primary text-sm">map</span><span
                             class="text-slate-300 font-bold">Slot Map</span></a>
                     <a href="entry.html" class="action-card text-xs"><span
@@ -475,7 +475,7 @@
                 <div class="p-3 rounded-xl bg-emerald-500/8 border border-emerald-500/15 text-center" style="background:rgba(16,185,129,0.06)"><p class="text-lg font-black text-emerald-400">5</p><p class="text-[9px] text-slate-500 font-black uppercase">Zone C</p></div>
                 <div class="p-3 rounded-xl bg-emerald-500/8 border border-emerald-500/15 text-center" style="background:rgba(16,185,129,0.06)"><p class="text-lg font-black text-emerald-400">12</p><p class="text-[9px] text-slate-500 font-black uppercase">Zone D</p></div>
             </div>
-            <p class="mt-3 text-xs"><strong class="text-emerald-400">42 slots</strong> available right now out of 100 total. Would you like to <a href="slot_overview.html" class="text-primary underline">view the slot map</a> or make a reservation?</p>`
+            <p class="mt-3 text-xs"><strong class="text-emerald-400">42 slots</strong> available right now out of 100 total. Would you like to <a href="slot-overview.html" class="text-primary underline">view the slot map</a> or make a reservation?</p>`
         },
         'Make a reservation for tomorrow': {
             text: "Sure! To book a slot for tomorrow, I'll need a few details. You can use the quick reservation form or I can guide you through it. Which vehicle would you like to reserve for?",
@@ -503,7 +503,7 @@
         },
         'How many slots are available in Zone A?': {
             text: "Zone A (Ground Floor) currently has <strong class='text-emerald-400'>10 available slots</strong> out of 25 total. 13 are occupied and 2 are under maintenance.",
-            extra: `<div class="mt-3"><a href="slot_overview.html" class="flex items-center gap-2 text-primary text-xs font-black hover:brightness-125 transition-all"><span class="material-symbols-outlined text-sm">map</span>View Zone A on slot map →</a></div>`
+            extra: `<div class="mt-3"><a href="slot-overview.html" class="flex items-center gap-2 text-primary text-xs font-black hover:brightness-125 transition-all"><span class="material-symbols-outlined text-sm">map</span>View Zone A on slot map →</a></div>`
         },
         'What is my wallet balance?': {
             text: "Your Parkiyo Wallet balance is currently <strong class='text-emerald-400 text-lg'>$48.50</strong>. Your wallet ID is PKW-00441-KP.",
