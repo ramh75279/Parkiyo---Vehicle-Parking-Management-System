@@ -1,0 +1,304 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Parkiyo | Vehicle Import</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { primary: "#1f68f9", "background-dark": "#020617" },
+                    fontFamily: { display: ["Public Sans", "sans-serif"] },
+                    borderRadius: { squircle: "14px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Public Sans', sans-serif; background-color: #020617; }
+        .premium-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .bg-subtle-radial { background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%); }
+        .glass-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-container { width: 80px; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); background: rgba(2,6,23,0.6); overflow: hidden; white-space: nowrap; }
+        .sidebar-container:hover { width: 280px; background: rgba(2,6,23,0.95); }
+        .nav-label { opacity: 0; transition: opacity 0.3s ease; margin-left: 1rem; }
+        .sidebar-container:hover .nav-label { opacity: 1; }
+        .drop-zone { border: 2px dashed rgba(255,255,255,0.12); border-radius: 24px; padding: 60px 40px; text-align: center; cursor: pointer; transition: all 0.25s; }
+        .drop-zone:hover, .drop-zone.dragging { border-color: #1f68f9; background: rgba(31,104,249,0.05); }
+        .step-circle { height: 34px; width: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 900; border: 2px solid; }
+        .step-done .step-circle { background: rgba(16,185,129,0.12); border-color: #10b981; color: #34d399; }
+        .step-active .step-circle { background: rgba(31,104,249,0.12); border-color: #1f68f9; color: #60a5fa; }
+        .step-idle .step-circle { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.08); color: #475569; }
+        .step-line { flex: 1; height: 2px; background: rgba(255,255,255,0.07); margin-bottom: 0; }
+        .step-line.done { background: #10b981; }
+        .badge-ok { background: rgba(16,185,129,0.1); color: #34d399; border: 1px solid rgba(16,185,129,0.2); padding: 2px 10px; border-radius: 8px; font-size: 0.67rem; font-weight: 800; text-transform: uppercase; }
+        .badge-warn { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); padding: 2px 10px; border-radius: 8px; font-size: 0.67rem; font-weight: 800; text-transform: uppercase; }
+        .badge-err { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); padding: 2px 10px; border-radius: 8px; font-size: 0.67rem; font-weight: 800; text-transform: uppercase; }
+        ::-webkit-scrollbar { width: 5px;display: none; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    </style>
+</head>
+<body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+<div class="flex flex-1 overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
+        <div class="p-6 mb-4 flex items-center">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+                <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
+            </div>
+            <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+        </div>
+        <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+            <a href="dashboard-admin.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">dashboard</span><span class="nav-label text-sm">Dashboard</span></a>
+            <a href="entry-admin.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle Entry</span></a>
+            <a href="exitvehicle-admin.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span></a>
+            <a href="vehicle-list-page.html" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span class="material-symbols-outlined shrink-0">directions_car</span><span class="nav-label text-sm">Vehicles</span></a>
+            <a href="slot-overview.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">grid_view</span><span class="nav-label text-sm">Parking Slots</span></a>
+            <a href="usermanagement.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">group</span><span class="nav-label text-sm">Users</span></a>
+            <a href="paymenthistory.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">payments</span><span class="nav-label text-sm">Payments</span></a>
+            <a href="repportshubpage.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">bar_chart</span><span class="nav-label text-sm">Reports</span></a>
+            <a href="accountsetting.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">settings</span><span class="nav-label text-sm">Settings</span></a>
+        </nav>
+        <div class="p-4 border-t border-white/5">
+            <button onclick="window.location.href='logout.html'" class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                <span class="material-symbols-outlined shrink-0"><a href="logout.html">power_settings_new</a></span><span class="nav-label"><a href="logout.html">Logout</a></span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
+            <div class="flex items-center gap-4">
+                <button onclick="window.location.href='vehicle-list-page.html'" class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                    <span class="material-symbols-outlined text-slate-400">arrow_back</span>
+                </button>
+                <div>
+                    <h2 class="text-xl font-black text-white">Vehicle Import</h2>
+                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Bulk import via CSV or Excel</p>
+                </div>
+            </div>
+            <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
+                <div class="h-full w-full rounded-squircle bg-background-dark flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white/50">person</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-10">
+            <div class="max-w-3xl mx-auto space-y-8">
+
+                <!-- Step progress -->
+                <div class="flex items-center gap-0">
+                    <div class="flex flex-col items-center gap-2 step-done">
+                        <div class="step-circle"><span class="material-symbols-outlined text-base">check</span></div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Upload</p>
+                    </div>
+                    <div class="step-line done mx-2 mb-5"></div>
+                    <div class="flex flex-col items-center gap-2 step-active">
+                        <div class="step-circle">2</div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-primary">Validate</p>
+                    </div>
+                    <div class="step-line mx-2 mb-5"></div>
+                    <div class="flex flex-col items-center gap-2 step-idle">
+                        <div class="step-circle">3</div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-600">Import</p>
+                    </div>
+                </div>
+
+                <!-- Template download -->
+                <div class="glass-card rounded-[2.5rem] p-7 flex items-center justify-between gap-6 flex-wrap">
+                    <div class="flex items-center gap-4">
+                        <div class="h-12 w-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-emerald-400 text-xl">table_view</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-black text-white">Download Template</p>
+                            <p class="text-[11px] text-slate-500 font-bold mt-0.5">Use our CSV template to ensure correct formatting before importing.</p>
+                        </div>
+                    </div>
+                    <button class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-black px-5 py-2.5 rounded-xl hover:bg-emerald-500/20 transition-all text-xs uppercase tracking-widest shrink-0">
+                        <span class="material-symbols-outlined text-base">download</span> vehicles_template.csv
+                    </button>
+                </div>
+
+                <!-- Drop zone — shown as file uploaded -->
+                <div class="glass-card rounded-[2.5rem] p-8">
+                    <h3 class="text-base font-black text-white mb-6">Upload File</h3>
+                    <!-- Uploaded state -->
+                    <div class="flex items-center gap-4 p-5 rounded-2xl bg-primary/5 border border-primary/15">
+                        <div class="h-12 w-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-primary text-xl">description</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-white font-black text-sm">vehicles_batch_march.csv</p>
+                            <p class="text-slate-500 text-[10px] font-bold mt-0.5">48 KB · Uploaded just now</p>
+                        </div>
+                        <button onclick="removeFile()" class="h-9 w-9 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center hover:bg-rose-500/20 transition-all">
+                            <span class="material-symbols-outlined text-rose-400 text-base">close</span>
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-slate-500 font-bold mt-4 text-center">Or <button class="text-primary hover:brightness-125 transition-all">click to upload a different file</button> · Supports .csv and .xlsx</p>
+                </div>
+
+                <!-- Validation results -->
+                <div class="glass-card rounded-[2.5rem] overflow-hidden">
+                    <div class="p-7 border-b border-white/5 flex items-center justify-between flex-wrap gap-4">
+                        <div>
+                            <h3 class="text-base font-black text-white">Validation Results</h3>
+                            <p class="text-[11px] text-slate-500 font-bold mt-1">Review before importing — errors must be fixed</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-1.5 text-xs font-black text-emerald-400"><span class="h-2 w-2 rounded-full bg-emerald-400"></span>18 Ready</div>
+                            <div class="flex items-center gap-1.5 text-xs font-black text-amber-400"><span class="h-2 w-2 rounded-full bg-amber-400"></span>3 Warnings</div>
+                            <div class="flex items-center gap-1.5 text-xs font-black text-rose-400"><span class="h-2 w-2 rounded-full bg-rose-400"></span>2 Errors</div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-slate-500 text-[10px] font-black uppercase tracking-widest border-b border-white/5">
+                                    <th class="px-7 py-4">Row</th>
+                                    <th class="px-7 py-4">Plate</th>
+                                    <th class="px-7 py-4">Make / Model</th>
+                                    <th class="px-7 py-4">Category</th>
+                                    <th class="px-7 py-4">Owner</th>
+                                    <th class="px-7 py-4">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm font-bold text-slate-300 divide-y divide-white/5">
+                                <tr class="hover:bg-white/[0.015]">
+                                    <td class="px-7 py-4 text-slate-500 font-mono text-xs">01</td>
+                                    <td class="px-7 py-4 text-white font-black tracking-wider">NEW-0001</td>
+                                    <td class="px-7 py-4 opacity-70">Toyota Axio</td>
+                                    <td class="px-7 py-4 opacity-70">Car</td>
+                                    <td class="px-7 py-4 opacity-70">R. Perera</td>
+                                    <td class="px-7 py-4"><span class="badge-ok">Ready</span></td>
+                                </tr>
+                                <tr class="hover:bg-white/[0.015]">
+                                    <td class="px-7 py-4 text-slate-500 font-mono text-xs">02</td>
+                                    <td class="px-7 py-4 text-white font-black tracking-wider">NEW-0002</td>
+                                    <td class="px-7 py-4 opacity-70">Honda Fit</td>
+                                    <td class="px-7 py-4 opacity-70">Car</td>
+                                    <td class="px-7 py-4 opacity-70">S. Fernando</td>
+                                    <td class="px-7 py-4"><span class="badge-ok">Ready</span></td>
+                                </tr>
+                                <tr class="hover:bg-white/[0.015] bg-amber-500/5">
+                                    <td class="px-7 py-4 text-slate-500 font-mono text-xs">05</td>
+                                    <td class="px-7 py-4 text-amber-300 font-black tracking-wider">XYZ-8899</td>
+                                    <td class="px-7 py-4 opacity-70">Honda Civic</td>
+                                    <td class="px-7 py-4 opacity-70">Car</td>
+                                    <td class="px-7 py-4 opacity-70">N. Silva</td>
+                                    <td class="px-7 py-4">
+                                        <span class="badge-warn">Duplicate</span>
+                                        <p class="text-[10px] text-amber-400/70 font-bold mt-1">Plate already registered</p>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-white/[0.015] bg-rose-500/5">
+                                    <td class="px-7 py-4 text-slate-500 font-mono text-xs">09</td>
+                                    <td class="px-7 py-4 text-rose-400 font-black tracking-wider">BAD--001</td>
+                                    <td class="px-7 py-4 opacity-70">—</td>
+                                    <td class="px-7 py-4 opacity-70">—</td>
+                                    <td class="px-7 py-4 opacity-70">—</td>
+                                    <td class="px-7 py-4">
+                                        <span class="badge-err">Error</span>
+                                        <p class="text-[10px] text-rose-400/70 font-bold mt-1">Invalid plate format</p>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-white/[0.015] bg-rose-500/5">
+                                    <td class="px-7 py-4 text-slate-500 font-mono text-xs">14</td>
+                                    <td class="px-7 py-4 text-rose-400 font-black tracking-wider">NEW-0014</td>
+                                    <td class="px-7 py-4 opacity-70">—</td>
+                                    <td class="px-7 py-4 opacity-70">—</td>
+                                    <td class="px-7 py-4 opacity-70">—</td>
+                                    <td class="px-7 py-4">
+                                        <span class="badge-err">Error</span>
+                                        <p class="text-[10px] text-rose-400/70 font-bold mt-1">Missing required fields</p>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-white/[0.015] bg-amber-500/5">
+                                    <td class="px-7 py-4 text-slate-500 font-mono text-xs">19</td>
+                                    <td class="px-7 py-4 text-amber-300 font-black tracking-wider">NEW-0019</td>
+                                    <td class="px-7 py-4 opacity-70">Suzuki Swift</td>
+                                    <td class="px-7 py-4 opacity-70">Car</td>
+                                    <td class="px-7 py-4 opacity-70">—</td>
+                                    <td class="px-7 py-4">
+                                        <span class="badge-warn">Warning</span>
+                                        <p class="text-[10px] text-amber-400/70 font-bold mt-1">Owner name missing</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-7 py-4 border-t border-white/5 text-xs font-bold text-slate-500">
+                        Showing 6 of 23 rows · <span class="text-rose-400">Fix 2 errors before importing</span>
+                    </div>
+                </div>
+
+                <!-- Import options -->
+                <div class="glass-card rounded-[2.5rem] p-7">
+                    <h3 class="text-base font-black text-white mb-5">Import Options</h3>
+                    <div class="space-y-4">
+                        <label class="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 cursor-pointer hover:bg-white/[0.04] transition-all">
+                            <input type="checkbox" checked class="accent-primary h-4 w-4" />
+                            <div>
+                                <p class="text-sm font-black text-white">Skip duplicate plates</p>
+                                <p class="text-[11px] text-slate-500 font-bold">Rows where plate already exists will be skipped (not overwritten)</p>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 cursor-pointer hover:bg-white/[0.04] transition-all">
+                            <input type="checkbox" class="accent-primary h-4 w-4" />
+                            <div>
+                                <p class="text-sm font-black text-white">Import rows with warnings</p>
+                                <p class="text-[11px] text-slate-500 font-bold">Rows with warnings (e.g. missing optional fields) will still be imported</p>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 cursor-pointer hover:bg-white/[0.04] transition-all">
+                            <input type="checkbox" checked class="accent-primary h-4 w-4" />
+                            <div>
+                                <p class="text-sm font-black text-white">Set all imported as Active</p>
+                                <p class="text-[11px] text-slate-500 font-bold">Imported vehicles will be immediately allowed for entry</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-between pb-4">
+                    <button onclick="window.location.href='vehicle-list-page.html'" class="px-7 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-black text-sm hover:bg-white/10 transition-all">
+                        Cancel
+                    </button>
+                    <div class="flex items-center gap-3">
+                        <p class="text-xs text-rose-400 font-bold">2 errors must be resolved first</p>
+                        <button class="px-7 py-3.5 rounded-2xl bg-primary/30 text-white/40 font-black text-sm cursor-not-allowed flex items-center gap-2 text-xs uppercase tracking-widest">
+                            <span class="material-symbols-outlined text-lg">upload</span> Start Import
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    function removeFile() {
+        document.querySelector('.bg-primary\\/5').closest('.glass-card').innerHTML = `
+            <h3 class="text-base font-black text-white mb-6">Upload File</h3>
+            <div class="drop-zone" onclick="this.querySelector('input').click()">
+                <input type="file" accept=".csv,.xlsx" class="hidden" />
+                <span class="material-symbols-outlined text-5xl text-slate-600 mb-4 block">upload_file</span>
+                <p class="text-white font-black text-lg mb-2">Drop your file here</p>
+                <p class="text-slate-500 text-sm font-bold mb-4">or click to browse</p>
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-600">Supports .csv and .xlsx · Max 10MB</p>
+            </div>`;
+    }
+</script>
+</body>
+</html>

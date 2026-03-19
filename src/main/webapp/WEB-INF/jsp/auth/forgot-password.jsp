@@ -1,11 +1,271 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
+
+
+<!DOCTYPE html>
+<html class="dark" lang="en">
 <head>
-    <title>Parkiyo - Forgot Password</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Parkiyo | Reset Access</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#1f68f9",
+                        "background-dark": "#020617",
+                    },
+                    fontFamily: { display: ["Public Sans", "sans-serif"] },
+                    borderRadius: { squircle: "14px", xl: "1.5rem", "2xl": "2.1rem", "3xl": "3rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .premium-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .bg-subtle-radial { background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 70%); }
+        .glass-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); }
+
+        .input-glass {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            color: white !important;
+        }
+        .input-glass:focus {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: #1f68f9;
+            outline: none;
+            box-shadow: 0 0 20px rgba(31,104,249,0.2);
+        }
+
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+            -webkit-text-fill-color: white !important;
+            -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .message-visible { animation: slideDown 0.3s ease-out forwards; display: flex !important; }
+
+        .notify-error {
+            background: linear-gradient(180deg, rgba(244,63,94,0.14), rgba(244,63,94,0.06));
+            border: 1px solid rgba(244,63,94,0.2);
+        }
+
+        .notify-success {
+            background: linear-gradient(180deg, rgba(34,197,94,0.14), rgba(34,197,94,0.06));
+            border: 1px solid rgba(34,197,94,0.2);
+        }
+
+        .notify-info {
+            background: linear-gradient(180deg, rgba(31,104,249,0.14), rgba(31,104,249,0.06));
+            border: 1px solid rgba(31,104,249,0.22);
+        }
+    </style>
 </head>
-<body>
-<h2>Forgot Password Page</h2>
-<p>This is the forgot password page.</p>
-<a href="/">Back to Login</a>
+<body class="bg-background-dark text-slate-100 font-display antialiased bg-subtle-radial min-h-screen flex flex-col">
+
+<header class="sticky top-0 z-50 w-full border-b border-white/5 bg-background-dark/75 premium-blur">
+    <div class="container mx-auto flex h-20 items-center justify-between px-6 lg:px-12">
+        <div class="flex items-center gap-4 cursor-pointer" onclick="window.location.href='home.html'">
+            <div class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]">
+                <span class="material-symbols-outlined font-bold text-2xl">local_parking</span>
+            </div>
+            <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+        </div>
+
+        <nav class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
+            <a class="hover:text-primary transition-all" href="home.html">Home</a>
+            <a class="hover:text-primary transition-all" href="features.html">Features</a>
+            <a class="hover:text-primary transition-all" href="solutions.html">Solutions</a>
+            <a class="hover:text-primary transition-all" href="analytics.html">Analytics</a>
+            <a class="hover:text-primary transition-all" href="faq.html">Support</a>
+        </nav>
+
+        <div class="flex items-center gap-6">
+            <button onclick="window.location.href='faq.html'" class="bg-white/5 border border-white/10 text-white text-sm font-black px-8 py-3.5 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all active:scale-95">
+                Get Help
+            </button>
+        </div>
+    </div>
+</header>
+
+<main class="flex-grow flex items-center justify-center py-20 px-6">
+    <div class="max-w-xl w-full glass-card rounded-[3rem] overflow-hidden shadow-2xl relative">
+        <div class="p-10 lg:p-16 relative z-10">
+            <div class="mb-10 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/10 text-primary rounded-2xl mb-6 border border-primary/20">
+                    <span class="material-symbols-outlined text-3xl">lock_reset</span>
+                </div>
+                <h2 class="text-3xl font-black text-white tracking-tight mb-3">Reset Password</h2>
+                <p class="text-slate-400 font-medium max-w-md mx-auto">
+                    Enter your registered email address and we’ll send password reset instructions.
+                </p>
+            </div>
+
+            <div class="mb-8 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+                <p class="text-[11px] font-black uppercase tracking-[0.2em] text-primary mb-2">Password Recovery</p>
+                <p class="text-sm text-slate-400 leading-relaxed">
+                    If your email exists in the system, Parkiyo will send a secure reset link to your inbox.
+                </p>
+            </div>
+
+            <form class="space-y-6" id="resetForm" novalidate>
+                <div id="formMessage" class="hidden px-4 py-4 rounded-2xl text-[13px] font-bold items-start gap-3">
+                    <span id="formMessageIcon" class="material-symbols-outlined text-base mt-[1px]">info</span>
+                    <div class="leading-relaxed">
+                        <p id="formMessageText">Message</p>
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block text-sm font-bold text-slate-200 ml-1 mb-2">Email Address</label>
+                    <input type="email" id="email" class="w-full h-14 rounded-2xl px-5 input-glass font-medium" placeholder="you@parkiyo.com" autocomplete="email">
+
+                    <div id="emailError" class="hidden mt-4 px-4 py-3 notify-info rounded-2xl text-primary text-[11px] font-black uppercase tracking-wider items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">info</span>
+                        <span>Enter a valid email address</span>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full h-16 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                        Request Reset Link
+                        <span class="material-symbols-outlined text-lg">mail</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-10 pt-8 border-t border-white/5 text-center">
+                <a href="login.html" class="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined text-base">arrow_back</span> Back to Login
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="border-t border-white/5 bg-background-dark pt-24 pb-12">
+    <div class="container mx-auto px-6 lg:px-12">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-16 mb-20">
+            <div class="col-span-2">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]">
+                        <span class="material-symbols-outlined font-bold text-2xl">local_parking</span>
+                    </div>
+                    <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+                </div>
+                <p class="text-slate-500 max-w-sm leading-relaxed mb-8 text-sm font-medium">
+                    Premium parking management software for secure operations, cleaner workflows and real-time visibility across modern facilities.
+                </p>
+            </div>
+
+            <div>
+                <h5 class="text-white font-black mb-8 text-[11px] uppercase tracking-[0.2em] opacity-80">Platform</h5>
+                <ul class="space-y-4 text-slate-500 text-sm font-bold">
+                    <li><a href="features.html" class="hover:text-primary transition-colors">Features</a></li>
+                    <li><a href="solutions.html" class="hover:text-primary transition-colors">Solutions</a></li>
+                    <li><a href="analytics.html" class="hover:text-primary transition-colors">Analytics</a></li>
+                    <li><a href="faq.html" class="hover:text-primary transition-colors">Support</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h5 class="text-white font-black mb-8 text-[11px] uppercase tracking-[0.2em] opacity-80">Company</h5>
+                <ul class="space-y-4 text-slate-500 text-sm font-bold">
+                    <li><a href="faq.html" class="hover:text-primary transition-colors">Help & FAQ</a></li>
+                    <li><a href="privacy.html" class="hover:text-primary transition-colors">Privacy</a></li>
+                    <li><a href="login.html" class="hover:text-primary transition-colors">Login</a></li>
+                    <li><a href="register.html" class="hover:text-primary transition-colors">Register</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+            <p class="text-slate-600 text-[9px] tracking-[0.3em] uppercase font-bold">© 2026 Parkiyo. All rights reserved.</p>
+            <div class="flex gap-8">
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="home.html">language</a></span>
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="privacy.html">shield_person</a></span>
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="faq.html">support_agent</a></span>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    const form = document.getElementById('resetForm');
+    const emailInput = document.getElementById('email');
+    const emailErr = document.getElementById('emailError');
+    const formMessage = document.getElementById('formMessage');
+    const formMessageText = document.getElementById('formMessageText');
+    const formMessageIcon = document.getElementById('formMessageIcon');
+
+    function validateEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function showInlineError(message) {
+        emailErr.classList.remove('hidden');
+        emailErr.classList.add('message-visible');
+        const text = emailErr.querySelector('span:last-child');
+        if (text) text.textContent = message;
+        emailInput.style.borderColor = "#1f68f9";
+    }
+
+    function hideInlineError() {
+        emailErr.classList.add('hidden');
+        emailErr.classList.remove('message-visible');
+        emailInput.style.borderColor = "rgba(255, 255, 255, 0.15)";
+    }
+
+    function showFormMessage(type, message) {
+        formMessage.classList.remove('hidden', 'notify-error', 'notify-success', 'notify-info');
+        formMessage.classList.add(type === 'error' ? 'notify-error' : 'notify-success', 'message-visible');
+        formMessageIcon.textContent = type === 'error' ? 'error' : 'check_circle';
+        formMessageText.textContent = message;
+    }
+
+    function hideFormMessage() {
+        formMessage.classList.add('hidden');
+        formMessage.classList.remove('message-visible', 'notify-error', 'notify-success', 'notify-info');
+    }
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const email = emailInput.value.trim().toLowerCase();
+        hideInlineError();
+        hideFormMessage();
+
+        if (!email || !validateEmail(email)) {
+            showInlineError('Enter a valid email address');
+            return;
+        }
+
+        if (email === 'unknown@parkiyo.com') {
+            showFormMessage('error', 'User not found. Please check the email address and try again.');
+            return;
+        }
+
+        showFormMessage('success', 'If the email exists in our system, password reset instructions have been sent.');
+    });
+
+    emailInput.addEventListener('input', () => {
+        hideInlineError();
+        hideFormMessage();
+    });
+</script>
 </body>
 </html>
