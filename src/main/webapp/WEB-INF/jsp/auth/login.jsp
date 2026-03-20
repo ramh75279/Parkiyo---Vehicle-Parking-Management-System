@@ -73,20 +73,20 @@
 
 <header class="sticky top-0 z-50 w-full border-b border-white/5 bg-background-dark/75 premium-blur">
     <div class="container mx-auto flex h-20 items-center justify-between px-6 lg:px-12">
-        <a href="/home" class="flex items-center gap-4">
+        <a href="home.html" class="flex items-center gap-4">
             <div class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]">
                 <span class="material-symbols-outlined font-bold">local_parking</span>
             </div>
             <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </a>
         <nav class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <a class="hover:text-primary transition-colors" href="/home">Home</a>
-            <a class="hover:text-primary transition-colors" href="/features">Features</a>
-            <a class="hover:text-primary transition-colors" href="/solutions">Solutions</a>
-            <a class="hover:text-primary transition-colors" href="/analytics">Analytics</a>
-            <a class="hover:text-primary transition-colors" href="/faq">Support</a>
+            <a class="hover:text-primary transition-colors" href="home.html">Home</a>
+            <a class="hover:text-primary transition-colors" href="features.html">Features</a>
+            <a class="hover:text-primary transition-colors" href="solutions.html">Solutions</a>
+            <a class="hover:text-primary transition-colors" href="analytics.html">Analytics</a>
+            <a class="hover:text-primary transition-colors" href="faq.html">Support</a>
         </nav>
-        <a href="/register" class="bg-primary text-white text-sm font-bold px-7 py-3 rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/30">Register</a>
+        <a href="register.html" class="bg-primary text-white text-sm font-bold px-7 py-3 rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/30">Register</a>
     </div>
 </header>
 
@@ -131,7 +131,7 @@
                                 <input type="checkbox" id="rememberMe" class="w-4 h-4 rounded accent-primary"/>
                                 <span class="text-sm text-slate-400 font-medium">Remember me</span>
                             </label>
-                            <a href="/forgotpassword" class="text-sm font-bold text-primary hover:brightness-125 transition-all">Forgot password?</a>
+                            <a href="forgotpassword.html" class="text-sm font-bold text-primary hover:brightness-125 transition-all">Forgot password?</a>
                         </div>
 
                         <div class="pt-2">
@@ -143,7 +143,7 @@
                     </form>
 
                     <div class="mt-8 pt-8 border-t border-white/5 text-center">
-                        <p class="text-slate-500 text-sm font-medium">Don't have an account? <a href="/register" class="text-primary font-black hover:brightness-125 transition-all">Create one</a></p>
+                        <p class="text-slate-500 text-sm font-medium">Don't have an account? <a href="register.html" class="text-primary font-black hover:brightness-125 transition-all">Create one</a></p>
                     </div>
                 </div>
             </div>
@@ -232,7 +232,7 @@
     function togglePw() {
         const pw = document.getElementById('password');
         const icon = document.getElementById('eyeIcon');
-        if (pw.type == 'password') { pw.type = 'text'; icon.textContent = 'visibility_off'; }
+        if (pw.type === 'password') { pw.type = 'text'; icon.textContent = 'visibility_off'; }
         else { pw.type = 'password'; icon.textContent = 'visibility'; }
     }
 
@@ -243,8 +243,8 @@
     const formMsgIcon = document.getElementById('formMsgIcon');
 
     function showMsg(type, text) {
-        formMsg.className = `px-4 py-4 rounded-2xl text-[13px] font-bold flex items-start gap-3 msg-visible ${type == 'error' ? 'notify-error text-rose-400' : 'notify-success text-emerald-400'}`;
-        formMsgIcon.textContent = type == 'error' ? 'error' : 'check_circle';
+        formMsg.className = `px-4 py-4 rounded-2xl text-[13px] font-bold flex items-start gap-3 msg-visible ${type === 'error' ? 'notify-error text-rose-400' : 'notify-success text-emerald-400'}`;
+        formMsgIcon.textContent = type === 'error' ? 'error' : 'check_circle';
         formMsgText.textContent = text;
     }
 
@@ -256,7 +256,7 @@
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMsg('error', 'Enter a valid email address.'); return; }
 
         // Demo role routing
-        if (email == 'admin@parkiyo.com' && pw == 'admin123') {
+        if (email === 'admin@parkiyo.com' && pw === 'admin123') {
             showMsg('success', 'Login successful. Redirecting to admin dashboard...');
             setTimeout(() => window.location.href = 'dashboard_admin.html', 1200);
         } else if (pw.length >= 6) {

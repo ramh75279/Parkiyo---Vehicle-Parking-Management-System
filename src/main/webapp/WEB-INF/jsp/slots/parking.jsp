@@ -158,52 +158,52 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-2 overflow-y-auto">
-            <a href="/dashboard_user"
+            <a href="dashboard_user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">dashboard</span>
                 <span class="nav-label text-sm">Dashboard</span>
             </a>
-            <a href="/entry"
+            <a href="entry.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">login</span>
                 <span class="nav-label text-sm">Vehicle Entry</span>
             </a>
-            <a href="/exitvehicle"
+            <a href="exitvehicle.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">logout</span>
                 <span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a href="/parking"
+            <a href="parking.html"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                 <span class="material-symbols-outlined shrink-0">local_parking</span>
                 <span class="nav-label text-sm">Active Parking</span>
             </a>
-            <a href="/advancereservation"
+            <a href="advancereservation.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">event_available</span>
                 <span class="nav-label text-sm">Reservation</span>
             </a>
-            <a href="/paymenthistory_user"
+            <a href="paymenthistory_user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">payments</span>
                 <span class="nav-label text-sm">Payments</span>
             </a>
-            <a href="/receipt"
+            <a href="receipt.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">receipt_long</span>
                 <span class="nav-label text-sm">Receipts</span>
             </a>
-            <a href="/walletoverview"
+            <a href="walletoverview.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">account_balance_wallet</span>
                 <span class="nav-label text-sm">Wallet</span>
             </a>
-            <a href="/notification_user"
+            <a href="notification_user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">notifications</span>
                 <span class="nav-label text-sm">Notifications</span>
             </a>
-            <a href="/accountsetting_user"
+            <a href="accountsetting_user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">settings</span>
                 <span class="nav-label text-sm">Account Settings</span>
@@ -212,8 +212,8 @@
         <div class="p-4 border-t border-white/5">
             <button onclick="window.location.href='logout.html'"
                     class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
-                <span class="material-symbols-outlined shrink-0"><a href="/logout">power_settings_new</a></span><span
-                    class="nav-label"><a href="/logout">Logout</a></span>
+                <span class="material-symbols-outlined shrink-0"><a href="logout.html">power_settings_new</a></span><span
+                    class="nav-label"><a href="logout.html">Logout</a></span>
             </button>
         </div>
     </aside>
@@ -227,7 +227,7 @@
                     currently in the facility</p>
             </div>
             <div class="flex items-center gap-3">
-                <a href="/entry"
+                <a href="entry.html"
                    class="flex items-center gap-2 bg-primary text-white font-black px-5 py-2.5 rounded-xl hover:bg-primary/80 transition-all text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(31,104,249,0.25)]">
                     <span class="material-symbols-outlined text-lg">add</span> New Entry
                 </a>
@@ -332,7 +332,7 @@
                     <div class="flex gap-2" onclick="event.stopPropagation()">
                         <a href="parkingrecorddetails.html"
                            class="flex-1 text-center py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 font-black text-xs hover:bg-white/10 transition-all">Details</a>
-                        <a href="/exitvehicle"
+                        <a href="exitvehicle.html"
                            class="flex-1 text-center py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 font-black text-xs hover:bg-rose-500/20 transition-all">Process
                             Exit</a>
                     </div>
@@ -380,7 +380,7 @@
                     <div class="flex gap-2" onclick="event.stopPropagation()">
                         <a href="parkingrecorddetails.html"
                            class="flex-1 text-center py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 font-black text-xs hover:bg-white/10 transition-all">Details</a>
-                        <a href="/exitvehicle"
+                        <a href="exitvehicle.html"
                            class="flex-1 text-center py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 font-black text-xs hover:bg-rose-500/20 transition-all">Process
                             Exit</a>
                     </div>
@@ -426,7 +426,7 @@
                     <div class="flex gap-2" onclick="event.stopPropagation()">
                         <a href="parkingrecorddetails.html"
                            class="flex-1 text-center py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 font-black text-xs hover:bg-white/10 transition-all">Details</a>
-                        <a href="/exitvehicle"
+                        <a href="exitvehicle.html"
                            class="flex-1 text-center py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 font-black text-xs hover:bg-rose-500/20 transition-all">Process
                             Exit</a>
                     </div>
@@ -474,7 +474,7 @@
                     <div class="flex gap-2" onclick="event.stopPropagation()">
                         <a href="parkingrecorddetails.html"
                            class="flex-1 text-center py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 font-black text-xs hover:bg-white/10 transition-all">Details</a>
-                        <a href="/exitvehicle"
+                        <a href="exitvehicle.html"
                            class="flex-1 text-center py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 font-black text-xs hover:bg-rose-500/20 transition-all">Process
                             Exit</a>
                     </div>
@@ -520,7 +520,7 @@
                     <div class="flex gap-2" onclick="event.stopPropagation()">
                         <a href="parkingrecorddetails.html"
                            class="flex-1 text-center py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 font-black text-xs hover:bg-white/10 transition-all">Details</a>
-                        <a href="/exitvehicle"
+                        <a href="exitvehicle.html"
                            class="flex-1 text-center py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 font-black text-xs hover:bg-rose-500/20 transition-all">Process
                             Exit</a>
                     </div>
@@ -566,7 +566,7 @@
                     <div class="flex gap-2" onclick="event.stopPropagation()">
                         <a href="parkingrecorddetails.html"
                            class="flex-1 text-center py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 font-black text-xs hover:bg-white/10 transition-all">Details</a>
-                        <a href="/exitvehicle"
+                        <a href="exitvehicle.html"
                            class="flex-1 text-center py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 font-black text-xs hover:bg-rose-500/20 transition-all">Process
                             Exit</a>
                     </div>

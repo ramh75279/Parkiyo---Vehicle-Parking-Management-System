@@ -73,20 +73,20 @@
 
 <header class="sticky top-0 z-50 w-full border-b border-white/5 bg-background-dark/75 premium-blur">
     <div class="container mx-auto flex h-20 items-center justify-between px-6 lg:px-12">
-        <a href="/home" class="flex items-center gap-4">
+        <a href="home.html" class="flex items-center gap-4">
             <div class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]">
                 <span class="material-symbols-outlined font-bold">local_parking</span>
             </div>
             <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </a>
         <nav class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <a class="hover:text-primary transition-colors" href="/home">Home</a>
-            <a class="hover:text-primary transition-colors" href="/features">Features</a>
-            <a class="hover:text-primary transition-colors" href="/solutions">Solutions</a>
-            <a class="hover:text-primary transition-colors" href="/analytics">Analytics</a>
-            <a class="hover:text-primary transition-colors" href="/faq">Support</a>
+            <a class="hover:text-primary transition-colors" href="home.html">Home</a>
+            <a class="hover:text-primary transition-colors" href="features.html">Features</a>
+            <a class="hover:text-primary transition-colors" href="solutions.html">Solutions</a>
+            <a class="hover:text-primary transition-colors" href="analytics.html">Analytics</a>
+            <a class="hover:text-primary transition-colors" href="faq.html">Support</a>
         </nav>
-        <a href="/login" class="text-sm font-bold text-slate-300 hover:text-white transition-colors">Sign In</a>
+        <a href="login.html" class="text-sm font-bold text-slate-300 hover:text-white transition-colors">Sign In</a>
     </div>
 </header>
 
@@ -181,7 +181,7 @@
                 </form>
 
                 <div class="mt-8 pt-8 border-t border-white/5 text-center">
-                    <p class="text-slate-500 text-sm font-medium">Already have an account? <a href="/login" class="text-primary font-black hover:brightness-125 transition-all">Sign in</a></p>
+                    <p class="text-slate-500 text-sm font-medium">Already have an account? <a href="login.html" class="text-primary font-black hover:brightness-125 transition-all">Sign in</a></p>
                 </div>
             </div>
         </div>
@@ -195,8 +195,8 @@
     function togglePw(id, iconId) {
         const el = document.getElementById(id);
         const icon = document.getElementById(iconId);
-        el.type = el.type == 'password' ? 'text' : 'password';
-        icon.textContent = el.type == 'password' ? 'visibility' : 'visibility_off';
+        el.type = el.type === 'password' ? 'text' : 'password';
+        icon.textContent = el.type === 'password' ? 'visibility' : 'visibility_off';
     }
 
     function checkPwStrength(val) {
@@ -211,7 +211,7 @@
         bar.style.width = map[score].w;
         bar.className = `pw-strength-bar ${map[score].c}`;
         label.textContent = map[score].t;
-        label.style.color = score == 4 ? '#4ade80' : score >= 2 ? '#fbbf24' : '#f87171';
+        label.style.color = score === 4 ? '#4ade80' : score >= 2 ? '#fbbf24' : '#f87171';
     }
 
     function resetForm() {
@@ -227,8 +227,8 @@
     const formMsgIcon = document.getElementById('formMsgIcon');
 
     function showMsg(type, text) {
-        formMsg.className = `px-4 py-4 rounded-2xl text-[13px] font-bold flex items-start gap-3 msg-in ${type == 'error' ? 'notify-error' : 'notify-success'}`;
-        formMsgIcon.textContent = type == 'error' ? 'error' : 'check_circle';
+        formMsg.className = `px-4 py-4 rounded-2xl text-[13px] font-bold flex items-start gap-3 msg-in ${type === 'error' ? 'notify-error' : 'notify-success'}`;
+        formMsgIcon.textContent = type === 'error' ? 'error' : 'check_circle';
         formMsgText.textContent = text;
     }
     function hideMsg() { formMsg.classList.add('hidden'); }

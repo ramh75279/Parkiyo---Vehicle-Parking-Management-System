@@ -132,8 +132,8 @@
             <button onclick="window.location.href='logout.html'"
                     class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
                     <span class="material-symbols-outlined shrink-0"><a
-                            href="/logout">power_settings_new</a></span><span class="nav-label"><a
-                    href="/logout">Logout</a></span>
+                            href="logout.html">power_settings_new</a></span><span class="nav-label"><a
+                    href="logout.html">Logout</a></span>
             </button>
         </div>
     </aside>
@@ -212,7 +212,7 @@
                                         class="text-[10px] font-black text-primary hover:brightness-125 transition-all">Mark
                                     read</button>
                                 <span class="text-slate-700">·</span>
-                                <a href="/edit_slot"
+                                <a href="edit_slot.html"
                                    class="text-[10px] font-black text-slate-400 hover:text-white transition-all">View
                                     slot</a>
                             </div>
@@ -240,7 +240,7 @@
                                         class="text-[10px] font-black text-primary hover:brightness-125 transition-all">Mark
                                     read</button>
                                 <span class="text-slate-700">·</span>
-                                <a href="/receipt"
+                                <a href="receipt.html"
                                    class="text-[10px] font-black text-slate-400 hover:text-white transition-all">View
                                     receipt</a>
                             </div>
@@ -268,7 +268,7 @@
                                         class="text-[10px] font-black text-primary hover:brightness-125 transition-all">Mark
                                     read</button>
                                 <span class="text-slate-700">·</span>
-                                <a href="/slot_overview"
+                                <a href="slot_overview.html"
                                    class="text-[10px] font-black text-slate-400 hover:text-white transition-all">View
                                     map</a>
                             </div>
@@ -351,9 +351,9 @@
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         document.querySelectorAll('.notif-row').forEach(el => {
-            el.style.display = (cat == 'all' || el.dataset.cat == cat) ? '' : 'none';
+            el.style.display = (cat === 'all' || el.dataset.cat === cat) ? '' : 'none';
         });
-        if (cat == 'unread') {
+        if (cat === 'unread') {
             document.querySelectorAll('.notif-row').forEach(el => {
                 el.style.display = el.classList.contains('unread') ? '' : 'none';
             });
@@ -399,7 +399,7 @@
             lnk('accountsetting.html', 'settings', 'Settings', false),
         ];
 
-        nav.innerHTML = (role == 'admin' ? adminLinks : userLinks).join('');
+        nav.innerHTML = (role === 'admin' ? adminLinks : userLinks).join('');
     })();
 </script>
 </body>

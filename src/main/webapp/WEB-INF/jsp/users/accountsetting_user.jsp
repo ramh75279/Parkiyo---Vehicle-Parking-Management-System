@@ -169,8 +169,8 @@
         <div class="p-4 border-t border-white/5">
             <button onclick="window.location.href='logout.html'"
                     class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
-                <span class="material-symbols-outlined shrink-0"><a href="/logout">power_settings_new</a></span><span
-                    class="nav-label"><a href="/logout">Logout</a></span>
+                <span class="material-symbols-outlined shrink-0"><a href="logout.html">power_settings_new</a></span><span
+                    class="nav-label"><a href="logout.html">Logout</a></span>
             </button>
         </div>
     </aside>
@@ -469,8 +469,8 @@
 
     function showMsg(id, text, type) {
         const el = document.getElementById(id);
-        el.className = type == 'success' ? 'notify-success mb-5 flex items-center gap-2' : 'notify-error mb-5 flex items-center gap-2';
-        el.innerHTML = '<span class="material-symbols-outlined text-lg">' + (type == 'success' ? 'check_circle' : 'error') + '</span>' + text;
+        el.className = type === 'success' ? 'notify-success mb-5 flex items-center gap-2' : 'notify-error mb-5 flex items-center gap-2';
+        el.innerHTML = '<span class="material-symbols-outlined text-lg">' + (type === 'success' ? 'check_circle' : 'error') + '</span>' + text;
         el.classList.remove('hidden');
         setTimeout(() => el.classList.add('hidden'), 3500);
     }
@@ -536,14 +536,14 @@
             lnk('accountsetting.html', 'settings', 'Settings', true),
         ];
 
-        nav.innerHTML = (role == 'admin' ? adminLinks : userLinks).join('');
+        nav.innerHTML = (role === 'admin' ? adminLinks : userLinks).join('');
 
         // Update header badges
-        document.getElementById('roleBadge').textContent = role == 'admin' ? 'Admin' : 'User';
-        document.getElementById('headerName').textContent = role == 'admin' ? 'Alex Johnson' : 'Kamal Perera';
-        document.getElementById('avatarName').textContent = role == 'admin' ? 'Alex Johnson' : 'Kamal Perera';
-        document.getElementById('avatarRole').textContent = role == 'admin' ? 'Admin · PKW-00441-AJ' : 'User · PKW-00441-KP';
-        document.getElementById('roleField').value = role == 'admin' ? 'Administrator' : 'User';
+        document.getElementById('roleBadge').textContent = role === 'admin' ? 'Admin' : 'User';
+        document.getElementById('headerName').textContent = role === 'admin' ? 'Alex Johnson' : 'Kamal Perera';
+        document.getElementById('avatarName').textContent = role === 'admin' ? 'Alex Johnson' : 'Kamal Perera';
+        document.getElementById('avatarRole').textContent = role === 'admin' ? 'Admin · PKW-00441-AJ' : 'User · PKW-00441-KP';
+        document.getElementById('roleField').value = role === 'admin' ? 'Administrator' : 'User';
     })();
 </script>
 
@@ -590,11 +590,11 @@
             lnk('accountsetting_user.html', 'settings', 'Account Settings', true),
         ];
 
-        nav.innerHTML = (role == 'admin' ? adminLinks : userLinks).join('');
+        nav.innerHTML = (role === 'admin' ? adminLinks : userLinks).join('');
 
         // Update role badge if present
         const badge = document.getElementById('roleBadge');
-        if (badge) badge.textContent = role == 'admin' ? 'Admin' : 'User';
+        if (badge) badge.textContent = role === 'admin' ? 'Admin' : 'User';
     })();
 </script>
 

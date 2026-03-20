@@ -201,52 +201,52 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-2 overflow-y-auto">
-            <a href="/dashboard_user"
+            <a href="dashboard_user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">dashboard</span>
                 <span class="nav-label text-sm">Dashboard</span>
             </a>
-            <a href="/entry"
+            <a href="entry.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">login</span>
                 <span class="nav-label text-sm">Vehicle Entry</span>
             </a>
-            <a href="/exitvehicle"
+            <a href="exitvehicle.html"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                 <span class="material-symbols-outlined shrink-0">logout</span>
                 <span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a href="/parking"
+            <a href="parking.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">local_parking</span>
                 <span class="nav-label text-sm">Active Parking</span>
             </a>
-            <a href="/advancereservation"
+            <a href="advancereservation.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">event_available</span>
                 <span class="nav-label text-sm">Reservation</span>
             </a>
-            <a href="/paymenthistory_user"
+            <a href="paymenthistory_user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">payments</span>
                 <span class="nav-label text-sm">Payments</span>
             </a>
-            <a href="/receipt"
+            <a href="receipt.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">receipt_long</span>
                 <span class="nav-label text-sm">Receipts</span>
             </a>
-            <a href="/walletoverview"
+            <a href="walletoverview.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">account_balance_wallet</span>
                 <span class="nav-label text-sm">Wallet</span>
             </a>
-            <a href="/notification_user"
+            <a href="notification_user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">notifications</span>
                 <span class="nav-label text-sm">Notifications</span>
             </a>
-            <a href="/accountsetting_user"
+            <a href="accountsetting_user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">settings</span>
                 <span class="nav-label text-sm">Account Settings</span>
@@ -255,8 +255,8 @@
         <div class="p-4 border-t border-white/5">
             <button onclick="window.location.href='login.html'"
                     class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
-                <span class="material-symbols-outlined shrink-0"><a href="/logout">power_settings_new</a></span><span
-                    class="nav-label"><a href="/logout">logout</a></span>
+                <span class="material-symbols-outlined shrink-0"><a href="logout.html">power_settings_new</a></span><span
+                    class="nav-label"><a href="logout.html">logout</a></span>
             </button>
         </div>
     </aside>
@@ -292,7 +292,7 @@
                         facility.</p>
                     <input id="plateField" type="text" placeholder="e.g. ABC-1234"
                            class="pt-3 rounded-3xl plate-input mb-4 text-sm font-bold" oninput="this.value=this.value.toUpperCase()"
-                           onkeydown="if(event.key=='Enter')lookupPlate()" />
+                           onkeydown="if(event.key==='Enter')lookupPlate()" />
                     <div class="flex gap-3">
                         <button onclick="lookupPlate()"
                                 class="flex-1 flex items-center justify-center gap-2 bg-rose-500 text-white font-black py-3.5 rounded-2xl hover:bg-rose-600 transition-all text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(239,68,68,0.2)]">
@@ -424,7 +424,7 @@
                             </div>
                         </div>
                         <div class="flex gap-3">
-                            <a href="/receipt"
+                            <a href="receipt.html"
                                class="flex-1 flex items-center justify-center gap-2 bg-primary/10 border border-primary/20 text-primary font-black py-3 rounded-2xl hover:bg-primary/20 transition-all text-sm">
                                 <span class="material-symbols-outlined text-base">receipt_long</span> View Receipt
                             </a>

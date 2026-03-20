@@ -195,11 +195,11 @@
 
                 <!-- Action buttons (hidden until done) -->
                 <div id="actionBtns" class="hidden space-y-3">
-                    <a href="/login"
+                    <a href="login.html"
                        class="w-full flex items-center justify-center gap-2 bg-primary text-white font-black py-3.5 rounded-2xl hover:bg-primary/80 transition-all text-sm shadow-[0_0_20px_rgba(31,104,249,0.3)]">
                         <span class="material-symbols-outlined text-base">login</span> Sign In Again
                     </a>
-                    <a href="/home"
+                    <a href="home.html"
                        class="w-full flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-sm">
                         <span class="material-symbols-outlined text-base">home</span> Back to Home
                     </a>
