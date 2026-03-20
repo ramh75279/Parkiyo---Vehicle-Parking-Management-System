@@ -54,57 +54,57 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a href="/dashboard_admin"
+            <a href="dashboard_admin.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">dashboard</span>
                 <span class="nav-label text-sm">Dashboard</span>
             </a>
-            <a href="/entry_admin"
+            <a href="entry_admin.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">login</span>
                 <span class="nav-label text-sm">Vehicle Entry</span>
             </a>
-            <a href="/exitvehicle_admin"
+            <a href="exitvehicle_admin.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">logout</span>
                 <span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a href="/slot_overview"
+            <a href="slot_overview.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">grid_view</span>
                 <span class="nav-label text-sm">Parking Slots</span>
             </a>
-            <a href="/Vehicle_List_Page"
+            <a href="Vehicle_List_Page.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">directions_car</span>
                 <span class="nav-label text-sm">Vehicles</span>
             </a>
-            <a href="/usermanagement"
+            <a href="usermanagement.html"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                 <span class="material-symbols-outlined shrink-0">group</span>
                 <span class="nav-label text-sm">Users</span>
             </a>
-            <a href="/paymenthistory"
+            <a href="paymenthistory.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">payments</span>
                 <span class="nav-label text-sm">Payments</span>
             </a>
-            <a href="/Repportshubpage"
+            <a href="Repportshubpage.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">bar_chart</span>
                 <span class="nav-label text-sm">Reports</span>
             </a>
-            <a href="/notification"
+            <a href="notification.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">notifications</span>
                 <span class="nav-label text-sm">Notifications</span>
             </a>
-            <a href="/systemstatuspage"
+            <a href="systemstatuspage.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">monitor_heart</span>
                 <span class="nav-label text-sm">System Status</span>
             </a>
-            <a href="/accountsetting"
+            <a href="accountsetting.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">settings</span>
                 <span class="nav-label text-sm">Settings</span>
@@ -114,8 +114,8 @@
             <button onclick="window.location.href='logout.html'"
                     class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
                     <span class="material-symbols-outlined shrink-0"><a
-                            href="/logout">power_settings_new</a></span><span class="nav-label"><a
-                    href="/logout">Logout</a></span>
+                            href="logout.html">power_settings_new</a></span><span class="nav-label"><a
+                    href="logout.html">Logout</a></span>
             </button>
         </div>
     </aside>
@@ -127,7 +127,7 @@
                 <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Manage Platform Accounts</p>
             </div>
             <div class="flex items-center gap-6">
-                <a href="/createuser" class="flex items-center gap-2 bg-primary text-white text-sm font-black px-6 py-3 rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/20">
+                <a href="createuser.html" class="flex items-center gap-2 bg-primary text-white text-sm font-black px-6 py-3 rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/20">
                     <span class="material-symbols-outlined text-lg">person_add</span> Add User
                 </a>
                 <div class="flex items-center gap-4">
@@ -307,8 +307,8 @@
         const status = document.getElementById('statusFilter').value;
         document.querySelectorAll('#userTable tr').forEach(row => {
             const text = row.textContent.toLowerCase();
-            const rMatch = !role || row.dataset.role == role;
-            const sMatch = !status || row.dataset.status == status;
+            const rMatch = !role || row.dataset.role === role;
+            const sMatch = !status || row.dataset.status === status;
             const tMatch = !search || text.includes(search);
             row.style.display = (rMatch && sMatch && tMatch) ? '' : 'none';
         });

@@ -39,22 +39,22 @@
 <!-- NAV -->
 <header class="sticky top-0 z-50 w-full border-b border-white/5 bg-background-dark/75 premium-blur">
     <div class="container mx-auto flex h-20 items-center justify-between px-6 lg:px-12">
-        <a href="/home" class="flex items-center gap-4">
+        <a href="home.html" class="flex items-center gap-4">
             <div class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]">
                 <span class="material-symbols-outlined font-bold">local_parking</span>
             </div>
             <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </a>
         <nav class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <a class="text-primary" href="/home">Home</a>
-            <a class="hover:text-primary transition-colors" href="/features">Features</a>
-            <a class="hover:text-primary transition-colors" href="/solutions">Solutions</a>
-            <a class="hover:text-primary transition-colors" href="/analytics">Analytics</a>
-            <a class="hover:text-primary transition-colors" href="/faq">Support</a>
+            <a class="text-primary" href="home.html">Home</a>
+            <a class="hover:text-primary transition-colors" href="features.html">Features</a>
+            <a class="hover:text-primary transition-colors" href="solutions.html">Solutions</a>
+            <a class="hover:text-primary transition-colors" href="analytics.html">Analytics</a>
+            <a class="hover:text-primary transition-colors" href="faq.html">Support</a>
         </nav>
         <div class="flex items-center gap-6">
-            <a href="/login" class="text-sm font-bold text-slate-300 hover:text-white transition-colors">Login</a>
-            <a href="/register" class="bg-primary text-white text-sm font-bold px-7 py-3 rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/30">Get Started</a>
+            <a href="login.html" class="text-sm font-bold text-slate-300 hover:text-white transition-colors">Login</a>
+            <a href="register.html" class="bg-primary text-white text-sm font-bold px-7 py-3 rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/30">Get Started</a>
         </div>
     </div>
 </header>
@@ -84,11 +84,11 @@
                 </p>
 
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-5">
-                    <a href="/register" class="w-full sm:w-auto bg-primary text-white font-black px-10 py-5 rounded-2xl hover:scale-105 transition-all shadow-2xl shadow-primary/30 text-base flex items-center justify-center gap-3">
+                    <a href="register.html" class="w-full sm:w-auto bg-primary text-white font-black px-10 py-5 rounded-2xl hover:scale-105 transition-all shadow-2xl shadow-primary/30 text-base flex items-center justify-center gap-3">
                         Start for free
                         <span class="material-symbols-outlined text-xl">arrow_forward</span>
                     </a>
-                    <a href="/features" class="w-full sm:w-auto glass-card text-white font-bold px-10 py-5 rounded-2xl hover:bg-white/5 transition-all text-base flex items-center justify-center gap-3">
+                    <a href="features.html" class="w-full sm:w-auto glass-card text-white font-bold px-10 py-5 rounded-2xl hover:bg-white/5 transition-all text-base flex items-center justify-center gap-3">
                         <span class="material-symbols-outlined text-xl text-primary">play_circle</span>
                         See how it works
                     </a>
@@ -294,7 +294,7 @@
                             </div>
                         </div>
                     </div>
-                    <a href="/solutions" class="mt-10 inline-flex items-center gap-3 text-primary font-black text-sm hover:gap-5 transition-all">
+                    <a href="solutions.html" class="mt-10 inline-flex items-center gap-3 text-primary font-black text-sm hover:gap-5 transition-all">
                         Explore all solutions <span class="material-symbols-outlined text-base">arrow_forward</span>
                     </a>
                 </div>
@@ -314,8 +314,8 @@
                 <h2 class="text-4xl lg:text-6xl font-black text-white leading-tight mb-6">Ready to upgrade your parking operations?</h2>
                 <p class="text-blue-200 text-lg mb-12 font-medium max-w-xl mx-auto">Join forward-thinking facilities using Parkiyo to run cleaner, smarter, more profitable parking.</p>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-5">
-                    <a href="/register" class="w-full sm:w-auto bg-white text-primary font-black px-10 py-5 rounded-2xl hover:scale-105 transition-all text-base">Start for free today</a>
-                    <a href="/login" class="w-full sm:w-auto bg-white/10 text-white font-bold px-10 py-5 rounded-2xl hover:bg-white/20 transition-all text-base border border-white/20">Already have an account</a>
+                    <a href="register.html" class="w-full sm:w-auto bg-white text-primary font-black px-10 py-5 rounded-2xl hover:scale-105 transition-all text-base">Start for free today</a>
+                    <a href="login.html" class="w-full sm:w-auto bg-white/10 text-white font-bold px-10 py-5 rounded-2xl hover:bg-white/20 transition-all text-base border border-white/20">Already have an account</a>
                 </div>
             </div>
         </div>
@@ -338,28 +338,28 @@
             <div>
                 <h5 class="text-white font-black mb-8 text-[11px] uppercase tracking-[0.2em] opacity-80">Platform</h5>
                 <ul class="space-y-4 text-slate-500 text-sm font-bold">
-                    <li><a href="/features" class="hover:text-primary transition-colors">Features</a></li>
-                    <li><a href="/solutions" class="hover:text-primary transition-colors">Solutions</a></li>
-                    <li><a href="/analytics" class="hover:text-primary transition-colors">Analytics</a></li>
-                    <li><a href="/faq" class="hover:text-primary transition-colors">Support</a></li>
+                    <li><a href="features.html" class="hover:text-primary transition-colors">Features</a></li>
+                    <li><a href="solutions.html" class="hover:text-primary transition-colors">Solutions</a></li>
+                    <li><a href="analytics.html" class="hover:text-primary transition-colors">Analytics</a></li>
+                    <li><a href="faq.html" class="hover:text-primary transition-colors">Support</a></li>
                 </ul>
             </div>
             <div>
                 <h5 class="text-white font-black mb-8 text-[11px] uppercase tracking-[0.2em] opacity-80">Company</h5>
                 <ul class="space-y-4 text-slate-500 text-sm font-bold">
-                    <li><a href="/faq" class="hover:text-primary transition-colors">Help & FAQ</a></li>
-                    <li><a href="/privacy" class="hover:text-primary transition-colors">Privacy</a></li>
-                    <li><a href="/login" class="hover:text-primary transition-colors">Login</a></li>
-                    <li><a href="/register" class="hover:text-primary transition-colors">Register</a></li>
+                    <li><a href="faq.html" class="hover:text-primary transition-colors">Help & FAQ</a></li>
+                    <li><a href="privacy.html" class="hover:text-primary transition-colors">Privacy</a></li>
+                    <li><a href="login.html" class="hover:text-primary transition-colors">Login</a></li>
+                    <li><a href="register.html" class="hover:text-primary transition-colors">Register</a></li>
                 </ul>
             </div>
         </div>
         <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
             <p class="text-slate-600 text-[9px] tracking-[0.3em] uppercase font-bold">© 2026 Parkiyo. All rights reserved.</p>
             <div class="flex gap-8">
-                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="/home">language</a></span>
-                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="/privacy">shield_person</a></span>
-                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="/faq">support_agent</a></span>
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="home.html">language</a></span>
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="privacy.html">shield_person</a></span>
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="faq.html">support_agent</a></span>
             </div>
         </div>
     </div>

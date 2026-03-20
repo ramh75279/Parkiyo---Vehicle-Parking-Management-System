@@ -243,39 +243,39 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a href="/dashboard_user"
+            <a href="dashboard_user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">dashboard</span><span
                     class="nav-label text-sm">Dashboard</span></a>
-            <a href="/entry"
+            <a href="entry.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle
                         Entry</span></a>
-            <a href="/exitvehicle"
+            <a href="exitvehicle.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle
                         Exit</span></a>
-            <a href="/parking"
+            <a href="parking.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">local_parking</span><span
                     class="nav-label text-sm">Active Parking</span></a>
-            <a href="/advancereservation"
+            <a href="advancereservation.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">event_available</span><span
                     class="nav-label text-sm">Reservations</span></a>
-            <a href="/paymenthistory"
+            <a href="paymenthistory.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">payments</span><span
                     class="nav-label text-sm">Payments</span></a>
-            <a href="/walletoverview"
+            <a href="walletoverview.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">account_balance_wallet</span><span
                     class="nav-label text-sm">Wallet</span></a>
-            <a href="/assistant"
+            <a href="assistant.html"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span
                     class="material-symbols-outlined shrink-0">smart_toy</span><span class="nav-label text-sm">AI
                         Assistant</span></a>
-            <a href="/accountsetting_user"
+            <a href="accountsetting_user.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">settings</span><span
                     class="nav-label text-sm">Settings</span></a>
@@ -284,8 +284,8 @@
             <button onclick="window.location.href='logout.html'"
                     class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
                     <span class="material-symbols-outlined shrink-0"><a
-                            href="/logout">power_settings_new</a></span><span class="nav-label"><a
-                    href="/logout">Logout</a></span>
+                            href="logout.html">power_settings_new</a></span><span class="nav-label"><a
+                    href="logout.html">Logout</a></span>
             </button>
         </div>
     </aside>
@@ -404,7 +404,7 @@
                     <div class="relative">
                             <textarea id="composeInput" class="compose-input"
                                       placeholder="Ask Parky anything about parking, reservations, payments…" rows="1"
-                                      onkeydown="if(event.key=='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"
+                                      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"
                                       oninput="autoResize(this)"></textarea>
                         <button onclick="sendMessage()"
                                 class="absolute right-3 bottom-3 h-9 w-9 rounded-xl bg-primary flex items-center justify-center hover:bg-primary/80 transition-all shadow-[0_0_12px_rgba(31,104,249,0.4)]">
@@ -447,16 +447,16 @@
 
                 <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Quick Links</h3>
                 <div class="space-y-2">
-                    <a href="/slot_overview" class="action-card text-xs"><span
+                    <a href="slot_overview.html" class="action-card text-xs"><span
                             class="material-symbols-outlined text-primary text-sm">map</span><span
                             class="text-slate-300 font-bold">Slot Map</span></a>
-                    <a href="/entry" class="action-card text-xs"><span
+                    <a href="entry.html" class="action-card text-xs"><span
                             class="material-symbols-outlined text-emerald-400 text-sm">login</span><span
                             class="text-slate-300 font-bold">Process Entry</span></a>
-                    <a href="/exitvehicle" class="action-card text-xs"><span
+                    <a href="exitvehicle.html" class="action-card text-xs"><span
                             class="material-symbols-outlined text-rose-400 text-sm">logout</span><span
                             class="text-slate-300 font-bold">Process Exit</span></a>
-                    <a href="/advancereservation" class="action-card text-xs"><span
+                    <a href="advancereservation.html" class="action-card text-xs"><span
                             class="material-symbols-outlined text-amber-400 text-sm">event_available</span><span
                             class="text-slate-300 font-bold">Reservations</span></a>
                 </div>
@@ -475,12 +475,12 @@
                 <div class="p-3 rounded-xl bg-emerald-500/8 border border-emerald-500/15 text-center" style="background:rgba(16,185,129,0.06)"><p class="text-lg font-black text-emerald-400">5</p><p class="text-[9px] text-slate-500 font-black uppercase">Zone C</p></div>
                 <div class="p-3 rounded-xl bg-emerald-500/8 border border-emerald-500/15 text-center" style="background:rgba(16,185,129,0.06)"><p class="text-lg font-black text-emerald-400">12</p><p class="text-[9px] text-slate-500 font-black uppercase">Zone D</p></div>
             </div>
-            <p class="mt-3 text-xs"><strong class="text-emerald-400">42 slots</strong> available right now out of 100 total. Would you like to <a href="/slot_overview" class="text-primary underline">view the slot map</a> or make a reservation?</p>`
+            <p class="mt-3 text-xs"><strong class="text-emerald-400">42 slots</strong> available right now out of 100 total. Would you like to <a href="slot_overview.html" class="text-primary underline">view the slot map</a> or make a reservation?</p>`
         },
         'Make a reservation for tomorrow': {
             text: "Sure! To book a slot for tomorrow, I'll need a few details. You can use the quick reservation form or I can guide you through it. Which vehicle would you like to reserve for?",
             extra: `<div class="mt-3 flex gap-2">
-                <a href="/advancereservation" class="flex-1 flex items-center justify-center gap-1.5 bg-primary/10 border border-primary/20 text-primary font-black py-2.5 rounded-xl text-xs hover:bg-primary/20 transition-all"><span class="material-symbols-outlined text-sm">add</span>New Reservation</a>
+                <a href="advancereservation.html" class="flex-1 flex items-center justify-center gap-1.5 bg-primary/10 border border-primary/20 text-primary font-black py-2.5 rounded-xl text-xs hover:bg-primary/20 transition-all"><span class="material-symbols-outlined text-sm">add</span>New Reservation</a>
             </div>`
         },
         'Show my recent payments': {
@@ -490,7 +490,7 @@
                 <div class="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/6" style="border-color:rgba(255,255,255,0.06)"><div><p class="text-xs font-black text-white">ABC-1234 · Walk-in</p><p class="text-[9px] text-slate-500 font-bold">09 Mar 2026</p></div><span class="text-emerald-400 font-black text-sm">-$18.75</span></div>
                 <div class="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/6" style="border-color:rgba(255,255,255,0.06)"><div><p class="text-xs font-black text-white">GHI-7721 · Walk-in</p><p class="text-[9px] text-slate-500 font-bold">08 Mar 2026</p></div><span class="text-emerald-400 font-black text-sm">-$13.75</span></div>
             </div>
-            <p class="mt-2 text-xs">Total spent this month: <strong class="text-white">$124.75</strong>. <a href="/paymenthistory" class="text-primary underline">View full history →</a></p>`
+            <p class="mt-2 text-xs">Total spent this month: <strong class="text-white">$124.75</strong>. <a href="paymenthistory.html" class="text-primary underline">View full history →</a></p>`
         },
         'What are the parking rates?': {
             text: "Here's our current pricing structure:",
@@ -503,26 +503,26 @@
         },
         'How many slots are available in Zone A?': {
             text: "Zone A (Ground Floor) currently has <strong class='text-emerald-400'>10 available slots</strong> out of 25 total. 13 are occupied and 2 are under maintenance.",
-            extra: `<div class="mt-3"><a href="/slot_overview" class="flex items-center gap-2 text-primary text-xs font-black hover:brightness-125 transition-all"><span class="material-symbols-outlined text-sm">map</span>View Zone A on slot map →</a></div>`
+            extra: `<div class="mt-3"><a href="slot_overview.html" class="flex items-center gap-2 text-primary text-xs font-black hover:brightness-125 transition-all"><span class="material-symbols-outlined text-sm">map</span>View Zone A on slot map →</a></div>`
         },
         'What is my wallet balance?': {
             text: "Your Parkiyo Wallet balance is currently <strong class='text-emerald-400 text-lg'>$48.50</strong>. Your wallet ID is PKW-00441-KP.",
-            extra: `<div class="mt-3 flex gap-2"><a href="/walletoverview" class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-black px-4 py-2 rounded-xl text-xs hover:bg-emerald-500/15 transition-all"><span class="material-symbols-outlined text-sm">add_circle</span>Top Up Wallet</a></div>`
+            extra: `<div class="mt-3 flex gap-2"><a href="walletoverview.html" class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-black px-4 py-2 rounded-xl text-xs hover:bg-emerald-500/15 transition-all"><span class="material-symbols-outlined text-sm">add_circle</span>Top Up Wallet</a></div>`
         },
         'Show my active parking session': {
             text: "You have <strong class='text-white'>51 active sessions</strong> facility-wide right now. Your most recent entry was <strong class='text-white'>ABC-1234</strong> at slot A-12 (entered 10:45 AM, 2h 14m ago).",
-            extra: `<div class="mt-3"><a href="/parking" class="flex items-center gap-2 text-primary text-xs font-black hover:brightness-125 transition-all"><span class="material-symbols-outlined text-sm">local_parking</span>View all active sessions →</a></div>`
+            extra: `<div class="mt-3"><a href="parking.html" class="flex items-center gap-2 text-primary text-xs font-black hover:brightness-125 transition-all"><span class="material-symbols-outlined text-sm">local_parking</span>View all active sessions →</a></div>`
         },
         'How do I cancel a reservation?': {
             text: "To cancel a reservation, go to <strong class='text-white'>Reservations</strong> from the sidebar, find the booking you want to cancel, and click the red × cancel button on the right. Cancellations made <strong class='text-white'>more than 2 hours before</strong> arrival are free. Cancellations within 2 hours may incur a small fee.",
-            extra: `<div class="mt-3"><a href="/advancereservation" class="flex items-center gap-2 text-primary text-xs font-black hover:brightness-125 transition-all"><span class="material-symbols-outlined text-sm">event_available</span>Go to My Reservations →</a></div>`
+            extra: `<div class="mt-3"><a href="advancereservation.html" class="flex items-center gap-2 text-primary text-xs font-black hover:brightness-125 transition-all"><span class="material-symbols-outlined text-sm">event_available</span>Go to My Reservations →</a></div>`
         },
         'What is the daily maximum rate?': {
             text: "The daily maximum rate at Parkiyo is <strong class='text-white'>$30.00</strong>. This means regardless of how long you park, you won't be charged more than $30 in a single calendar day. This applies to standard slots — EV and oversized slots have a daily max of <strong class='text-white'>$35.00</strong>."
         },
         'Help me top up my wallet': {
             text: "I'll take you to the wallet top-up page right now! You can add $10, $20, $50, $100, $200, or a custom amount using your card or online banking.",
-            extra: `<div class="mt-3"><a href="/walletoverview" class="flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary font-black px-4 py-2 rounded-xl text-xs hover:bg-primary/20 transition-all inline-flex"><span class="material-symbols-outlined text-sm">account_balance_wallet</span>Open Wallet →</a></div>`
+            extra: `<div class="mt-3"><a href="walletoverview.html" class="flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary font-black px-4 py-2 rounded-xl text-xs hover:bg-primary/20 transition-all inline-flex"><span class="material-symbols-outlined text-sm">account_balance_wallet</span>Open Wallet →</a></div>`
         }
     };
 
@@ -536,11 +536,11 @@
     function appendMessage(role, text, extra = '') {
         const container = document.getElementById('chatMessages');
         const wrapper = document.createElement('div');
-        wrapper.className = `flex gap-4 msg-appear ${role == 'user' ? 'flex-row-reverse' : ''}`;
+        wrapper.className = `flex gap-4 msg-appear ${role === 'user' ? 'flex-row-reverse' : ''}`;
 
         const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-        if (role == 'ai') {
+        if (role === 'ai') {
             wrapper.innerHTML = `
                 <div class="h-9 w-9 rounded-[14px] ai-avatar flex items-center justify-center shrink-0 mt-1">
                     <span class="material-symbols-outlined text-white text-base">smart_toy</span>

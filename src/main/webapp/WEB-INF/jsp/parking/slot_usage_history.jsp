@@ -195,39 +195,39 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a href="/dashboard_admin"
+            <a href="dashboard_admin.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">dashboard</span><span
                     class="nav-label text-sm">Dashboard</span></a>
-            <a href="/entry"
+            <a href="entry.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle
                         Entry</span></a>
-            <a href="/exitvehicle"
+            <a href="exitvehicle.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle
                         Exit</span></a>
-            <a href="/Vehicle_List_Page"
+            <a href="Vehicle_List_Page.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">directions_car</span><span
                     class="nav-label text-sm">Vehicles</span></a>
-            <a href="/slot_list"
+            <a href="slot_list.html"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span
                     class="material-symbols-outlined shrink-0">grid_view</span><span
                     class="nav-label text-sm">Parking Slots</span></a>
-            <a href="/usermanagement"
+            <a href="usermanagement.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">group</span><span
                     class="nav-label text-sm">Users</span></a>
-            <a href="/paymenthistory"
+            <a href="paymenthistory.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">payments</span><span
                     class="nav-label text-sm">Payments</span></a>
-            <a href="/Repportshubpage"
+            <a href="Repportshubpage.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">bar_chart</span><span
                     class="nav-label text-sm">Reports</span></a>
-            <a href="/accountsetting"
+            <a href="accountsetting.html"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">settings</span><span
                     class="nav-label text-sm">Settings</span></a>
@@ -236,8 +236,8 @@
             <button onclick="window.location.href='logout.html'"
                     class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
                     <span class="material-symbols-outlined shrink-0"><a
-                            href="/logout">power_settings_new</a></span><span class="nav-label"><a
-                    href="/logout">Logout</a></span>
+                            href="logout.html">power_settings_new</a></span><span class="nav-label"><a
+                    href="logout.html">Logout</a></span>
             </button>
         </div>
     </aside>
@@ -246,7 +246,7 @@
         <header
                 class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
             <div class="flex items-center gap-4">
-                <button onclick="window.location.href='/edit_slot'"
+                <button onclick="window.location.href='edit_slot.html'"
                         class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
                     <span class="material-symbols-outlined text-slate-400">arrow_back</span>
                 </button>
