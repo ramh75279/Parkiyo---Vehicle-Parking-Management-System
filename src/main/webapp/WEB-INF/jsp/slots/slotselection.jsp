@@ -210,31 +210,31 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a href="dashboard_user.html"
+            <a href="/dashboard_user"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">dashboard</span><span
                     class="nav-label text-sm">Dashboard</span></a>
-            <a href="entry.html"
+            <a href="/entry"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle
                         Entry</span></a>
-            <a href="exitvehicle.html"
+            <a href="/exitvehicle"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle
                         Exit</span></a>
-            <a href="parking.html"
+            <a href="/parking"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">local_parking</span><span
                     class="nav-label text-sm">Active Parking</span></a>
-            <a href="advancereservation.html"
+            <a href="/advancereservation"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span
                     class="material-symbols-outlined shrink-0">event_available</span><span
                     class="nav-label text-sm">Reservations</span></a>
-            <a href="paymenthistory.html"
+            <a href="/paymenthistory"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">payments</span><span
                     class="nav-label text-sm">Payments</span></a>
-            <a href="walletoverview.html"
+            <a href="/walletoverview"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">account_balance_wallet</span><span
                     class="nav-label text-sm">Wallet</span></a>
@@ -243,8 +243,8 @@
             <button onclick="window.location.href='logout.html'"
                     class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
                     <span class="material-symbols-outlined shrink-0"><a
-                            href="logout.html">power_settings_new</a></span><span class="nav-label"><a
-                    href="logout.html">Logout</a></span>
+                            href="/logout">power_settings_new</a></span><span class="nav-label"><a
+                    href="/logout">Logout</a></span>
             </button>
         </div>
     </aside>
@@ -424,14 +424,14 @@
         const grid = document.getElementById('slotGrid');
         grid.innerHTML = '';
         zd.slots.forEach(slot => {
-            const tip = slot.s === 'available' ? `${slot.code} · Available` : slot.s === 'occupied' ? `${slot.code} · Occupied` : `${slot.code} · Reserved`;
+            const tip = slot.s == 'available' ? `${slot.code} · Available` : slot.s == 'occupied' ? `${slot.code} · Occupied` : `${slot.code} · Reserved`;
             const cell = document.createElement('div');
             cell.className = `slot-cell ${slot.s}`;
             cell.innerHTML = `
-            <span class="material-symbols-outlined text-lg ${slot.s === 'available' ? 'text-emerald-400' : slot.s === 'occupied' ? 'text-rose-400' : 'text-amber-400'}">${iconMap[slot.s]}</span>
+            <span class="material-symbols-outlined text-lg ${slot.s == 'available' ? 'text-emerald-400' : slot.s == 'occupied' ? 'text-rose-400' : 'text-amber-400'}">${iconMap[slot.s]}</span>
             <span class="slot-code">${slot.code}</span>
             <div class="slot-tooltip text-white">${tip}</div>`;
-            if (slot.s === 'available') {
+            if (slot.s == 'available') {
                 cell.onclick = () => selectSlot(cell, slot.code, z);
             }
             grid.appendChild(cell);

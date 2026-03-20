@@ -94,43 +94,43 @@
         </div>
 
         <nav class="flex-1 px-3 space-y-2 overflow-y-auto">
-            <a href="dashboard_user.html" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
+            <a href="/dashboard_user" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                 <span class="material-symbols-outlined shrink-0">dashboard</span>
                 <span class="nav-label text-sm">Dashboard</span>
             </a>
-            <a href="entry.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a href="/entry" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">login</span>
                 <span class="nav-label text-sm">Vehicle Entry</span>
             </a>
-            <a href="exitvehicle.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a href="/exitvehicle" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">logout</span>
                 <span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a href="parking.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a href="/parking" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">local_parking</span>
                 <span class="nav-label text-sm">Active Parking</span>
             </a>
-            <a href="advancereservation.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a href="/advancereservation" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">event_available</span>
                 <span class="nav-label text-sm">Reservation</span>
             </a>
-            <a href="paymenthistory_user.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a href="/paymenthistory_user" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">payments</span>
                 <span class="nav-label text-sm">Payments</span>
             </a>
-            <a href="receipt.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a href="/receipt" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">receipt_long</span>
                 <span class="nav-label text-sm">Receipts</span>
             </a>
-            <a href="walletoverview.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a href="/walletoverview" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">account_balance_wallet</span>
                 <span class="nav-label text-sm">Wallet</span>
             </a>
-            <a href="notification_user.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a href="/notification_user" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">notifications</span>
                 <span class="nav-label text-sm">Notifications</span>
             </a>
-            <a href="accountsetting_user.html" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a href="/accountsetting_user" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">settings</span>
                 <span class="nav-label text-sm">Account Settings</span>
             </a>
@@ -139,8 +139,8 @@
         <div class="p-4 border-t border-white/5">
             <button onclick="window.location.href='logout.html'"
                     class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
-                <span class="material-symbols-outlined shrink-0"><a href="logout.html">power_settings_new</a></span><span
-                    class="nav-label"><a href="logout.html">Logout</a></span>
+                <span class="material-symbols-outlined shrink-0"><a href="/logout">power_settings_new</a></span><span
+                    class="nav-label"><a href="/logout">Logout</a></span>
             </button>
         </div>
     </aside>
@@ -219,19 +219,19 @@
                 <div class="glass-card rounded-[2.5rem] p-8 lg:col-span-1">
                     <h3 class="text-lg font-black text-white mb-6">Quick Actions</h3>
                     <div class="grid grid-cols-2 gap-4">
-                        <a href="entry.html" class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:bg-primary/15 transition">
+                        <a href="/entry" class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:bg-primary/15 transition">
                             <span class="material-symbols-outlined text-white mb-2">login</span>
                             <p class="text-xs font-black uppercase tracking-widest text-white">New Entry</p>
                         </a>
-                        <a href="exitvehicle.html" class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:bg-white/10 transition">
+                        <a href="/exitvehicle" class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:bg-white/10 transition">
                             <span class="material-symbols-outlined text-white mb-2">logout</span>
                             <p class="text-xs font-black uppercase tracking-widest text-white">Process Exit</p>
                         </a>
-                        <a href="slotselection.html" class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:bg-white/10 transition">
+                        <a href="/slotselection" class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:bg-white/10 transition">
                             <span class="material-symbols-outlined text-white mb-2">grid_view</span>
                             <p class="text-xs font-black uppercase tracking-widest text-white">Assign Slot</p>
                         </a>
-                        <a href="pendingpayment.html" class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:bg-white/10 transition">
+                        <a href="/pendingpayment" class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:bg-white/10 transition">
                             <span class="material-symbols-outlined text-white mb-2">payments</span>
                             <p class="text-xs font-black uppercase tracking-widest text-white">Take Payment</p>
                         </a>
@@ -445,7 +445,7 @@
     </div>
     <!-- Footer -->
     <div class="px-6 py-4 border-t border-white/5">
-        <a href="notification.html" class="flex items-center justify-center gap-2 text-primary text-xs font-black hover:brightness-125 transition-all">
+        <a href="/notification" class="flex items-center justify-center gap-2 text-primary text-xs font-black hover:brightness-125 transition-all">
             <span class="material-symbols-outlined text-sm">open_in_new</span> View all notifications
         </a>
     </div>
@@ -479,9 +479,9 @@
         active.classList.remove('text-slate-500','border-transparent');
 
         document.querySelectorAll('.notif-item').forEach(el => {
-            if (tab === 'all') { el.style.display = ''; }
-            else if (tab === 'unread') { el.style.display = el.dataset.type === 'unread' ? '' : 'none'; }
-            else if (tab === 'system') { el.style.display = el.dataset.type === 'system' ? '' : 'none'; }
+            if (tab == 'all') { el.style.display = ''; }
+            else if (tab == 'unread') { el.style.display = el.dataset.type == 'unread' ? '' : 'none'; }
+            else if (tab == 'system') { el.style.display = el.dataset.type == 'system' ? '' : 'none'; }
         });
     }
 </script>

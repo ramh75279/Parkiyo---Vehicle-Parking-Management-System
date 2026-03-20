@@ -101,18 +101,18 @@
 
         <!-- Action buttons -->
         <div class="grid grid-cols-2 gap-3">
-            <a href="receipt.html" class="flex items-center justify-center gap-2 bg-primary text-white font-black py-4 rounded-2xl hover:bg-primary/80 transition-all text-sm shadow-[0_0_20px_rgba(31,104,249,0.3)]">
+            <a href="/receipt" class="flex items-center justify-center gap-2 bg-primary text-white font-black py-4 rounded-2xl hover:bg-primary/80 transition-all text-sm shadow-[0_0_20px_rgba(31,104,249,0.3)]">
                 <span class="material-symbols-outlined text-base">receipt_long</span> Receipt
             </a>
-            <a href="advancereservation.html" class="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black py-4 rounded-2xl hover:bg-white/10 transition-all text-sm">
+            <a href="/advancereservation" class="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black py-4 rounded-2xl hover:bg-white/10 transition-all text-sm">
                 <span class="material-symbols-outlined text-base">event_available</span> My Bookings
             </a>
         </div>
         <div class="grid grid-cols-2 gap-3">
-            <a href="walletoverview.html" class="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-400 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-xs">
+            <a href="/walletoverview" class="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-400 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-xs">
                 <span class="material-symbols-outlined text-base">account_balance_wallet</span> Wallet
             </a>
-            <a href="dashboard_user.html" class="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-400 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-xs">
+            <a href="/dashboard_user" class="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-400 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-xs">
                 <span class="material-symbols-outlined text-base">home</span> Dashboard
             </a>
         </div>

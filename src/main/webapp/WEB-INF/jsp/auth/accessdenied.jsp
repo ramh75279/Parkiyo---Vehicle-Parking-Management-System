@@ -63,7 +63,7 @@
             <span class="material-symbols-outlined">arrow_back</span>
             Go Back
         </button>
-        <a href="dashboard_user.html" class="bg-primary text-white font-black px-8 py-4 rounded-2xl hover:scale-105 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3">
+        <a href="/dashboard_user" class="bg-primary text-white font-black px-8 py-4 rounded-2xl hover:scale-105 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3">
             <span class="material-symbols-outlined">dashboard</span>
             My Dashboard
         </a>
