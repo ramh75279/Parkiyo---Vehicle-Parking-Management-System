@@ -49,7 +49,7 @@
 <body class="bg-background-dark text-slate-100 font-display antialiased bg-subtle-radial">
 <header class="sticky top-0 z-50 w-full border-b border-white/5 bg-background-dark/75 premium-blur">
     <div class="container mx-auto flex h-20 items-center justify-between px-6 lg:px-12">
-        <a href="home.html" class="flex items-center gap-4">
+        <a href="/home" class="flex items-center gap-4">
             <div
                     class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]">
                 <span class="material-symbols-outlined font-bold">local_parking</span>
@@ -57,7 +57,7 @@
             <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </a>
         <nav class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <a class="hover:text-primary" href="home.html">Home</a>
+            <a class="hover:text-primary" href="/home">Home</a>
             <a class="hover:text-primary" href="features.html">Features</a>
             <a class="hover:text-primary" href="solutions.html">Solutions</a>
             <a class="text-primary" href="analytics.html">Analytics</a>
@@ -209,7 +209,7 @@
         <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
             <p class="text-slate-600 text-[9px] tracking-[0.3em] uppercase font-bold">© 2026 Parkiyo. All rights reserved.</p>
             <div class="flex gap-8">
-                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="home.html">language</a></span>
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="/home">language</a></span>
                 <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="privacy.html">shield_person</a></span>
                 <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="faq.html">support_agent</a></span>
             </div>

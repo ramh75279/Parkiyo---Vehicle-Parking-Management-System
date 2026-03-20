@@ -87,7 +87,7 @@
         </div>
 
         <nav class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <a class="hover:text-primary transition-all" href="home.html">Home</a>
+            <a class="hover:text-primary transition-all" href="/home">Home</a>
             <a class="hover:text-primary transition-all" href="features.html">Features</a>
             <a class="hover:text-primary transition-all" href="solutions.html">Solutions</a>
             <a class="hover:text-primary transition-all" href="analytics.html">Analytics</a>
@@ -196,7 +196,7 @@
         <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
             <p class="text-slate-600 text-[9px] tracking-[0.3em] uppercase font-bold">© 2026 Parkiyo. All rights reserved.</p>
             <div class="flex gap-8">
-                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="home.html">language</a></span>
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="/home">language</a></span>
                 <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="privacy.html">shield_person</a></span>
                 <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="faq.html">support_agent</a></span>
             </div>
