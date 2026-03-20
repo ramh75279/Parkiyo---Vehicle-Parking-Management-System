@@ -195,8 +195,8 @@
     function togglePw(id, iconId) {
         const el = document.getElementById(id);
         const icon = document.getElementById(iconId);
-        el.type = el.type == 'password' ? 'text' : 'password';
-        icon.textContent = el.type == 'password' ? 'visibility' : 'visibility_off';
+        el.type = el.type === 'password' ? 'text' : 'password';
+        icon.textContent = el.type === 'password' ? 'visibility' : 'visibility_off';
     }
 
     function checkPwStrength(val) {
@@ -211,7 +211,7 @@
         bar.style.width = map[score].w;
         bar.className = `pw-strength-bar ${map[score].c}`;
         label.textContent = map[score].t;
-        label.style.color = score == 4 ? '#4ade80' : score >= 2 ? '#fbbf24' : '#f87171';
+        label.style.color = score === 4 ? '#4ade80' : score >= 2 ? '#fbbf24' : '#f87171';
     }
 
     function resetForm() {
@@ -227,8 +227,8 @@
     const formMsgIcon = document.getElementById('formMsgIcon');
 
     function showMsg(type, text) {
-        formMsg.className = `px-4 py-4 rounded-2xl text-[13px] font-bold flex items-start gap-3 msg-in ${type == 'error' ? 'notify-error' : 'notify-success'}`;
-        formMsgIcon.textContent = type == 'error' ? 'error' : 'check_circle';
+        formMsg.className = `px-4 py-4 rounded-2xl text-[13px] font-bold flex items-start gap-3 msg-in ${type === 'error' ? 'notify-error' : 'notify-success'}`;
+        formMsgIcon.textContent = type === 'error' ? 'error' : 'check_circle';
         formMsgText.textContent = text;
     }
     function hideMsg() { formMsg.classList.add('hidden'); }
