@@ -404,7 +404,7 @@
                     <div class="relative">
                             <textarea id="composeInput" class="compose-input"
                                       placeholder="Ask Parky anything about parking, reservations, payments…" rows="1"
-                                      onkeydown="if(event.key=='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"
+                                      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"
                                       oninput="autoResize(this)"></textarea>
                         <button onclick="sendMessage()"
                                 class="absolute right-3 bottom-3 h-9 w-9 rounded-xl bg-primary flex items-center justify-center hover:bg-primary/80 transition-all shadow-[0_0_12px_rgba(31,104,249,0.4)]">
@@ -536,11 +536,11 @@
     function appendMessage(role, text, extra = '') {
         const container = document.getElementById('chatMessages');
         const wrapper = document.createElement('div');
-        wrapper.className = `flex gap-4 msg-appear ${role == 'user' ? 'flex-row-reverse' : ''}`;
+        wrapper.className = `flex gap-4 msg-appear ${role === 'user' ? 'flex-row-reverse' : ''}`;
 
         const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-        if (role == 'ai') {
+        if (role === 'ai') {
             wrapper.innerHTML = `
                 <div class="h-9 w-9 rounded-[14px] ai-avatar flex items-center justify-center shrink-0 mt-1">
                     <span class="material-symbols-outlined text-white text-base">smart_toy</span>

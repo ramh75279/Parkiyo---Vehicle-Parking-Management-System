@@ -479,9 +479,9 @@
         active.classList.remove('text-slate-500','border-transparent');
 
         document.querySelectorAll('.notif-item').forEach(el => {
-            if (tab == 'all') { el.style.display = ''; }
-            else if (tab == 'unread') { el.style.display = el.dataset.type == 'unread' ? '' : 'none'; }
-            else if (tab == 'system') { el.style.display = el.dataset.type == 'system' ? '' : 'none'; }
+            if (tab === 'all') { el.style.display = ''; }
+            else if (tab === 'unread') { el.style.display = el.dataset.type === 'unread' ? '' : 'none'; }
+            else if (tab === 'system') { el.style.display = el.dataset.type === 'system' ? '' : 'none'; }
         });
     }
 </script>

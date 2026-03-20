@@ -147,13 +147,13 @@
         prog += 2;
         fill.style.width = Math.min(prog, 100) + '%';
 
-        if (prog == 40) {
+        if (prog === 40) {
             // Step 2 done
             s2dot.className = 'step-dot done';
             s2dot.innerHTML = '<span class="material-symbols-outlined text-emerald-400 text-sm">check</span>';
             document.getElementById('step2').classList.remove('opacity-40');
         }
-        if (prog == 60) {
+        if (prog === 60) {
             // Step 3 active
             step3.classList.remove('opacity-40');
             s3dot.className = 'step-dot active';
