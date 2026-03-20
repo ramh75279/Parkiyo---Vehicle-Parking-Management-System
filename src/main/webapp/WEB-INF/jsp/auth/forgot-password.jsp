@@ -87,11 +87,11 @@
         </div>
 
         <nav class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <a class="hover:text-primary transition-all" href="home.html">Home</a>
-            <a class="hover:text-primary transition-all" href="features.html">Features</a>
-            <a class="hover:text-primary transition-all" href="solutions.html">Solutions</a>
-            <a class="hover:text-primary transition-all" href="analytics.html">Analytics</a>
-            <a class="hover:text-primary transition-all" href="faq.html">Support</a>
+            <a class="hover:text-primary transition-all" href="/home">Home</a>
+            <a class="hover:text-primary transition-all" href="/features">Features</a>
+            <a class="hover:text-primary transition-all" href="/solutions">Solutions</a>
+            <a class="hover:text-primary transition-all" href="/analytics">Analytics</a>
+            <a class="hover:text-primary transition-all" href="/faq">Support</a>
         </nav>
 
         <div class="flex items-center gap-6">
@@ -149,7 +149,7 @@
             </form>
 
             <div class="mt-10 pt-8 border-t border-white/5 text-center">
-                <a href="login.html" class="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-primary transition-colors">
+                <a href="/login" class="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-primary transition-colors">
                     <span class="material-symbols-outlined text-base">arrow_back</span> Back to Login
                 </a>
             </div>
@@ -175,20 +175,20 @@
             <div>
                 <h5 class="text-white font-black mb-8 text-[11px] uppercase tracking-[0.2em] opacity-80">Platform</h5>
                 <ul class="space-y-4 text-slate-500 text-sm font-bold">
-                    <li><a href="features.html" class="hover:text-primary transition-colors">Features</a></li>
-                    <li><a href="solutions.html" class="hover:text-primary transition-colors">Solutions</a></li>
-                    <li><a href="analytics.html" class="hover:text-primary transition-colors">Analytics</a></li>
-                    <li><a href="faq.html" class="hover:text-primary transition-colors">Support</a></li>
+                    <li><a href="/features" class="hover:text-primary transition-colors">Features</a></li>
+                    <li><a href="/solutions" class="hover:text-primary transition-colors">Solutions</a></li>
+                    <li><a href="/analytics" class="hover:text-primary transition-colors">Analytics</a></li>
+                    <li><a href="/faq" class="hover:text-primary transition-colors">Support</a></li>
                 </ul>
             </div>
 
             <div>
                 <h5 class="text-white font-black mb-8 text-[11px] uppercase tracking-[0.2em] opacity-80">Company</h5>
                 <ul class="space-y-4 text-slate-500 text-sm font-bold">
-                    <li><a href="faq.html" class="hover:text-primary transition-colors">Help & FAQ</a></li>
-                    <li><a href="privacy.html" class="hover:text-primary transition-colors">Privacy</a></li>
-                    <li><a href="login.html" class="hover:text-primary transition-colors">Login</a></li>
-                    <li><a href="register.html" class="hover:text-primary transition-colors">Register</a></li>
+                    <li><a href="/faq" class="hover:text-primary transition-colors">Help & FAQ</a></li>
+                    <li><a href="/privacy" class="hover:text-primary transition-colors">Privacy</a></li>
+                    <li><a href="/login" class="hover:text-primary transition-colors">Login</a></li>
+                    <li><a href="/register" class="hover:text-primary transition-colors">Register</a></li>
                 </ul>
             </div>
         </div>
@@ -196,9 +196,9 @@
         <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
             <p class="text-slate-600 text-[9px] tracking-[0.3em] uppercase font-bold">© 2026 Parkiyo. All rights reserved.</p>
             <div class="flex gap-8">
-                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="home.html">language</a></span>
-                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="privacy.html">shield_person</a></span>
-                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="faq.html">support_agent</a></span>
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="/home">language</a></span>
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="/privacy">shield_person</a></span>
+                <span class="material-symbols-outlined text-slate-600 cursor-pointer hover:text-white transition-colors"><a href="/faq">support_agent</a></span>
             </div>
         </div>
     </div>
@@ -232,8 +232,8 @@
 
     function showFormMessage(type, message) {
         formMessage.classList.remove('hidden', 'notify-error', 'notify-success', 'notify-info');
-        formMessage.classList.add(type === 'error' ? 'notify-error' : 'notify-success', 'message-visible');
-        formMessageIcon.textContent = type === 'error' ? 'error' : 'check_circle';
+        formMessage.classList.add(type == 'error' ? 'notify-error' : 'notify-success', 'message-visible');
+        formMessageIcon.textContent = type == 'error' ? 'error' : 'check_circle';
         formMessageText.textContent = message;
     }
 
@@ -254,7 +254,7 @@
             return;
         }
 
-        if (email === 'unknown@parkiyo.com') {
+        if (email == 'unknown@parkiyo.com') {
             showFormMessage('error', 'User not found. Please check the email address and try again.');
             return;
         }

@@ -115,7 +115,7 @@
                     <a href="paymentsuccess.html" class="flex-1 flex items-center justify-center gap-2 bg-primary text-white font-black py-3.5 rounded-2xl hover:bg-primary/80 transition-all text-sm shadow-[0_0_20px_rgba(31,104,249,0.3)]">
                         <span class="material-symbols-outlined text-base">receipt_long</span> View Receipt
                     </a>
-                    <a href="advancereservation.html" class="flex-1 flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-sm">
+                    <a href="/advancereservation" class="flex-1 flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-sm">
                         <span class="material-symbols-outlined text-base">event_available</span> My Bookings
                     </a>
                 </div>
@@ -147,13 +147,13 @@
         prog += 2;
         fill.style.width = Math.min(prog, 100) + '%';
 
-        if (prog === 40) {
+        if (prog == 40) {
             // Step 2 done
             s2dot.className = 'step-dot done';
             s2dot.innerHTML = '<span class="material-symbols-outlined text-emerald-400 text-sm">check</span>';
             document.getElementById('step2').classList.remove('opacity-40');
         }
-        if (prog === 60) {
+        if (prog == 60) {
             // Step 3 active
             step3.classList.remove('opacity-40');
             s3dot.className = 'step-dot active';
