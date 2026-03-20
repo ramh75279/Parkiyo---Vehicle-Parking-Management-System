@@ -232,8 +232,8 @@
 
     function showFormMessage(type, message) {
         formMessage.classList.remove('hidden', 'notify-error', 'notify-success', 'notify-info');
-        formMessage.classList.add(type === 'error' ? 'notify-error' : 'notify-success', 'message-visible');
-        formMessageIcon.textContent = type === 'error' ? 'error' : 'check_circle';
+        formMessage.classList.add(type == 'error' ? 'notify-error' : 'notify-success', 'message-visible');
+        formMessageIcon.textContent = type == 'error' ? 'error' : 'check_circle';
         formMessageText.textContent = message;
     }
 
@@ -254,7 +254,7 @@
             return;
         }
 
-        if (email === 'unknown@parkiyo.com') {
+        if (email == 'unknown@parkiyo.com') {
             showFormMessage('error', 'User not found. Please check the email address and try again.');
             return;
         }

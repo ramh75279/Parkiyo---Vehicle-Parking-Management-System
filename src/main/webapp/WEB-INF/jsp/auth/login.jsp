@@ -232,7 +232,7 @@
     function togglePw() {
         const pw = document.getElementById('password');
         const icon = document.getElementById('eyeIcon');
-        if (pw.type === 'password') { pw.type = 'text'; icon.textContent = 'visibility_off'; }
+        if (pw.type == 'password') { pw.type = 'text'; icon.textContent = 'visibility_off'; }
         else { pw.type = 'password'; icon.textContent = 'visibility'; }
     }
 
@@ -243,8 +243,8 @@
     const formMsgIcon = document.getElementById('formMsgIcon');
 
     function showMsg(type, text) {
-        formMsg.className = `px-4 py-4 rounded-2xl text-[13px] font-bold flex items-start gap-3 msg-visible ${type === 'error' ? 'notify-error text-rose-400' : 'notify-success text-emerald-400'}`;
-        formMsgIcon.textContent = type === 'error' ? 'error' : 'check_circle';
+        formMsg.className = `px-4 py-4 rounded-2xl text-[13px] font-bold flex items-start gap-3 msg-visible ${type == 'error' ? 'notify-error text-rose-400' : 'notify-success text-emerald-400'}`;
+        formMsgIcon.textContent = type == 'error' ? 'error' : 'check_circle';
         formMsgText.textContent = text;
     }
 
@@ -256,7 +256,7 @@
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMsg('error', 'Enter a valid email address.'); return; }
 
         // Demo role routing
-        if (email === 'admin@parkiyo.com' && pw === 'admin123') {
+        if (email == 'admin@parkiyo.com' && pw == 'admin123') {
             showMsg('success', 'Login successful. Redirecting to admin dashboard...');
             setTimeout(() => window.location.href = 'dashboard_admin.html', 1200);
         } else if (pw.length >= 6) {
