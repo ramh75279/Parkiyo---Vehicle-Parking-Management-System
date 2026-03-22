@@ -1,7 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -23,6 +21,7 @@
     </script>
     <style>
         body { font-family: 'Public Sans', sans-serif; }
+        a { cursor: pointer; }
         .premium-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
         .bg-subtle-radial { background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 70%); }
         .glass-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); }
@@ -61,6 +60,8 @@
             caret-color: white;
         }
         input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus { -webkit-text-fill-color: white !important; -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important; }
+        input:invalid { box-shadow: none !important; outline: none !important; }
+        input:-moz-ui-invalid { box-shadow: none !important; }
         select.input-glass option { background: #0f172a; }
         .notify-error { background: linear-gradient(180deg, rgba(244,63,94,0.14), rgba(244,63,94,0.06)); border: 1px solid rgba(244,63,94,0.2); color: #fb7185; }
         .notify-success { background: linear-gradient(180deg, rgba(34,197,94,0.14), rgba(34,197,94,0.06)); border: 1px solid rgba(34,197,94,0.2); color: #4ade80; }
@@ -73,20 +74,20 @@
 
 <header class="sticky top-0 z-50 w-full border-b border-white/5 bg-background-dark/75 premium-blur">
     <div class="container mx-auto flex h-20 items-center justify-between px-6 lg:px-12">
-        <a href="/home" class="flex items-center gap-4">
+        <a th:href="@{/home}" class="flex items-center gap-4">
             <div class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]">
                 <span class="material-symbols-outlined font-bold">local_parking</span>
             </div>
             <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </a>
         <nav class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <a class="hover:text-primary transition-colors" href="/home">Home</a>
-            <a class="hover:text-primary transition-colors" href="features.html">Features</a>
-            <a class="hover:text-primary transition-colors" href="solutions.html">Solutions</a>
-            <a class="hover:text-primary transition-colors" href="analytics.html">Analytics</a>
-            <a class="hover:text-primary transition-colors" href="faq.html">Support</a>
+            <a class="hover:text-primary transition-colors" th:href="@{/home}">Home</a>
+            <a class="hover:text-primary transition-colors" th:href="@{/features}">Features</a>
+            <a class="hover:text-primary transition-colors" th:href="@{/solutions}">Solutions</a>
+            <a class="hover:text-primary transition-colors" th:href="@{/analytics}">Analytics</a>
+            <a class="hover:text-primary transition-colors" th:href="@{/faq}">Support</a>
         </nav>
-        <a href="login.html" class="text-sm font-bold text-slate-300 hover:text-white transition-colors">Sign In</a>
+        <a th:href="@{/login}" class="text-sm font-bold text-slate-300 hover:text-white transition-colors">Sign In</a>
     </div>
 </header>
 
@@ -102,42 +103,48 @@
                     <p class="text-slate-400 font-medium text-sm leading-relaxed">Self-registration creates a standard user account. Admin accounts are created by administrators only.</p>
                 </div>
 
-                <!-- Info Banner -->
                 <div class="mb-8 rounded-2xl border border-primary/20 bg-primary/5 p-5 flex items-start gap-4">
                     <span class="material-symbols-outlined text-primary shrink-0 mt-0.5">info</span>
                     <p class="text-sm text-slate-400 leading-relaxed font-medium">This form creates a <strong class="text-white">standard user account</strong> only. Contact your facility admin if you require admin access.</p>
                 </div>
 
-                <form id="registerForm" novalidate class="space-y-5">
+                <form id="registerForm" th:action="@{/register}" method="post" novalidate class="space-y-5">
+                    <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
                     <div id="formMsg" class="hidden px-4 py-4 rounded-2xl text-[13px] font-bold flex items-start gap-3 msg-in">
                         <span id="formMsgIcon" class="material-symbols-outlined text-base mt-[1px] shrink-0">info</span>
                         <p id="formMsgText"></p>
                     </div>
 
+                    <div th:if="${error != null and !#strings.isEmpty(error)}" class="px-4 py-4 rounded-2xl text-[13px] font-bold flex items-start gap-3 notify-error">
+                        <span class="material-symbols-outlined text-base mt-[1px] shrink-0">error</span>
+                        <p th:text="${error}"></p>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-bold text-slate-200 ml-1 mb-2">First Name</label>
-                            <input type="text" id="firstName" class="w-full h-14 rounded-2xl px-5 input-glass font-medium" placeholder="John"/>
+                            <input type="text" id="firstName" name="firstName" class="w-full h-14 rounded-2xl px-5 input-glass font-medium" placeholder="John"/>
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-slate-200 ml-1 mb-2">Last Name</label>
-                            <input type="text" id="lastName" class="w-full h-14 rounded-2xl px-5 input-glass font-medium" placeholder="Smith"/>
+                            <input type="text" id="lastName" name="lastName" class="w-full h-14 rounded-2xl px-5 input-glass font-medium" placeholder="Smith"/>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-slate-200 ml-1 mb-2">Email Address</label>
-                        <input type="email" id="email" class="w-full h-14 rounded-2xl px-5 input-glass font-medium" placeholder="you@example.com" autocomplete="email"/>
+                        <input type="email" id="email" name="email" class="w-full h-14 rounded-2xl px-5 input-glass font-medium" placeholder="you@example.com" autocomplete="email"/>
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-slate-200 ml-1 mb-2">Phone Number</label>
-                        <input type="tel" id="phone" class="w-full h-14 rounded-2xl px-5 input-glass font-medium" placeholder="+1 555 000 0000"/>
+                        <input type="tel" id="phone" name="phone" class="w-full h-14 rounded-2xl px-5 input-glass font-medium" placeholder="+1 555 000 0000"/>
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-slate-200 ml-1 mb-2">Gender</label>
-                        <select id="gender" class="w-full h-14 rounded-2xl px-5 input-glass font-medium appearance-none cursor-pointer">
+                        <select id="gender" name="gender" class="w-full h-14 rounded-2xl px-5 input-glass font-medium appearance-none cursor-pointer">
                             <option value="">Select gender</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
@@ -148,7 +155,7 @@
                     <div>
                         <label class="block text-sm font-bold text-slate-200 ml-1 mb-2">Password</label>
                         <div class="relative">
-                            <input type="password" id="password" class="w-full h-14 rounded-2xl px-5 pr-14 input-glass font-medium" placeholder="Create a strong password" oninput="checkPwStrength(this.value)"/>
+                            <input type="password" id="password" name="password" class="w-full h-14 rounded-2xl px-5 pr-14 input-glass font-medium" placeholder="Create a strong password" oninput="checkPwStrength(this.value)"/>
                             <button type="button" onclick="togglePw('password','eyePw')" class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors">
                                 <span id="eyePw" class="material-symbols-outlined text-xl">visibility</span>
                             </button>
@@ -162,7 +169,7 @@
                     <div>
                         <label class="block text-sm font-bold text-slate-200 ml-1 mb-2">Confirm Password</label>
                         <div class="relative">
-                            <input type="password" id="confirmPw" class="w-full h-14 rounded-2xl px-5 pr-14 input-glass font-medium" placeholder="Repeat your password"/>
+                            <input type="password" id="confirmPw" name="confirmPw" class="w-full h-14 rounded-2xl px-5 pr-14 input-glass font-medium" placeholder="Repeat your password"/>
                             <button type="button" onclick="togglePw('confirmPw','eyeCpw')" class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors">
                                 <span id="eyeCpw" class="material-symbols-outlined text-xl">visibility</span>
                             </button>
@@ -181,7 +188,7 @@
                 </form>
 
                 <div class="mt-8 pt-8 border-t border-white/5 text-center">
-                    <p class="text-slate-500 text-sm font-medium">Already have an account? <a href="login.html" class="text-primary font-black hover:brightness-125 transition-all">Sign in</a></p>
+                    <p class="text-slate-500 text-sm font-medium">Already have an account? <a th:href="@{/login}" class="text-primary font-black hover:brightness-125 transition-all">Sign in</a></p>
                 </div>
             </div>
         </div>
@@ -189,9 +196,6 @@
 </main>
 
 <script>
-    // Known emails for duplicate check demo
-    const usedEmails = ['admin@parkiyo.com', 'user@parkiyo.com'];
-
     function togglePw(id, iconId) {
         const el = document.getElementById(id);
         const icon = document.getElementById(iconId);
@@ -216,8 +220,7 @@
 
     function resetForm() {
         document.getElementById('registerForm').reset();
-        const bar = document.getElementById('pwStrengthBar');
-        bar.style.width = '0%';
+        document.getElementById('pwStrengthBar').style.width = '0%';
         document.getElementById('pwStrengthLabel').textContent = '';
         hideMsg();
     }
@@ -234,7 +237,6 @@
     function hideMsg() { formMsg.classList.add('hidden'); }
 
     document.getElementById('registerForm').addEventListener('submit', e => {
-        e.preventDefault();
         const fn = document.getElementById('firstName').value.trim();
         const ln = document.getElementById('lastName').value.trim();
         const email = document.getElementById('email').value.trim().toLowerCase();
@@ -243,16 +245,12 @@
         const pw = document.getElementById('password').value;
         const cpw = document.getElementById('confirmPw').value;
 
-        if (!fn || !ln) { showMsg('error', 'Please enter your first and last name.'); return; }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMsg('error', 'Enter a valid email address.'); return; }
-        if (!phone) { showMsg('error', 'Please enter your phone number.'); return; }
-        if (!gender) { showMsg('error', 'Please select your gender.'); return; }
-        if (pw.length < 8) { showMsg('error', 'Password must be at least 8 characters long.'); return; }
-        if (pw !== cpw) { showMsg('error', 'Passwords do not match. Please check and try again.'); return; }
-        if (usedEmails.includes(email)) { showMsg('error', 'This email address is already registered. Try logging in instead.'); return; }
-
-        showMsg('success', `Account created successfully for ${fn} ${ln}. Redirecting to login...`);
-        setTimeout(() => window.location.href = 'login.html', 2000);
+        if (!fn || !ln) { e.preventDefault(); showMsg('error', 'Please enter your first and last name.'); return; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { e.preventDefault(); showMsg('error', 'Enter a valid email address.'); return; }
+        if (!phone) { e.preventDefault(); showMsg('error', 'Please enter your phone number.'); return; }
+        if (!gender) { e.preventDefault(); showMsg('error', 'Please select your gender.'); return; }
+        if (pw.length < 8) { e.preventDefault(); showMsg('error', 'Password must be at least 8 characters long.'); return; }
+        if (pw !== cpw) { e.preventDefault(); showMsg('error', 'Passwords do not match. Please check and try again.'); return; }
     });
 </script>
 </body>

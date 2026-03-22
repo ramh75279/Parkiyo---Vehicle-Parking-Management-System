@@ -1,7 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -23,6 +21,7 @@
     </script>
     <style>
         body { font-family: 'Public Sans', sans-serif; }
+        a { cursor: pointer; }
         .premium-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
         .bg-subtle-radial { background: radial-gradient(circle at 50% 30%, #1e0a0a 0%, #020617 70%); }
         .glass-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); }
@@ -63,7 +62,7 @@
             <span class="material-symbols-outlined">arrow_back</span>
             Go Back
         </button>
-        <a href="dashboard-user.html" class="bg-primary text-white font-black px-8 py-4 rounded-2xl hover:scale-105 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3">
+        <a th:href="@{/dashboard}" class="bg-primary text-white font-black px-8 py-4 rounded-2xl hover:scale-105 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3">
             <span class="material-symbols-outlined">dashboard</span>
             My Dashboard
         </a>

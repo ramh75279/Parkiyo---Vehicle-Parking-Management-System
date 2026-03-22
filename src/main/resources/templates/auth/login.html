@@ -1,7 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -23,6 +21,7 @@
     </script>
     <style>
         body { font-family: 'Public Sans', sans-serif; }
+        a { cursor: pointer; }
         .premium-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
         .bg-subtle-radial { background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 70%); }
         .glass-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); }
@@ -61,6 +60,8 @@
             caret-color: white;
         }
         input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus { -webkit-text-fill-color: white !important; -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important; transition: background-color 5000s ease-in-out 0s; }
+        input:invalid { box-shadow: none !important; outline: none !important; }
+        input:-moz-ui-invalid { box-shadow: none !important; }
         .notify-error { background: linear-gradient(180deg, rgba(244,63,94,0.14), rgba(244,63,94,0.06)); border: 1px solid rgba(244,63,94,0.2); }
         .notify-success { background: linear-gradient(180deg, rgba(34,197,94,0.14), rgba(34,197,94,0.06)); border: 1px solid rgba(34,197,94,0.2); }
         @keyframes qrPulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
@@ -73,20 +74,20 @@
 
 <header class="sticky top-0 z-50 w-full border-b border-white/5 bg-background-dark/75 premium-blur">
     <div class="container mx-auto flex h-20 items-center justify-between px-6 lg:px-12">
-        <a href="/home" class="flex items-center gap-4">
+        <a th:href="@{/home}" class="flex items-center gap-4">
             <div class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]">
                 <span class="material-symbols-outlined font-bold">local_parking</span>
             </div>
             <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </a>
         <nav class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <a class="hover:text-primary transition-colors" href="/home">Home</a>
-            <a class="hover:text-primary transition-colors" href="features.html">Features</a>
-            <a class="hover:text-primary transition-colors" href="solutions.html">Solutions</a>
-            <a class="hover:text-primary transition-colors" href="analytics.html">Analytics</a>
-            <a class="hover:text-primary transition-colors" href="faq.html">Support</a>
+            <a class="hover:text-primary transition-colors" th:href="@{/home}">Home</a>
+            <a class="hover:text-primary transition-colors" th:href="@{/features}">Features</a>
+            <a class="hover:text-primary transition-colors" th:href="@{/solutions}">Solutions</a>
+            <a class="hover:text-primary transition-colors" th:href="@{/analytics}">Analytics</a>
+            <a class="hover:text-primary transition-colors" th:href="@{/faq}">Support</a>
         </nav>
-        <a href="register.html" class="bg-primary text-white text-sm font-bold px-7 py-3 rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/30">Register</a>
+        <a th:href="@{/register}" class="bg-primary text-white text-sm font-bold px-7 py-3 rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/30">Register</a>
     </div>
 </header>
 
@@ -105,21 +106,28 @@
                         <p class="text-slate-400 font-medium">Sign in to your Parkiyo account to continue.</p>
                     </div>
 
-                    <form id="loginForm" novalidate class="space-y-5">
+                    <form id="loginForm" th:action="@{/login}" method="post" novalidate class="space-y-5">
+                        <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
                         <div id="formMsg" class="hidden px-4 py-4 rounded-2xl text-[13px] font-bold flex items-start gap-3">
                             <span id="formMsgIcon" class="material-symbols-outlined text-base mt-[1px]">info</span>
                             <p id="formMsgText"></p>
                         </div>
 
+                        <div th:if="${error != null and !#strings.isEmpty(error)}" class="px-4 py-4 rounded-2xl text-[13px] font-bold flex items-start gap-3 notify-error text-rose-400">
+                            <span class="material-symbols-outlined text-base mt-[1px]">error</span>
+                            <p th:text="${error}"></p>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-bold text-slate-200 ml-1 mb-2">Email Address</label>
-                            <input type="email" id="email" class="w-full h-14 rounded-2xl px-5 input-glass font-medium" placeholder="you@parkiyo.com" autocomplete="email"/>
+                            <input type="email" id="email" name="email" class="w-full h-14 rounded-2xl px-5 input-glass font-medium" placeholder="you@parkiyo.com" autocomplete="email"/>
                         </div>
 
                         <div>
                             <label class="block text-sm font-bold text-slate-200 ml-1 mb-2">Password</label>
                             <div class="relative">
-                                <input type="password" id="password" class="w-full h-14 rounded-2xl px-5 pr-14 input-glass font-medium" placeholder="Your password" autocomplete="current-password"/>
+                                <input type="password" id="password" name="password" class="w-full h-14 rounded-2xl px-5 pr-14 input-glass font-medium" placeholder="Your password" autocomplete="current-password"/>
                                 <button type="button" onclick="togglePw()" class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors">
                                     <span id="eyeIcon" class="material-symbols-outlined text-xl">visibility</span>
                                 </button>
@@ -128,10 +136,10 @@
 
                         <div class="flex items-center justify-between pt-1">
                             <label class="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" id="rememberMe" class="w-4 h-4 rounded accent-primary"/>
+                                <input type="checkbox" id="rememberMe" name="rememberMe" class="w-4 h-4 rounded accent-primary"/>
                                 <span class="text-sm text-slate-400 font-medium">Remember me</span>
                             </label>
-                            <a href="forgot-password.html" class="text-sm font-bold text-primary hover:brightness-125 transition-all">Forgot password?</a>
+                            <a th:href="@{/forgot-password}" class="text-sm font-bold text-primary hover:brightness-125 transition-all">Forgot password?</a>
                         </div>
 
                         <div class="pt-2">
@@ -143,7 +151,7 @@
                     </form>
 
                     <div class="mt-8 pt-8 border-t border-white/5 text-center">
-                        <p class="text-slate-500 text-sm font-medium">Don't have an account? <a href="register.html" class="text-primary font-black hover:brightness-125 transition-all">Create one</a></p>
+                        <p class="text-slate-500 text-sm font-medium">Don't have an account? <a th:href="@{/register}" class="text-primary font-black hover:brightness-125 transition-all">Create one</a></p>
                     </div>
                 </div>
             </div>
@@ -218,7 +226,6 @@
 </main>
 
 <script>
-    // QR countdown
     let secs = 178;
     const countdown = document.getElementById('countdown');
     setInterval(() => {
@@ -228,7 +235,6 @@
         countdown.textContent = `${m}:${s.toString().padStart(2,'0')}`;
     }, 1000);
 
-    // Toggle pw
     function togglePw() {
         const pw = document.getElementById('password');
         const icon = document.getElementById('eyeIcon');
@@ -236,7 +242,6 @@
         else { pw.type = 'password'; icon.textContent = 'visibility'; }
     }
 
-    // Form logic
     const form = document.getElementById('loginForm');
     const formMsg = document.getElementById('formMsg');
     const formMsgText = document.getElementById('formMsgText');
@@ -249,21 +254,17 @@
     }
 
     form.addEventListener('submit', e => {
-        e.preventDefault();
         const email = document.getElementById('email').value.trim();
         const pw = document.getElementById('password').value;
-        if (!email || !pw) { showMsg('error', 'Please enter your email and password.'); return; }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMsg('error', 'Enter a valid email address.'); return; }
-
-        // Demo role routing
-        if (email == 'admin@parkiyo.com' && pw == 'admin123') {
-            showMsg('success', 'Login successful. Redirecting to admin dashboard...');
-            setTimeout(() => window.location.href = 'dashboard-admin.html', 1200);
-        } else if (pw.length >= 6) {
-            showMsg('success', 'Login successful. Redirecting...');
-            setTimeout(() => window.location.href = 'dashboard-user.html', 1200);
-        } else {
-            showMsg('error', 'Invalid credentials. Please check your email and password.');
+        if (!email || !pw) {
+            e.preventDefault();
+            showMsg('error', 'Please enter your email and password.');
+            return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            e.preventDefault();
+            showMsg('error', 'Enter a valid email address.');
+            return;
         }
     });
 </script>
