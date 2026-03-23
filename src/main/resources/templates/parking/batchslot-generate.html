@@ -1,18 +1,13 @@
-
-
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Parkiyo | Batch Generate Slots</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap"
-          rel="stylesheet" />
-    <link
-            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-            rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -26,113 +21,24 @@
         }
     </script>
     <style>
-        body {
-            font-family: 'Public Sans', sans-serif;
-            background-color: #020617;
-        }
-
-        .premium-blur {
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
-
-        .bg-subtle-radial {
-            background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%);
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .sidebar-container {
-            width: 80px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(2, 6, 23, 0.6);
-            overflow: hidden;
-            white-space: nowrap;
-        }
-
-        .sidebar-container:hover {
-            width: 280px;
-            background: rgba(2, 6, 23, 0.95);
-        }
-
-        .nav-label {
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            margin-left: 1rem;
-        }
-
-        .sidebar-container:hover .nav-label {
-            opacity: 1;
-        }
-
-        .input-glass {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: white;
-            border-radius: 12px;
-            padding: 11px 16px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            transition: all 0.2s;
-            outline: none;
-            width: 100%;
-        }
-
-        .input-glass:focus {
-            border-color: rgba(31, 104, 249, 0.5);
-            box-shadow: 0 0 0 3px rgba(31, 104, 249, 0.1);
-        }
-
-        .input-glass::placeholder {
-            color: rgba(255, 255, 255, 0.18);
-        }
-
-        select.input-glass option {
-            background: #0f172a;
-        }
-
-        label.field-label {
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: #64748b;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .preview-slot {
-            width: 58px;
-            height: 76px;
-            border-radius: 9px;
-            border: 1.5px solid rgba(31, 104, 249, 0.4);
-            background: rgba(31, 104, 249, 0.08);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-        }
-
-        .preview-slot span {
-            font-size: 0.58rem;
-            font-weight: 900;
-            color: #60a5fa;
-            letter-spacing: 0.05em;
-        }
-
-        ::-webkit-scrollbar {
-            width: 5px;
-            display: none;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
+        body { font-family: 'Public Sans', sans-serif; background-color: #020617; }
+        a { cursor: pointer; }
+        .premium-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .bg-subtle-radial { background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .sidebar-container { width: 80px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(2, 6, 23, 0.6); overflow: hidden; white-space: nowrap; }
+        .sidebar-container:hover { width: 280px; background: rgba(2, 6, 23, 0.95); }
+        .nav-label { opacity: 0; transition: opacity 0.3s ease; margin-left: 1rem; }
+        .sidebar-container:hover .nav-label { opacity: 1; }
+        .input-glass { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); color: white; border-radius: 12px; padding: 11px 16px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; outline: none; width: 100%; }
+        .input-glass:focus { border-color: rgba(31, 104, 249, 0.5); box-shadow: 0 0 0 3px rgba(31, 104, 249, 0.1); }
+        .input-glass::placeholder { color: rgba(255, 255, 255, 0.18); }
+        select.input-glass option { background: #0f172a; }
+        label.field-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 6px; display: block; }
+        .preview-slot { width: 58px; height: 76px; border-radius: 9px; border: 1.5px solid rgba(31, 104, 249, 0.4); background: rgba(31, 104, 249, 0.08); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+        .preview-slot span { font-size: 0.58rem; font-weight: 900; color: #60a5fa; letter-spacing: 0.05em; }
+        ::-webkit-scrollbar { width: 5px; display: none; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
     </style>
 </head>
 
@@ -140,74 +46,40 @@
 <div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
 <div class="flex flex-1 overflow-hidden">
 
-    <!-- SIDEBAR -->
     <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
         <div class="p-6 mb-4 flex items-center">
-            <div
-                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
                 <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
             </div>
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a href="dashboard-admin.html"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
-                    class="material-symbols-outlined shrink-0">dashboard</span><span
-                    class="nav-label text-sm">Dashboard</span></a>
-            <a href="entry.html"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
-                    class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle
-                        Entry</span></a>
-            <a href="exitvehicle.html"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
-                    class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle
-                        Exit</span></a>
-            <a href="vehicle-list-page.html"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
-                    class="material-symbols-outlined shrink-0">directions_car</span><span
-                    class="nav-label text-sm">Vehicles</span></a>
-            <a href="slot-list.html"
-               class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span
-                    class="material-symbols-outlined shrink-0">grid_view</span><span
-                    class="nav-label text-sm">Parking Slots</span></a>
-            <a href="usermanagement.html"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
-                    class="material-symbols-outlined shrink-0">group</span><span
-                    class="nav-label text-sm">Users</span></a>
-            <a href="paymenthistory.html"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
-                    class="material-symbols-outlined shrink-0">payments</span><span
-                    class="nav-label text-sm">Payments</span></a>
-            <a href="repportshubpage.html"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
-                    class="material-symbols-outlined shrink-0">bar_chart</span><span
-                    class="nav-label text-sm">Reports</span></a>
-            <a href="accountsetting.html"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
-                    class="material-symbols-outlined shrink-0">settings</span><span
-                    class="nav-label text-sm">Settings</span></a>
+            <a th:href="@{/admin/dashboard}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">dashboard</span><span class="nav-label text-sm">Dashboard</span></a>
+            <a th:href="@{/admin/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle Entry</span></a>
+            <a th:href="@{/admin/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span></a>
+            <a th:href="@{/admin/vehicles}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">directions_car</span><span class="nav-label text-sm">Vehicles</span></a>
+            <a th:href="@{/admin/slots}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span class="material-symbols-outlined shrink-0">grid_view</span><span class="nav-label text-sm">Parking Slots</span></a>
+            <a th:href="@{/admin/users}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">group</span><span class="nav-label text-sm">Users</span></a>
+            <a th:href="@{/admin/payments}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">payments</span><span class="nav-label text-sm">Payments</span></a>
+            <a th:href="@{/admin/reports}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">bar_chart</span><span class="nav-label text-sm">Reports</span></a>
+            <a th:href="@{/admin/settings}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">settings</span><span class="nav-label text-sm">Settings</span></a>
         </nav>
         <div class="p-4 border-t border-white/5">
-            <button onclick="window.location.href='logout.html'"
-                    class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
-                <span class="material-symbols-outlined shrink-0"><a href="logout.html">power_settings_new</a></span><span
-                    class="nav-label"><a href="logout.html">Logout</a></span>
-            </button>
+            <a th:href="@{/logout}" class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                <span class="material-symbols-outlined shrink-0">power_settings_new</span><span class="nav-label">Logout</span>
+            </a>
         </div>
     </aside>
 
     <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
-        <header
-                class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
             <div class="flex items-center gap-4">
-                <button onclick="window.location.href='slot-list.html'"
-                        class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                <a th:href="@{/admin/slots}" class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
                     <span class="material-symbols-outlined text-slate-400">arrow_back</span>
-                </button>
+                </a>
                 <div>
                     <h2 class="text-xl font-black text-white">Batch Generate Slots</h2>
-                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Create
-                        multiple slots at once</p>
+                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Create multiple slots at once</p>
                 </div>
             </div>
             <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
@@ -226,7 +98,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label class="field-label">Zone <span class="text-rose-400">*</span></label>
-                            <select class="input-glass px-4 h-12 rounded-2xl" onchange="updatePreview()">
+                            <select name="zone" class="input-glass px-4 h-12 rounded-2xl" onchange="updatePreview()">
                                 <option value="A" selected>Zone A — Ground Floor</option>
                                 <option value="B">Zone B — Level 1</option>
                                 <option value="C">Zone C — Level 2</option>
@@ -236,27 +108,20 @@
                         </div>
                         <div>
                             <label class="field-label">Zone Prefix <span class="text-rose-400">*</span></label>
-                            <input type="text" id="prefixInput" placeholder="A" maxlength="2"
-                                   class="input-glass bg-white/5 px-4 h-12 rounded-2xl uppercase tracking-widest"
-                                   oninput="updatePreview()" />
+                            <input type="text" id="prefixInput" name="prefix" placeholder="A" maxlength="2" class="input-glass bg-white/5 px-4 h-12 rounded-2xl uppercase tracking-widest" oninput="updatePreview()" />
                             <p class="text-[10px] text-slate-500 font-bold mt-1.5">Single letter, e.g. A, B, E</p>
                         </div>
                         <div>
                             <label class="field-label">Start Number <span class="text-rose-400">*</span></label>
-                            <input type="text" id="startNum" placeholder="26"
-                                   class="input-glass bg-white/5 px-4 h-12 rounded-2xl"
-                                   oninput="this.value=this.value.replace(/[^0-9]/g,''); updatePreview();" />
+                            <input type="text" id="startNum" name="startNum" placeholder="26" class="input-glass bg-white/5 px-4 h-12 rounded-2xl" oninput="this.value=this.value.replace(/[^0-9]/g,''); updatePreview();" />
                         </div>
                         <div>
                             <label class="field-label">End Number <span class="text-rose-400">*</span></label>
-                            <input type="text" id="startNum" placeholder="26"
-                                   class="input-glass bg-white/5 px-4 h-12 rounded-2xl"
-                                   oninput="this.value=this.value.replace(/[^0-9]/g,''); updatePreview();" />
+                            <input type="text" id="endNum" name="endNum" placeholder="50" class="input-glass bg-white/5 px-4 h-12 rounded-2xl" oninput="this.value=this.value.replace(/[^0-9]/g,''); updatePreview();" />
                         </div>
                         <div>
                             <label class="field-label">Number Padding</label>
-                            <select class="input-glass px-4 h-12 rounded-2xl" id="padSelect"
-                                    onchange="updatePreview()">
+                            <select class="input-glass px-4 h-12 rounded-2xl" id="padSelect" name="padding" onchange="updatePreview()">
                                 <option value="0">No padding (1, 2, 3…)</option>
                                 <option value="2" selected>2 digits (01, 02, 03…)</option>
                                 <option value="3">3 digits (001, 002…)</option>
@@ -264,7 +129,7 @@
                         </div>
                         <div>
                             <label class="field-label">Slot Type</label>
-                            <select class="input-glass px-4 h-12 rounded-2xl">
+                            <select name="slotType" class="input-glass px-4 h-12 rounded-2xl">
                                 <option selected>Standard</option>
                                 <option>Disabled</option>
                                 <option>EV Charging</option>
@@ -280,44 +145,33 @@
                     <div class="grid grid-cols-2 gap-6">
                         <div>
                             <label class="field-label">Hourly Rate ($)</label>
-                            <input type="number" value="5.50" step="0.50"
-                                   class="input-glass bg-white/5 px-4 h-12 rounded-2xl" />
+                            <input type="number" name="hourlyRate" value="5.50" step="0.50" class="input-glass bg-white/5 px-4 h-12 rounded-2xl" />
                         </div>
                         <div>
                             <label class="field-label">Daily Max Rate ($)</label>
-                            <input type="text" id="startNum" placeholder="26"
-                                   class="input-glass bg-white/5 px-4 h-12 rounded-2xl"
-                                   oninput="this.value=this.value.replace(/[^0-9]/g,''); updatePreview();" />
+                            <input type="number" name="dailyMaxRate" placeholder="30.00" step="1.00" class="input-glass bg-white/5 px-4 h-12 rounded-2xl" />
                         </div>
                     </div>
-                    <div
-                            class="mt-6 flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/5">
+                    <div class="mt-6 flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/5">
                         <div>
                             <p class="text-sm font-black text-white">Activate All Immediately</p>
-                            <p class="text-[11px] text-slate-500 font-bold mt-0.5">All generated slots will be set
-                                to Available upon creation</p>
+                            <p class="text-[11px] text-slate-500 font-bold mt-0.5">All generated slots will be set to Available upon creation</p>
                         </div>
-                        <button id="activeToggle" onclick="toggleActive()"
-                                class="relative h-7 w-14 rounded-full bg-primary transition-all">
-                                <span id="activeThumb"
-                                      class="absolute top-1 right-1 h-5 w-5 rounded-full bg-white shadow transition-all"></span>
+                        <button id="activeToggle" type="button" onclick="toggleActive()" class="relative h-7 w-14 rounded-full bg-primary transition-all">
+                            <span id="activeThumb" class="absolute top-1 right-1 h-5 w-5 rounded-full bg-white shadow transition-all"></span>
                         </button>
                     </div>
+                    <input type="hidden" id="activeStatus" name="activeStatus" value="true" />
                 </div>
 
                 <!-- Live preview -->
                 <div class="glass-card rounded-[2.5rem] p-8">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-base font-black text-white">Preview</h3>
-                        <span id="previewCount"
-                              class="text-[10px] font-black uppercase tracking-widest text-primary">25 slots will be
-                                created</span>
+                        <span id="previewCount" class="text-[10px] font-black uppercase tracking-widest text-primary">25 slots will be created</span>
                     </div>
-                    <div id="previewGrid" class="flex flex-wrap gap-3 mb-5">
-                        <!-- populated by JS -->
-                    </div>
-                    <p class="text-[10px] font-bold text-slate-500" id="previewNote">Showing A-26 through A-50 · 25
-                        new slots</p>
+                    <div id="previewGrid" class="flex flex-wrap gap-3 mb-5"></div>
+                    <p class="text-[10px] font-bold text-slate-500" id="previewNote">Showing A-26 through A-50 · 25 new slots</p>
                 </div>
 
                 <!-- Conflict check -->
@@ -326,21 +180,16 @@
                         <span class="material-symbols-outlined text-emerald-400">check_circle</span>
                         <p class="text-sm font-black text-white">No conflicts detected</p>
                     </div>
-                    <p class="text-[11px] text-slate-500 font-bold ml-8">All slot codes in this range are available.
-                        Ready to generate.</p>
+                    <p class="text-[11px] text-slate-500 font-bold ml-8">All slot codes in this range are available. Ready to generate.</p>
                 </div>
 
                 <!-- Actions -->
                 <div class="flex items-center justify-between pb-4">
-                    <button onclick="window.location.href='slot-list.html'"
-                            class="px-8 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-black text-sm hover:bg-white/10 transition-all">Cancel</button>
+                    <a th:href="@{/admin/slots}" class="px-8 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-black text-sm hover:bg-white/10 transition-all">Cancel</a>
                     <div class="flex items-center gap-3">
                         <p class="text-xs text-slate-500 font-bold">Need one slot?</p>
-                        <a href="add-slot.html"
-                           class="text-primary text-xs font-black hover:brightness-125 transition-all">Single slot
-                            →</a>
-                        <button onclick="generate()"
-                                class="px-8 py-3.5 rounded-2xl bg-primary text-white font-black text-sm hover:bg-primary/80 transition-all shadow-[0_0_20px_rgba(31,104,249,0.3)] flex items-center gap-2">
+                        <a th:href="@{/admin/slots/add}" class="text-primary text-xs font-black hover:brightness-125 transition-all">Single slot →</a>
+                        <button onclick="generate()" class="px-8 py-3.5 rounded-2xl bg-primary text-white font-black text-sm hover:bg-primary/80 transition-all shadow-[0_0_20px_rgba(31,104,249,0.3)] flex items-center gap-2">
                             <span class="material-symbols-outlined text-lg">auto_awesome</span>
                             <span id="generateBtnText">Generate 25 Slots</span>
                         </button>
@@ -349,21 +198,15 @@
 
                 <!-- Success banner (hidden) -->
                 <div id="successBanner" class="hidden pb-6">
-                    <div
-                            class="flex items-center gap-4 p-6 rounded-[2rem] bg-emerald-500/10 border border-emerald-500/20">
+                    <div class="flex items-center gap-4 p-6 rounded-[2rem] bg-emerald-500/10 border border-emerald-500/20">
                         <span class="material-symbols-outlined text-emerald-400 text-3xl">check_circle</span>
                         <div class="flex-1">
                             <p class="font-black text-white text-base">25 slots generated successfully!</p>
-                            <p class="text-emerald-400/70 text-xs font-bold mt-1">Slots A-26 through A-50 are now
-                                active in Zone A.</p>
+                            <p class="text-emerald-400/70 text-xs font-bold mt-1">Slots A-26 through A-50 are now active in Zone A.</p>
                         </div>
                         <div class="flex gap-3">
-                            <a href="slot-overview.html"
-                               class="bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-black px-4 py-2.5 rounded-xl text-xs hover:bg-emerald-500/30 transition-all">View
-                                Map →</a>
-                            <a href="slot-list.html"
-                               class="text-emerald-400/60 font-bold text-xs hover:text-emerald-400 transition-all py-2">Back
-                                to list</a>
+                            <a th:href="@{/admin/slots/overview}" class="bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-black px-4 py-2.5 rounded-xl text-xs hover:bg-emerald-500/30 transition-all">View Map →</a>
+                            <a th:href="@{/admin/slots}" class="text-emerald-400/60 font-bold text-xs hover:text-emerald-400 transition-all py-2">Back to list</a>
                         </div>
                     </div>
                 </div>
@@ -372,6 +215,7 @@
         </div>
     </main>
 </div>
+
 <script>
     let isActive = true;
 
@@ -379,12 +223,15 @@
         isActive = !isActive;
         const btn = document.getElementById('activeToggle');
         const thumb = document.getElementById('activeThumb');
+        const status = document.getElementById('activeStatus');
         if (isActive) {
             btn.classList.add('bg-primary'); btn.classList.remove('bg-white/10');
             thumb.style.right = '4px'; thumb.style.left = 'auto';
+            status.value = 'true';
         } else {
             btn.classList.remove('bg-primary'); btn.classList.add('bg-white/10');
             thumb.style.left = '4px'; thumb.style.right = 'auto';
+            status.value = 'false';
         }
     }
 
@@ -433,7 +280,6 @@
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
-    // Init
     updatePreview();
 </script>
 </body>
