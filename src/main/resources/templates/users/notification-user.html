@@ -1,7 +1,5 @@
-
-
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8" />
@@ -111,6 +109,8 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
+
+        a { cursor: pointer; }
     </style>
 </head>
 
@@ -129,11 +129,10 @@
         </div>
         <nav class="flex-1 px-3 space-y-2 overflow-y-auto" id="sidebarNav"></nav>
         <div class="p-4 border-t border-white/5">
-            <button onclick="window.location.href='logout.html'"
+            <button onclick="window.location.href='/logout'"
                     class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
-                    <span class="material-symbols-outlined shrink-0"><a
-                            href="logout.html">power_settings_new</a></span><span class="nav-label"><a
-                    href="logout.html">Logout</a></span>
+                <span class="material-symbols-outlined shrink-0">power_settings_new</span>
+                <span class="nav-label">Logout</span>
             </button>
         </div>
     </aside>
@@ -212,7 +211,7 @@
                                         class="text-[10px] font-black text-primary hover:brightness-125 transition-all">Mark
                                     read</button>
                                 <span class="text-slate-700">·</span>
-                                <a href="edit-slot.html"
+                                <a th:href="@{/admin/slots/edit}"
                                    class="text-[10px] font-black text-slate-400 hover:text-white transition-all">View
                                     slot</a>
                             </div>
@@ -240,7 +239,7 @@
                                         class="text-[10px] font-black text-primary hover:brightness-125 transition-all">Mark
                                     read</button>
                                 <span class="text-slate-700">·</span>
-                                <a href="receipt.html"
+                                <a th:href="@{/user/receipt}"
                                    class="text-[10px] font-black text-slate-400 hover:text-white transition-all">View
                                     receipt</a>
                             </div>
@@ -268,7 +267,7 @@
                                         class="text-[10px] font-black text-primary hover:brightness-125 transition-all">Mark
                                     read</button>
                                 <span class="text-slate-700">·</span>
-                                <a href="slot-overview.html"
+                                <a th:href="@{/admin/slots/overview}"
                                    class="text-[10px] font-black text-slate-400 hover:text-white transition-all">View
                                     map</a>
                             </div>
@@ -322,7 +321,7 @@
                             </div>
                             <p class="text-xs text-slate-400 font-bold mt-1">Revenue report for 9 Mar 2026 has been
                                 generated and is ready to download.</p>
-                            <a href="revenuerepoartpage.html"
+                            <a th:href="@{/admin/reports/daily-revenue}"
                                class="inline-block mt-2 text-[10px] font-black text-slate-400 hover:text-white transition-all">View
                                 report →</a>
                         </div>
@@ -360,7 +359,7 @@
         }
     }
 
-    // ── Role-aware sidebar (matches dashboard-user.html reference exactly) ──
+    // ── Role-aware sidebar ──
     (function buildSidebar() {
         const params = new URLSearchParams(window.location.search);
         let role = params.get('role') || localStorage.getItem('parkiyo_role') || 'user';
@@ -376,27 +375,27 @@
             `<a href="${href}" class="${isActive ? a : n}"><span class="material-symbols-outlined shrink-0">${icon}</span><span class="nav-label text-sm">${label}</span></a>`;
 
         const userLinks = [
-            lnk('dashboard-user.html', 'dashboard', 'Dashboard', false),
-            lnk('entry.html', 'login', 'Vehicle Entry', false),
-            lnk('exitvehicle.html', 'logout', 'Vehicle Exit', false),
-            lnk('parking.html', 'local_parking', 'Active Parking', false),
-            lnk('advancereservation.html', 'event_available', 'Reservation', false),
-            lnk('paymenthistory-user.html', 'payments', 'Payments', false),
-            lnk('receipt.html', 'receipt_long', 'Receipts', false),
-            lnk('walletoverview.html', 'account_balance_wallet', 'Wallet', false),
-            lnk('notification-user.html', 'notifications', 'Notifications', true),
-            lnk('accountsetting-user.html', 'settings', 'Account Settings', false),
+            lnk('/dashboard/user', 'dashboard', 'Dashboard', false),
+            lnk('/user/entry', 'login', 'Vehicle Entry', false),
+            lnk('/user/exit', 'logout', 'Vehicle Exit', false),
+            lnk('/user/parking', 'local_parking', 'Active Parking', false),
+            lnk('/user/reservation', 'event_available', 'Reservation', false),
+            lnk('/user/payments/history', 'payments', 'Payments', false),
+            lnk('/user/receipt', 'receipt_long', 'Receipts', false),
+            lnk('/user/wallet', 'account_balance_wallet', 'Wallet', false),
+            lnk('/user/notifications', 'notifications', 'Notifications', true),
+            lnk('/user/account-settings', 'settings', 'Account Settings', false),
         ];
 
         const adminLinks = [
-            lnk('dashboard-admin.html', 'dashboard', 'Dashboard', false),
-            lnk('entry.html', 'login', 'Vehicle Entry', false),
-            lnk('exitvehicle.html', 'logout', 'Vehicle Exit', false),
-            lnk('slot-overview.html', 'grid_view', 'Parking Slots', false),
-            lnk('usermanagement.html', 'group', 'Users', false),
-            lnk('repportshubpage.html', 'bar_chart', 'Reports', false),
-            lnk('notification.html', 'notifications', 'Notifications', true),
-            lnk('accountsetting.html', 'settings', 'Settings', false),
+            lnk('/admin/dashboard', 'dashboard', 'Dashboard', false),
+            lnk('/admin/entry', 'login', 'Vehicle Entry', false),
+            lnk('/admin/exit', 'logout', 'Vehicle Exit', false),
+            lnk('/admin/slots/overview', 'grid_view', 'Parking Slots', false),
+            lnk('/admin/users', 'group', 'Users', false),
+            lnk('/admin/reports', 'bar_chart', 'Reports', false),
+            lnk('/admin/notifications', 'notifications', 'Notifications', true),
+            lnk('/admin/account-settings', 'settings', 'Settings', false),
         ];
 
         nav.innerHTML = (role === 'admin' ? adminLinks : userLinks).join('');

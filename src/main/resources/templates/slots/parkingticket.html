@@ -1,7 +1,5 @@
-
-
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8" />
@@ -206,6 +204,8 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
+
+        a { cursor: pointer; }
     </style>
 </head>
 
@@ -223,42 +223,41 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a href="dashboard-user.html"
+            <a th:href="@{/dashboard/user}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">dashboard</span><span
                     class="nav-label text-sm">Dashboard</span></a>
-            <a href="entry.html"
+            <a th:href="@{/entry}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle
                         Entry</span></a>
-            <a href="exitvehicle.html"
+            <a th:href="@{/exit}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle
                         Exit</span></a>
-            <a href="parking.html"
+            <a th:href="@{/parking}"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span
                     class="material-symbols-outlined shrink-0">local_parking</span><span
                     class="nav-label text-sm">Active Parking</span></a>
-            <a href="paymenthistory.html"
+            <a th:href="@{/payments/history}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">payments</span><span
                     class="nav-label text-sm">Payments</span></a>
-            <a href="walletoverview.html"
+            <a th:href="@{/wallet}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">account_balance_wallet</span><span
                     class="nav-label text-sm">Wallet</span></a>
-            <a href="accountsetting.html"
+            <a th:href="@{/account/settings}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">settings</span><span
                     class="nav-label text-sm">Settings</span></a>
         </nav>
         <div class="p-4 border-t border-white/5">
-            <button onclick="window.location.href='logout.html'"
-                    class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
-                    <span class="material-symbols-outlined shrink-0"><a
-                            href="logout.html">power_settings_new</a></span><span class="nav-label"><a
-                    href="logout.html">Logout</a></span>
-            </button>
+            <a th:href="@{/logout}"
+               class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                <span class="material-symbols-outlined shrink-0">power_settings_new</span>
+                <span class="nav-label">Logout</span>
+            </a>
         </div>
     </aside>
 
@@ -266,14 +265,14 @@
         <header
                 class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0 no-print">
             <div class="flex items-center gap-4">
-                <button onclick="window.location.href='parking.html'"
-                        class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                <a th:href="@{/parking}"
+                   class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
                     <span class="material-symbols-outlined text-slate-400">arrow_back</span>
-                </button>
+                </a>
                 <div>
                     <h2 class="text-xl font-black text-white">Parking Ticket</h2>
                     <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Session
-                        SES-20260309-092</p>
+                        <span th:text="${ticket.sessionId}">SES-20260309-092</span></p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -322,7 +321,7 @@
                         <div class="bg-white/15 rounded-2xl px-6 py-4 text-center border border-white/20">
                             <p class="text-[9px] font-black uppercase tracking-widest text-blue-200/60 mb-1">License
                                 Plate</p>
-                            <p class="text-4xl font-black text-white tracking-[0.25em]">ABC-1234</p>
+                            <p class="text-4xl font-black text-white tracking-[0.25em]" th:text="${ticket.plate}">ABC-1234</p>
                         </div>
                     </div>
 
@@ -330,23 +329,23 @@
                     <div class="ticket-body">
                         <div class="ticket-row">
                             <span class="lbl">Session ID</span>
-                            <span class="val font-mono text-xs text-slate-400">SES-20260309-092</span>
+                            <span class="val font-mono text-xs text-slate-400" th:text="${ticket.sessionId}">SES-20260309-092</span>
                         </div>
                         <div class="ticket-row">
                             <span class="lbl">Vehicle</span>
-                            <span class="val">Toyota Prius · Silver</span>
+                            <span class="val" th:text="${ticket.vehicleModel + ' · ' + ticket.color}">Toyota Prius · Silver</span>
                         </div>
                         <div class="ticket-row">
                             <span class="lbl">Owner</span>
-                            <span class="val">Kamal Perera</span>
+                            <span class="val" th:text="${ticket.ownerName}">Kamal Perera</span>
                         </div>
                         <div class="ticket-row">
                             <span class="lbl">Slot</span>
-                            <span class="val text-primary">A-12 · Zone A · Ground Floor</span>
+                            <span class="val text-primary" th:text="${ticket.slotCode + ' · ' + ticket.zone + ' · ' + ticket.floor}">A-12 · Zone A · Ground Floor</span>
                         </div>
                         <div class="ticket-row">
                             <span class="lbl">Entry Time</span>
-                            <span class="val">09 Mar 2026, 10:45 AM</span>
+                            <span class="val" th:text="${ticket.entryDateTime}">09 Mar 2026, 10:45 AM</span>
                         </div>
                         <div class="ticket-row">
                             <span class="lbl">Exit Time</span>
@@ -359,7 +358,7 @@
                         </div>
                         <div class="ticket-row">
                             <span class="lbl">Rate</span>
-                            <span class="val">$5.50 / hr</span>
+                            <span class="val" th:text="'$' + ${ticket.hourlyRate} + ' / hr'">$5.50 / hr</span>
                         </div>
                     </div>
 
@@ -402,11 +401,11 @@
 
                 <!-- Action buttons -->
                 <div class="flex gap-3 mt-6 no-print">
-                    <a href="exitvehicle.html"
+                    <a th:href="@{/exit}"
                        class="flex-1 flex items-center justify-center gap-2 bg-rose-500/10 border border-rose-500/20 text-rose-400 font-black py-3.5 rounded-2xl hover:bg-rose-500/20 transition-all text-sm">
                         <span class="material-symbols-outlined text-lg">logout</span> Process Exit
                     </a>
-                    <a href="parkingrecorddetails.html"
+                    <a th:href="@{/parking/record}"
                        class="flex-1 flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-sm">
                         <span class="material-symbols-outlined text-lg">info</span> Full Details
                     </a>

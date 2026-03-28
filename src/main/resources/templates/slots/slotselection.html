@@ -1,7 +1,5 @@
-
-
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8" />
@@ -194,6 +192,8 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
+
+        a { cursor: pointer; }
     </style>
 </head>
 
@@ -210,42 +210,41 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a href="dashboard-user.html"
+            <a th:href="@{/dashboard/user}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">dashboard</span><span
                     class="nav-label text-sm">Dashboard</span></a>
-            <a href="entry.html"
+            <a th:href="@{/entry}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle
                         Entry</span></a>
-            <a href="exitvehicle.html"
+            <a th:href="@{/exit}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle
                         Exit</span></a>
-            <a href="parking.html"
+            <a th:href="@{/parking}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">local_parking</span><span
                     class="nav-label text-sm">Active Parking</span></a>
-            <a href="advancereservation.html"
+            <a th:href="@{/reservations}"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span
                     class="material-symbols-outlined shrink-0">event_available</span><span
                     class="nav-label text-sm">Reservations</span></a>
-            <a href="paymenthistory.html"
+            <a th:href="@{/payments/history}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">payments</span><span
                     class="nav-label text-sm">Payments</span></a>
-            <a href="walletoverview.html"
+            <a th:href="@{/wallet}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">account_balance_wallet</span><span
                     class="nav-label text-sm">Wallet</span></a>
         </nav>
         <div class="p-4 border-t border-white/5">
-            <button onclick="window.location.href='logout.html'"
-                    class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
-                    <span class="material-symbols-outlined shrink-0"><a
-                            href="logout.html">power_settings_new</a></span><span class="nav-label"><a
-                    href="logout.html">Logout</a></span>
-            </button>
+            <a th:href="@{/logout}"
+               class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                <span class="material-symbols-outlined shrink-0">power_settings_new</span>
+                <span class="nav-label">Logout</span>
+            </a>
         </div>
     </aside>
 
@@ -253,14 +252,14 @@
         <header
                 class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
             <div class="flex items-center gap-4">
-                <button onclick="window.location.href='advancereservation.html'"
-                        class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                <a th:href="@{/reservations}"
+                   class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
                     <span class="material-symbols-outlined text-slate-400">arrow_back</span>
-                </button>
+                </a>
                 <div>
                     <h2 class="text-xl font-black text-white">Select a Slot</h2>
-                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">XYZ-8899 · 11
-                        Mar 2026 · 09:00 – 12:00</p>
+                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1"
+                       th:text="${reservation.plate + ' · ' + reservation.date + ' · ' + reservation.arrival + ' – ' + reservation.departure}">XYZ-8899 · 11 Mar 2026 · 09:00 – 12:00</p>
                 </div>
             </div>
             <div class="h-10 w-10 rounded-[14px] bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
@@ -284,8 +283,8 @@
                         <button class="zone-tab" onclick="setZone(this,'D')">Zone D</button>
                     </div>
                     <div class="flex items-center gap-5 flex-wrap">
-                            <span class="flex items-center gap-2 text-xs font-bold text-emerald-400"><span
-                                    class="h-3 w-3 rounded-sm bg-emerald-500/20 border border-emerald-500/50 inline-block"></span>Available</span>
+                        <span class="flex items-center gap-2 text-xs font-bold text-emerald-400"><span
+                                class="h-3 w-3 rounded-sm bg-emerald-500/20 border border-emerald-500/50 inline-block"></span>Available</span>
                         <span class="flex items-center gap-2 text-xs font-bold text-primary"><span
                                 class="h-3 w-3 rounded-sm bg-primary/25 border border-primary/60 inline-block"></span>Selected</span>
                         <span class="flex items-center gap-2 text-xs font-bold text-rose-400"><span
@@ -311,7 +310,7 @@
                 <!-- Slot grid -->
                 <div class="flex-1 overflow-y-auto px-8 pb-8">
                     <div id="slotGrid" class="flex flex-wrap gap-3">
-                        <!-- Zone A slots rendered by JS -->
+                        <!-- Slots rendered by JS -->
                     </div>
                 </div>
             </div>
@@ -322,15 +321,15 @@
 
                 <div class="space-y-3 mb-6 text-xs">
                     <div class="flex justify-between"><span class="text-slate-500 font-bold">Vehicle</span><span
-                            class="text-white font-black">XYZ-8899</span></div>
+                            class="text-white font-black" th:text="${reservation.plate}">XYZ-8899</span></div>
                     <div class="flex justify-between"><span class="text-slate-500 font-bold">Date</span><span
-                            class="text-white font-black">11 Mar 2026</span></div>
+                            class="text-white font-black" th:text="${reservation.date}">11 Mar 2026</span></div>
                     <div class="flex justify-between"><span class="text-slate-500 font-bold">Arrival</span><span
-                            class="text-white font-black">09:00 AM</span></div>
+                            class="text-white font-black" th:text="${reservation.arrival}">09:00 AM</span></div>
                     <div class="flex justify-between"><span class="text-slate-500 font-bold">Departure</span><span
-                            class="text-white font-black">12:00 PM</span></div>
+                            class="text-white font-black" th:text="${reservation.departure}">12:00 PM</span></div>
                     <div class="flex justify-between"><span class="text-slate-500 font-bold">Duration</span><span
-                            class="text-white font-black">3 hours</span></div>
+                            class="text-white font-black" th:text="${reservation.duration}">3 hours</span></div>
                     <div class="flex justify-between border-t border-white/5 pt-3"><span
                             class="text-slate-500 font-bold">Slot</span><span class="text-primary font-black"
                                                                               id="selectedSlotLabel">—</span></div>
@@ -340,8 +339,8 @@
 
                 <div class="p-4 rounded-2xl bg-primary/5 border border-primary/15 mb-6">
                     <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Estimated Fee</p>
-                    <p class="text-2xl font-black text-white">$16.50</p>
-                    <p class="text-[9px] text-slate-500 font-bold mt-1">3h × $5.50/hr</p>
+                    <p class="text-2xl font-black text-white" th:text="'$' + ${reservation.estimatedFee}">$16.50</p>
+                    <p class="text-[9px] text-slate-500 font-bold mt-1" th:text="${reservation.duration + ' × $' + reservation.hourlyRate + '/hr'}">3h × $5.50/hr</p>
                 </div>
 
                 <button id="confirmBtn" onclick="confirmSlot()" disabled
@@ -353,9 +352,9 @@
                     the map</p>
 
                 <div class="mt-auto pt-6 border-t border-white/5">
-                    <button onclick="window.location.href='advancereservation.html'"
-                            class="w-full text-slate-500 font-bold text-xs hover:text-slate-300 transition-all py-2">←
-                        Back to Reservations</button>
+                    <a th:href="@{/reservations}"
+                       class="w-full text-slate-500 font-bold text-xs hover:text-slate-300 transition-all py-2 block text-center">←
+                        Back to Reservations</a>
                 </div>
             </div>
         </div>
@@ -470,7 +469,7 @@
     function confirmSlot() {
         if (!selectedSlot) return;
         document.getElementById('successToast').classList.remove('hidden');
-        setTimeout(() => window.location.href = 'pendingpayment.html', 1800);
+        setTimeout(() => window.location.href = '/reservations/pending-payment', 1800);
     }
 
     renderZone('A');
