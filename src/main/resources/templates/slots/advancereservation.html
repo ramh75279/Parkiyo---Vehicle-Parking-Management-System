@@ -1,7 +1,5 @@
-
-
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8" />
@@ -167,6 +165,8 @@
             background: rgba(255, 255, 255, 0.04);
         }
 
+        a { cursor: pointer; }
+
         ::-webkit-scrollbar {
             width: 5px;
             display: none;
@@ -177,7 +177,6 @@
             border-radius: 10px;
         }
 
-        /* ── Date input dark override ─────────────────────────────── */
         input[type="date"].input-glass,
         input[type="datetime-local"].input-glass {
             background: rgba(255, 255, 255, 0.04) !important;
@@ -197,17 +196,9 @@
             cursor: pointer;
         }
 
-        input[type="date"].input-glass::-webkit-datetime-edit {
-            color: rgba(148, 163, 184, 0.85);
-        }
-
-        input[type="date"].input-glass::-webkit-datetime-edit-fields-wrapper {
-            color: rgba(148, 163, 184, 0.85);
-        }
-
-        input[type="date"].input-glass::-webkit-datetime-edit-text {
-            color: rgba(100, 116, 139, 0.7);
-        }
+        input[type="date"].input-glass::-webkit-datetime-edit { color: rgba(148, 163, 184, 0.85); }
+        input[type="date"].input-glass::-webkit-datetime-edit-fields-wrapper { color: rgba(148, 163, 184, 0.85); }
+        input[type="date"].input-glass::-webkit-datetime-edit-text { color: rgba(100, 116, 139, 0.7); }
 
         input[type="date"].input-glass::-webkit-datetime-edit-month-field,
         input[type="date"].input-glass::-webkit-datetime-edit-day-field,
@@ -238,63 +229,63 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-2 overflow-y-auto">
-            <a href="dashboard-user.html"
+            <a th:href="@{/dashboard}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">dashboard</span>
                 <span class="nav-label text-sm">Dashboard</span>
             </a>
-            <a href="entry.html"
+            <a th:href="@{/entry}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">login</span>
                 <span class="nav-label text-sm">Vehicle Entry</span>
             </a>
-            <a href="exitvehicle.html"
+            <a th:href="@{/exit}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">logout</span>
                 <span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a href="parking.html"
+            <a th:href="@{/parking}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">local_parking</span>
                 <span class="nav-label text-sm">Active Parking</span>
             </a>
-            <a href="advancereservation.html"
+            <a th:href="@{/reservations}"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                 <span class="material-symbols-outlined shrink-0">event_available</span>
                 <span class="nav-label text-sm">Reservation</span>
             </a>
-            <a href="paymenthistory-user.html"
+            <a th:href="@{/payments}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">payments</span>
                 <span class="nav-label text-sm">Payments</span>
             </a>
-            <a href="receipt.html"
+            <a th:href="@{/receipts}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">receipt_long</span>
                 <span class="nav-label text-sm">Receipts</span>
             </a>
-            <a href="walletoverview.html"
+            <a th:href="@{/wallet}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">account_balance_wallet</span>
                 <span class="nav-label text-sm">Wallet</span>
             </a>
-            <a href="notification-user.html"
+            <a th:href="@{/notifications}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">notifications</span>
                 <span class="nav-label text-sm">Notifications</span>
             </a>
-            <a href="accountsetting-user.html"
+            <a th:href="@{/settings}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">settings</span>
                 <span class="nav-label text-sm">Account Settings</span>
             </a>
         </nav>
         <div class="p-4 border-t border-white/5">
-            <button onclick="window.location.href='logout.html'"
-                    class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
-                <span class="material-symbols-outlined shrink-0"><a href="logout.html">power_settings_new</a></span><span
-                    class="nav-label"><a href="logout.html">Logout</a></span>
-            </button>
+            <a th:href="@{/logout}"
+               class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                <span class="material-symbols-outlined shrink-0">power_settings_new</span>
+                <span class="nav-label">Logout</span>
+            </a>
         </div>
     </aside>
 
@@ -355,8 +346,7 @@
                     <button class="tab-btn" onclick="setTab(this)">Cancelled</button>
                 </div>
                 <div class="flex-1 min-w-[180px] relative ml-auto">
-                        <span
-                                class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg">search</span>
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg">search</span>
                     <input type="text" placeholder="Search plate or name…"
                            class="input-glass bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl px-4 h-12 pl-10" />
                 </div>
@@ -388,8 +378,7 @@
                                 <p class="text-sm font-black text-primary mt-0.5">A-12</p>
                             </div>
                             <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Arrival
-                                </p>
+                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Arrival</p>
                                 <p class="text-sm font-black text-white mt-0.5">10:30 AM</p>
                             </div>
                             <div class="text-center">
@@ -404,7 +393,7 @@
                                 <button
                                         class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all"><span
                                         class="material-symbols-outlined text-sm text-slate-400">edit</span></button>
-                                <a href="parkingrecorddetails.html"
+                                <a th:href="@{/parking/record-details}"
                                    class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all"><span
                                         class="material-symbols-outlined text-sm text-slate-400">open_in_new</span></a>
                             </div>
@@ -436,8 +425,7 @@
                                 <p class="text-sm font-black text-primary mt-0.5">B-05</p>
                             </div>
                             <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Arrival
-                                </p>
+                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Arrival</p>
                                 <p class="text-sm font-black text-white mt-0.5">02:00 PM</p>
                             </div>
                             <div class="text-center">
@@ -538,7 +526,7 @@
                                 <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Paid</p>
                                 <p class="text-sm font-black text-emerald-400 mt-0.5">$13.75</p>
                             </div>
-                            <a href="receipt.html"
+                            <a th:href="@{/receipts}"
                                class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all"><span
                                     class="material-symbols-outlined text-sm text-slate-400">receipt_long</span></a>
                         </div>
@@ -650,7 +638,7 @@
             class="flex items-center gap-3 bg-primary text-white font-black px-5 py-3.5 rounded-2xl shadow-[0_0_30px_rgba(31,104,249,0.4)]">
         <span class="material-symbols-outlined">info</span>
         <span class="text-sm">Select a slot to complete</span>
-        <a href="slotselection.html" class="ml-2 underline text-blue-200 text-sm">Open Slot Selection →</a>
+        <a th:href="@{/slots/select}" class="ml-2 underline text-blue-200 text-sm">Open Slot Selection →</a>
         <button onclick="document.getElementById('slotSelHint').classList.add('hidden')"
                 class="ml-2 opacity-60 hover:opacity-100"><span
                 class="material-symbols-outlined text-base">close</span></button>

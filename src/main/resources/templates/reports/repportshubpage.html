@@ -1,7 +1,5 @@
-
-
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8" />
@@ -78,6 +76,8 @@
             background: rgba(31, 104, 249, 0.03);
         }
 
+        a { cursor: pointer; }
+
         ::-webkit-scrollbar {
             width: 5px;
             display: none;
@@ -103,69 +103,68 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a href="dashboard-admin.html"
+            <a th:href="@{/admin/dashboard}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">dashboard</span>
                 <span class="nav-label text-sm">Dashboard</span>
             </a>
-            <a href="entry-admin.html"
+            <a th:href="@{/admin/entry}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">login</span>
                 <span class="nav-label text-sm">Vehicle Entry</span>
             </a>
-            <a href="exitvehicle-admin.html"
+            <a th:href="@{/admin/exit}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">logout</span>
                 <span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a href="slot-overview.html"
+            <a th:href="@{/admin/slots/overview}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">grid_view</span>
                 <span class="nav-label text-sm">Parking Slots</span>
             </a>
-            <a href="vehicle-list-page.html"
+            <a th:href="@{/admin/vehicles}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">directions_car</span>
                 <span class="nav-label text-sm">Vehicles</span>
             </a>
-            <a href="usermanagement.html"
+            <a th:href="@{/admin/users}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">group</span>
                 <span class="nav-label text-sm">Users</span>
             </a>
-            <a href="paymenthistory.html"
+            <a th:href="@{/admin/payments/history}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">payments</span>
                 <span class="nav-label text-sm">Payments</span>
             </a>
-            <a href="repportshubpage.html"
+            <a th:href="@{/admin/reports}"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                 <span class="material-symbols-outlined shrink-0">bar_chart</span>
                 <span class="nav-label text-sm">Reports</span>
             </a>
-            <a href="notification.html"
+            <a th:href="@{/admin/notifications}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">notifications</span>
                 <span class="nav-label text-sm">Notifications</span>
             </a>
-            <a href="systemstatuspage.html"
+            <a th:href="@{/admin/system-status}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">monitor_heart</span>
                 <span class="nav-label text-sm">System Status</span>
             </a>
-            <a href="accountsetting.html"
+            <a th:href="@{/admin/settings}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">settings</span>
                 <span class="nav-label text-sm">Settings</span>
             </a>
         </nav>
         <div class="p-4 border-t border-white/5">
-            <button onclick="window.location.href='logout.html'"
-                    class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
-                    <span class="material-symbols-outlined shrink-0"><a
-                            href="logout.html">power_settings_new</a></span><span class="nav-label"><a
-                    href="logout.html">Logout</a></span>
-            </button>
+            <a th:href="@{/logout}"
+               class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                <span class="material-symbols-outlined shrink-0">power_settings_new</span>
+                <span class="nav-label">Logout</span>
+            </a>
         </div>
     </aside>
 
@@ -179,7 +178,7 @@
             </div>
             <div class="flex items-center gap-4">
                 <div class="text-right">
-                    <p class="text-xs font-black text-white uppercase tracking-widest">Alex Johnson</p>
+                    <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${adminName ?: 'Alex Johnson'}">Alex Johnson</p>
                     <p class="text-[10px] text-primary font-bold uppercase tracking-tighter">Admin</p>
                 </div>
                 <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
@@ -195,27 +194,23 @@
             <!-- Summary Stats -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                 <div class="glass-card p-7 rounded-3xl">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Total Revenue
-                    </p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Total Revenue</p>
                     <h3 class="text-2xl font-black text-white">$45,820</h3>
                     <p class="text-emerald-400 text-[10px] font-bold mt-2 flex items-center gap-1"><span
                             class="material-symbols-outlined text-xs">trending_up</span> +14% this month</p>
                 </div>
                 <div class="glass-card p-7 rounded-3xl">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Total Sessions
-                    </p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Total Sessions</p>
                     <h3 class="text-2xl font-black text-white">3,241</h3>
                     <p class="text-slate-500 text-[10px] font-bold mt-2">This month</p>
                 </div>
                 <div class="glass-card p-7 rounded-3xl">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Avg Occupancy
-                    </p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Avg Occupancy</p>
                     <h3 class="text-2xl font-black text-primary">87%</h3>
                     <p class="text-slate-500 text-[10px] font-bold mt-2">Peak: 94%</p>
                 </div>
                 <div class="glass-card p-7 rounded-3xl">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Receipts Issued
-                    </p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Receipts Issued</p>
                     <h3 class="text-2xl font-black text-white">3,198</h3>
                     <p class="text-slate-500 text-[10px] font-bold mt-2">98.7% payment rate</p>
                 </div>
@@ -224,14 +219,12 @@
             <!-- Report Cards Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                <div class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer"
-                     onclick="window.location.href='revenuerepoartpage.html'">
+                <a th:href="@{/admin/reports/revenue}" class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer">
                     <div
                             class="h-14 w-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined text-emerald-400 text-2xl">attach_money</span>
                     </div>
-                    <p class="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-400 mb-2">Financial
-                    </p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-400 mb-2">Financial</p>
                     <h3 class="text-xl font-black text-white mb-3">Revenue Report</h3>
                     <p class="text-slate-400 text-sm font-medium leading-relaxed mb-6">Total revenue, payment method
                         breakdown, daily and monthly trends, and receipt summaries.</p>
@@ -242,10 +235,9 @@
                             <span class="material-symbols-outlined text-emerald-400 text-lg">arrow_forward</span>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer"
-                     onclick="window.location.href='occupancyrepoartpage.html'">
+                <a th:href="@{/admin/reports/occupancy}" class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer">
                     <div
                             class="h-14 w-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined text-primary text-2xl">grid_view</span>
@@ -261,10 +253,9 @@
                             <span class="material-symbols-outlined text-primary text-lg">arrow_forward</span>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer"
-                     onclick="window.location.href='dailyrevenuereport.html'">
+                <a th:href="@{/admin/reports/daily-revenue}" class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer">
                     <div
                             class="h-14 w-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined text-amber-400 text-2xl">today</span>
@@ -280,10 +271,9 @@
                             <span class="material-symbols-outlined text-amber-400 text-lg">arrow_forward</span>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer"
-                     onclick="window.location.href='auditlog.html'">
+                <a th:href="@{/admin/reports/audit-log}" class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer">
                     <div
                             class="h-14 w-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined text-rose-400 text-2xl">fact_check</span>
@@ -299,10 +289,9 @@
                             <span class="material-symbols-outlined text-rose-400 text-lg">arrow_forward</span>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer"
-                     onclick="window.location.href='paymenthistory.html'">
+                <a th:href="@{/admin/payments/history}" class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer">
                     <div
                             class="h-14 w-14 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined text-violet-400 text-2xl">receipt_long</span>
@@ -318,10 +307,9 @@
                             <span class="material-symbols-outlined text-violet-400 text-lg">arrow_forward</span>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer"
-                     onclick="window.location.href='slot-usage-history.html'">
+                <a th:href="@{/admin/slots/history}" class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer">
                     <div
                             class="h-14 w-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined text-cyan-400 text-2xl">history</span>
@@ -337,7 +325,7 @@
                             <span class="material-symbols-outlined text-cyan-400 text-lg">arrow_forward</span>
                         </div>
                     </div>
-                </div>
+                </a>
 
             </div>
         </div>
