@@ -1,4 +1,4 @@
-package com.parkiyo.enums;
+package com.parkiyo.parkiyo.enums;
 
 public enum SlotStatus {
     AVAILABLE,
