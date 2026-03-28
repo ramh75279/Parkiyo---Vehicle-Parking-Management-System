@@ -1,7 +1,5 @@
-
-
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8" />
@@ -134,7 +132,6 @@
             border-radius: 10px;
         }
 
-        /* ── Date input dark override ─────────────────────────────── */
         input[type="date"].input-glass,
         input[type="datetime-local"].input-glass {
             background: rgba(255, 255, 255, 0.04) !important;
@@ -179,6 +176,8 @@
             color: white;
             border-radius: 4px;
         }
+
+        a { cursor: pointer; }
     </style>
 </head>
 
@@ -195,63 +194,63 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-2 overflow-y-auto">
-            <a href="dashboard-user.html"
+            <a th:href="@{/dashboard/user}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">dashboard</span>
                 <span class="nav-label text-sm">Dashboard</span>
             </a>
-            <a href="entry.html"
+            <a th:href="@{/entry}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">login</span>
                 <span class="nav-label text-sm">Vehicle Entry</span>
             </a>
-            <a href="exitvehicle.html"
+            <a th:href="@{/exit}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">logout</span>
                 <span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a href="parking.html"
+            <a th:href="@{/parking}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">local_parking</span>
                 <span class="nav-label text-sm">Active Parking</span>
             </a>
-            <a href="advancereservation.html"
+            <a th:href="@{/reservation}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">event_available</span>
                 <span class="nav-label text-sm">Reservation</span>
             </a>
-            <a href="paymenthistory-user.html"
+            <a th:href="@{/payments/history}"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                 <span class="material-symbols-outlined shrink-0">payments</span>
                 <span class="nav-label text-sm">Payments</span>
             </a>
-            <a href="receipt.html"
+            <a th:href="@{/receipt}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">receipt_long</span>
                 <span class="nav-label text-sm">Receipts</span>
             </a>
-            <a href="walletoverview.html"
+            <a th:href="@{/wallet}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">account_balance_wallet</span>
                 <span class="nav-label text-sm">Wallet</span>
             </a>
-            <a href="notification-user.html"
+            <a th:href="@{/notifications}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">notifications</span>
                 <span class="nav-label text-sm">Notifications</span>
             </a>
-            <a href="accountsetting-user.html"
+            <a th:href="@{/account/settings}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">settings</span>
                 <span class="nav-label text-sm">Account Settings</span>
             </a>
         </nav>
         <div class="p-4 border-t border-white/5">
-            <button onclick="window.location.href='logout.html'"
-                    class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
-                <span class="material-symbols-outlined shrink-0"><a href="logout.html">power_settings_new</a></span><span
-                    class="nav-label"><a href="logout.html">Logout</a></span>
-            </button>
+            <a th:href="@{/logout}"
+               class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                <span class="material-symbols-outlined shrink-0">power_settings_new</span>
+                <span class="nav-label">Logout</span>
+            </a>
         </div>
     </aside>
 
@@ -387,7 +386,7 @@
                         </tr>
                         </thead>
                         <tbody class="text-sm font-bold text-slate-300 divide-y divide-white/5">
-                        <tr class="txn-row" onclick="window.location.href='receipt.html'">
+                        <tr class="txn-row" onclick="window.location.href='/receipt'">
                             <td class="px-8 py-5 font-mono text-xs text-slate-400">TXN-88291047</td>
                             <td class="px-8 py-5 opacity-70 text-xs">10 Mar 2026</td>
                             <td class="px-8 py-5"><span
@@ -399,12 +398,12 @@
                             </td>
                             <td class="px-8 py-5 text-emerald-400 font-black">$16.50</td>
                             <td class="px-8 py-5"><span class="status-pill pill-paid">Paid</span></td>
-                            <td class="px-8 py-5" onclick="event.stopPropagation()"><a href="receipt.html"
+                            <td class="px-8 py-5" onclick="event.stopPropagation()"><a th:href="@{/receipt}"
                                                                                        class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all"><span
                                     class="material-symbols-outlined text-sm text-slate-400">receipt_long</span></a>
                             </td>
                         </tr>
-                        <tr class="txn-row" onclick="window.location.href='receipt.html'">
+                        <tr class="txn-row" onclick="window.location.href='/receipt'">
                             <td class="px-8 py-5 font-mono text-xs text-slate-400">TXN-88290031</td>
                             <td class="px-8 py-5 opacity-70 text-xs">09 Mar 2026</td>
                             <td class="px-8 py-5"><span
@@ -416,12 +415,12 @@
                             </td>
                             <td class="px-8 py-5 text-emerald-400 font-black">$18.75</td>
                             <td class="px-8 py-5"><span class="status-pill pill-paid">Paid</span></td>
-                            <td class="px-8 py-5" onclick="event.stopPropagation()"><a href="receipt.html"
+                            <td class="px-8 py-5" onclick="event.stopPropagation()"><a th:href="@{/receipt}"
                                                                                        class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all"><span
                                     class="material-symbols-outlined text-sm text-slate-400">receipt_long</span></a>
                             </td>
                         </tr>
-                        <tr class="txn-row" onclick="window.location.href='receipt.html'">
+                        <tr class="txn-row" onclick="window.location.href='/receipt'">
                             <td class="px-8 py-5 font-mono text-xs text-slate-400">TXN-88288714</td>
                             <td class="px-8 py-5 opacity-70 text-xs">08 Mar 2026</td>
                             <td class="px-8 py-5"><span
@@ -433,7 +432,7 @@
                             </td>
                             <td class="px-8 py-5 text-emerald-400 font-black">$13.75</td>
                             <td class="px-8 py-5"><span class="status-pill pill-paid">Paid</span></td>
-                            <td class="px-8 py-5" onclick="event.stopPropagation()"><a href="receipt.html"
+                            <td class="px-8 py-5" onclick="event.stopPropagation()"><a th:href="@{/receipt}"
                                                                                        class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all"><span
                                     class="material-symbols-outlined text-sm text-slate-400">receipt_long</span></a>
                             </td>
@@ -455,7 +454,7 @@
                                     class="material-symbols-outlined text-sm text-slate-600">receipt_long</span></span>
                             </td>
                         </tr>
-                        <tr class="txn-row" onclick="window.location.href='receipt.html'">
+                        <tr class="txn-row" onclick="window.location.href='/receipt'">
                             <td class="px-8 py-5 font-mono text-xs text-slate-400">TXN-88281044</td>
                             <td class="px-8 py-5 opacity-70 text-xs">05 Mar 2026</td>
                             <td class="px-8 py-5"><span
@@ -467,7 +466,7 @@
                             </td>
                             <td class="px-8 py-5 text-slate-400 font-black line-through">$14.75</td>
                             <td class="px-8 py-5"><span class="status-pill pill-refunded">Refunded</span></td>
-                            <td class="px-8 py-5" onclick="event.stopPropagation()"><a href="receipt.html"
+                            <td class="px-8 py-5" onclick="event.stopPropagation()"><a th:href="@{/receipt}"
                                                                                        class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all"><span
                                     class="material-symbols-outlined text-sm text-slate-400">receipt_long</span></a>
                             </td>
