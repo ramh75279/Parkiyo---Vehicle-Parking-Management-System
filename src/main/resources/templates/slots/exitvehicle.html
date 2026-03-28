@@ -1,7 +1,5 @@
-
-
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8" />
@@ -184,6 +182,8 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
+
+        a { cursor: pointer; }
     </style>
 </head>
 
@@ -201,63 +201,63 @@
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-2 overflow-y-auto">
-            <a href="dashboard-user.html"
+            <a th:href="@{/dashboard/user}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">dashboard</span>
                 <span class="nav-label text-sm">Dashboard</span>
             </a>
-            <a href="entry.html"
+            <a th:href="@{/entry}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">login</span>
                 <span class="nav-label text-sm">Vehicle Entry</span>
             </a>
-            <a href="exitvehicle.html"
+            <a th:href="@{/exit}"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                 <span class="material-symbols-outlined shrink-0">logout</span>
                 <span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a href="parking.html"
+            <a th:href="@{/parking}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">local_parking</span>
                 <span class="nav-label text-sm">Active Parking</span>
             </a>
-            <a href="advancereservation.html"
+            <a th:href="@{/reservation}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">event_available</span>
                 <span class="nav-label text-sm">Reservation</span>
             </a>
-            <a href="paymenthistory-user.html"
+            <a th:href="@{/payments/history}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">payments</span>
                 <span class="nav-label text-sm">Payments</span>
             </a>
-            <a href="receipt.html"
+            <a th:href="@{/receipts}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">receipt_long</span>
                 <span class="nav-label text-sm">Receipts</span>
             </a>
-            <a href="walletoverview.html"
+            <a th:href="@{/wallet}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">account_balance_wallet</span>
                 <span class="nav-label text-sm">Wallet</span>
             </a>
-            <a href="notification-user.html"
+            <a th:href="@{/notifications}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">notifications</span>
                 <span class="nav-label text-sm">Notifications</span>
             </a>
-            <a href="accountsetting-user.html"
+            <a th:href="@{/account/settings}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">settings</span>
                 <span class="nav-label text-sm">Account Settings</span>
             </a>
         </nav>
         <div class="p-4 border-t border-white/5">
-            <button onclick="window.location.href='login.html'"
-                    class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
-                <span class="material-symbols-outlined shrink-0"><a href="logout.html">power_settings_new</a></span><span
-                    class="nav-label"><a href="logout.html">logout</a></span>
-            </button>
+            <a th:href="@{/logout}"
+               class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                <span class="material-symbols-outlined shrink-0">power_settings_new</span>
+                <span class="nav-label">Logout</span>
+            </a>
         </div>
     </aside>
 
@@ -271,7 +271,7 @@
             </div>
             <div class="flex items-center gap-4">
                 <div class="text-right hidden xl:block">
-                    <p class="text-xs font-black text-white uppercase tracking-widest">Maria Santos</p>
+                    <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${userName != null ? userName : 'Maria Santos'}">Maria Santos</p>
                     <p class="text-[10px] text-primary font-bold uppercase tracking-tighter">User</p>
                 </div>
                 <div class="h-10 w-10 rounded-[14px] bg-gradient-to-tr from-emerald-400 to-primary p-[2px]">
@@ -403,8 +403,7 @@
                         </div>
                         <div class="grid grid-cols-2 gap-3 mb-6">
                             <div class="p-4 rounded-2xl bg-black/20 border border-white/5">
-                                <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">Plate
-                                </p>
+                                <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">Plate</p>
                                 <p class="text-white font-black tracking-widest">ABC-1234</p>
                             </div>
                             <div class="p-4 rounded-2xl bg-black/20 border border-white/5">
@@ -413,18 +412,16 @@
                                 <p class="text-emerald-400 font-black text-lg">$12.65</p>
                             </div>
                             <div class="p-4 rounded-2xl bg-black/20 border border-white/5">
-                                <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">Method
-                                </p>
+                                <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">Method</p>
                                 <p class="text-white font-black">Parkiyo Wallet</p>
                             </div>
                             <div class="p-4 rounded-2xl bg-black/20 border border-white/5">
-                                <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">
-                                    Duration</p>
+                                <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">Duration</p>
                                 <p class="text-white font-black">2h 18m</p>
                             </div>
                         </div>
                         <div class="flex gap-3">
-                            <a href="receipt.html"
+                            <a th:href="@{/receipts}"
                                class="flex-1 flex items-center justify-center gap-2 bg-primary/10 border border-primary/20 text-primary font-black py-3 rounded-2xl hover:bg-primary/20 transition-all text-sm">
                                 <span class="material-symbols-outlined text-base">receipt_long</span> View Receipt
                             </a>
