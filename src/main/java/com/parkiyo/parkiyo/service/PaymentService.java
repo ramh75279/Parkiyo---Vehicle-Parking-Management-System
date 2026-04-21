@@ -131,8 +131,30 @@ public class PaymentService {
         if (payment.getStatus() != PaymentStatus.SUCCESS) {
             throw new RuntimeException("Only successful payments can be refunded.");
         }
+
+        Wallet wallet = walletRepository.findByUserEmail(payment.getUser().getEmail())
+                .orElseThrow(() -> new RuntimeException("Wallet not found."));
+
+        BigDecimal refundedBalance = wallet.getBalance().add(payment.getAmount());
+        wallet.setBalance(refundedBalance);
+
+        if (wallet.getTransactions() == null) {
+            wallet.setTransactions(new ArrayList<>());
+        }
+
+        WalletTransaction walletTransaction = WalletTransaction.builder()
+                .wallet(wallet)
+                .type("CREDIT")
+                .amount(payment.getAmount())
+                .balanceAfter(refundedBalance)
+                .description("Refund for " + payment.getTransactionCode())
+                .payment(payment)
+                .build();
+        wallet.getTransactions().add(walletTransaction);
+
         payment.setStatus(PaymentStatus.REFUNDED);
         payment.setRefundedAt(LocalDateTime.now());
+        walletRepository.save(wallet);
         paymentRepository.save(payment);
     }
 }
