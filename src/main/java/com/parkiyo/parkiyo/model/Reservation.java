@@ -1,4 +1,4 @@
-package com.parkiyo.model;
+package com.parkiyo.parkiyo.model;
 
 import com.parkiyo.enums.ReservationStatus;
 import jakarta.persistence.*;

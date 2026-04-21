@@ -1,4 +1,4 @@
-package com.parkiyo.model;
+package com.parkiyo.parkiyo.model;
 
 import jakarta.persistence.*;
 import lombok.*;

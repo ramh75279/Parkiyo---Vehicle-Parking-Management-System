@@ -1,4 +1,4 @@
-package com.parkiyo.controller;
+package com.parkiyo.parkiyo.controller;
 
 import com.parkiyo.dto.LoginRequest;
 import com.parkiyo.dto.RegisterRequest;
