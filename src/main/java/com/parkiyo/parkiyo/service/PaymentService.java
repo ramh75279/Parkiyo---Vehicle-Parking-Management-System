@@ -1,6 +1,7 @@
 package com.parkiyo.parkiyo.service;
 
 import com.parkiyo.parkiyo.enums.PaymentStatus;
+import com.parkiyo.parkiyo.enums.NotificationType;
 import com.parkiyo.parkiyo.model.ParkingRecord;
 import com.parkiyo.parkiyo.model.Payment;
 import com.parkiyo.parkiyo.model.Receipt;
@@ -28,6 +29,7 @@ public class PaymentService {
     private final WalletService walletService;
     private final WalletRepository walletRepository;
     private final AuditLogService auditLogService;
+    private final NotificationService notificationService;
 
     public Payment getPendingPayment(Long id, String email) {
         return paymentRepository.findById(id)
@@ -139,6 +141,14 @@ public class PaymentService {
         payment.setReceipt(receipt);
         walletRepository.save(wallet);
         paymentRepository.save(payment);
+
+        notificationService.createNotification(
+            payment.getUser(),
+            NotificationType.PAYMENT,
+            "Payment Successful",
+            "Payment " + payment.getTransactionCode() + " was completed successfully.",
+            "/payments/processing/" + payment.getId()
+        );
 
         auditLogService.logAction(
             "PAYMENT",
@@ -296,6 +306,14 @@ public class PaymentService {
         payment.setRefundedAt(LocalDateTime.now());
         walletRepository.save(wallet);
         paymentRepository.save(payment);
+
+        notificationService.createNotification(
+            payment.getUser(),
+            NotificationType.PAYMENT,
+            "Payment Refunded",
+            "Refund completed for payment " + payment.getTransactionCode() + ".",
+            "/payments/history"
+        );
 
         auditLogService.logAction(
             "PAYMENT_REFUNDED",

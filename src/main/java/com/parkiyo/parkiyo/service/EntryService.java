@@ -1,6 +1,7 @@
 package com.parkiyo.parkiyo.service;
 
 import com.parkiyo.parkiyo.dto.EntryRequest;
+import com.parkiyo.parkiyo.enums.NotificationType;
 import com.parkiyo.parkiyo.enums.SlotStatus;
 import com.parkiyo.parkiyo.enums.VehicleCategory;
 import com.parkiyo.parkiyo.model.ParkingRecord;
@@ -27,6 +28,7 @@ public class EntryService {
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
     private final AuditLogService auditLogService;
+    private final NotificationService notificationService;
 
     @Transactional
     public void processEntry(EntryRequest request, String operatorEmail) {
@@ -70,6 +72,14 @@ public class EntryService {
         // Mark slot as occupied
         slot.setStatus(SlotStatus.OCCUPIED);
         slotRepository.save(slot);
+
+        notificationService.createNotification(
+            user,
+            NotificationType.ENTRY,
+            "Vehicle Entry Recorded",
+            "Vehicle " + vehicle.getLicensePlate() + " entered slot " + slot.getSlotNumber() + ".",
+            "/parking"
+        );
 
         auditLogService.logAction(
             "ENTRY",

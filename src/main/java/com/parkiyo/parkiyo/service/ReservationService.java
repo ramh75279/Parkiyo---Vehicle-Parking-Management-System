@@ -1,6 +1,7 @@
 package com.parkiyo.parkiyo.service;
 
 import com.parkiyo.parkiyo.dto.ReservationRequest;
+import com.parkiyo.parkiyo.enums.NotificationType;
 import com.parkiyo.parkiyo.enums.PaymentStatus;
 import com.parkiyo.parkiyo.enums.ReservationStatus;
 import com.parkiyo.parkiyo.enums.SlotStatus;
@@ -24,6 +25,7 @@ public class ReservationService {
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
+        private final NotificationService notificationService;
 
     public List<Reservation> getUserReservations(String email) {
         return reservationRepository.findByUserEmail(email);
@@ -80,6 +82,14 @@ public class ReservationService {
                 .build();
         paymentRepository.save(payment);
 
+        notificationService.createNotification(
+                user,
+                NotificationType.RESERVATION,
+                "Reservation Confirmed",
+                "Reservation " + reservation.getReservationCode() + " was created for slot " + slot.getSlotNumber() + ".",
+                "/reservations"
+        );
+
         return payment.getId();
     }
 
@@ -97,5 +107,13 @@ public class ReservationService {
         ParkingSlot slot = reservation.getSlot();
         slot.setStatus(SlotStatus.AVAILABLE);
         slotRepository.save(slot);
+
+        notificationService.createNotification(
+                reservation.getUser(),
+                NotificationType.RESERVATION,
+                "Reservation Cancelled",
+                "Reservation " + reservation.getReservationCode() + " was cancelled.",
+                "/reservations"
+        );
     }
 }

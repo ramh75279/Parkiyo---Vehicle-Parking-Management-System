@@ -1,6 +1,7 @@
 package com.parkiyo.parkiyo.service;
 
 import com.parkiyo.parkiyo.dto.ExitRequest;
+import com.parkiyo.parkiyo.enums.NotificationType;
 import com.parkiyo.parkiyo.enums.PaymentStatus;
 import com.parkiyo.parkiyo.enums.SlotStatus;
 import com.parkiyo.parkiyo.model.Payment;
@@ -28,6 +29,7 @@ public class ExitService {
     private final ParkingSlotRepository slotRepository;
     private final PaymentRepository paymentRepository;
     private final AuditLogService auditLogService;
+    private final NotificationService notificationService;
 
     @Transactional
     public Long processExit(ExitRequest request, String operatorEmail) {
@@ -69,6 +71,14 @@ public class ExitService {
                 .status(PaymentStatus.PENDING)
                 .build();
         paymentRepository.save(payment);
+
+            notificationService.createNotification(
+                record.getUser(),
+                NotificationType.EXIT,
+                "Vehicle Exit Processed",
+                "Vehicle " + record.getVehicle().getLicensePlate() + " exited. Pending payment " + payment.getTransactionCode() + " created.",
+                "/payments/pending/" + payment.getId()
+            );
 
         auditLogService.logAction(
             "EXIT",
