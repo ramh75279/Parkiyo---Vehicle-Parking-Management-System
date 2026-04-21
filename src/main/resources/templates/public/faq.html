@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Parkiyo | Support & FAQ</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { primary: "#1f68f9", "background-dark": "#020617" },
+                    fontFamily: { display: ["Public Sans", "sans-serif"] },
+                    borderRadius: { squircle: "14px", xl: "1.5rem", "2xl": "2rem", "3xl": "3rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Public Sans', sans-serif; }
+        a { cursor: pointer; }
+        .premium-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .bg-subtle-radial { background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 70%); }
+        .glass-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); }
+        .input-glass { background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(255,255,255,0.12); color: white !important; transition: all 0.3s ease; }
+        .input-glass:focus { background: rgba(255,255,255,0.08) !important; border-color: #1f68f9; outline: none; box-shadow: 0 0 20px rgba(31,104,249,0.15); }
+        .faq-item { border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1), padding 0.3s ease; }
+        .faq-answer.open { max-height: 300px; }
+        .faq-icon { transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .faq-icon.open { transform: rotate(45deg); }
+        ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display antialiased bg-subtle-radial">
+<header class="sticky top-0 z-50 w-full border-b border-white/5 bg-background-dark/75 premium-blur">
+    <div class="container mx-auto flex h-20 items-center justify-between px-6 lg:px-12">
+        <a th:href="@{/home}" class="flex items-center gap-4">
+            <div class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]">
+                <span class="material-symbols-outlined font-bold">local_parking</span>
+            </div>
+            <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+        </a>
+        <nav class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
+            <a class="hover:text-primary transition-colors" th:href="@{/home}">Home</a>
+            <a class="hover:text-primary transition-colors" th:href="@{/features}">Features</a>
+            <a class="hover:text-primary transition-colors" th:href="@{/solutions}">Solutions</a>
+            <a class="hover:text-primary transition-colors" th:href="@{/analytics}">Analytics</a>
+            <a class="text-primary" th:href="@{/faq}">Support</a>
+        </nav>
+        <div class="flex items-center gap-6">
+            <a th:href="@{/login}" class="text-sm font-bold text-slate-300 hover:text-white">Login</a>
+            <a th:href="@{/register}" class="bg-primary text-white text-sm font-bold px-7 py-3 rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/30">Get Started</a>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="container mx-auto px-6 lg:px-12 pt-24 pb-16">
+        <div class="text-center max-w-3xl mx-auto">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-[0.22em] mb-6">Help Center</div>
+            <h1 class="text-5xl lg:text-6xl font-black leading-tight tracking-tight text-white mb-8">How can we help you?</h1>
+            <div class="relative max-w-xl mx-auto">
+                <span class="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-slate-500">search</span>
+                <input id="faqSearch" type="text" placeholder="Search questions..." class="w-full h-16 rounded-2xl pl-14 pr-6 input-glass font-medium text-base" oninput="filterFAQ(this.value)"/>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-6 lg:px-12 pb-32">
+        <div class="max-w-4xl mx-auto">
+
+            <!-- Category: Registration -->
+            <div class="faq-category mb-12" data-category="registration">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-lg">person_add</span>
+                    </div>
+                    <h2 class="text-lg font-black text-white uppercase tracking-wider">Registration</h2>
+                </div>
+                <div class="glass-card rounded-[2rem] overflow-hidden divide-y divide-white/5">
+                    <div class="faq-item">
+                        <button class="faq-btn w-full flex items-center justify-between p-7 text-left hover:bg-white/[0.02] transition-colors" onclick="toggleFAQ(this)">
+                            <span class="text-sm font-bold text-white pr-6">How do I create a Parkiyo account?</span>
+                            <span class="material-symbols-outlined text-slate-500 faq-icon shrink-0">add</span>
+                        </button>
+                        <div class="faq-answer px-7">
+                            <p class="text-slate-400 text-sm leading-relaxed pb-7">Visit the Register page and fill in your name, email, phone number, password, and gender. Self-registration creates a standard user account. Admin accounts can only be created by an existing administrator through the user management panel.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-btn w-full flex items-center justify-between p-7 text-left hover:bg-white/[0.02] transition-colors" onclick="toggleFAQ(this)">
+                            <span class="text-sm font-bold text-white pr-6">Can I register with an email that's already been used?</span>
+                            <span class="material-symbols-outlined text-slate-500 faq-icon shrink-0">add</span>
+                        </button>
+                        <div class="faq-answer px-7">
+                            <p class="text-slate-400 text-sm leading-relaxed pb-7">No. Each email address must be unique in the system. If you try to register with an existing email, you'll receive a duplicate email error. Use the Forgot Password page to recover access to your existing account.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-btn w-full flex items-center justify-between p-7 text-left hover:bg-white/[0.02] transition-colors" onclick="toggleFAQ(this)">
+                            <span class="text-sm font-bold text-white pr-6">How do I get an admin account?</span>
+                            <span class="material-symbols-outlined text-slate-500 faq-icon shrink-0">add</span>
+                        </button>
+                        <div class="faq-answer px-7">
+                            <p class="text-slate-400 text-sm leading-relaxed pb-7">Admin accounts must be created by an existing administrator. They cannot be self-registered. Contact your facility's system administrator to have an admin role assigned or a new admin account created on your behalf.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category: Login -->
+            <div class="faq-category mb-12" data-category="login">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="h-10 w-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-emerald-400 text-lg">lock_open</span>
+                    </div>
+                    <h2 class="text-lg font-black text-white uppercase tracking-wider">Login & Access</h2>
+                </div>
+                <div class="glass-card rounded-[2rem] overflow-hidden divide-y divide-white/5">
+                    <div class="faq-item">
+                        <button class="faq-btn w-full flex items-center justify-between p-7 text-left hover:bg-white/[0.02] transition-colors" onclick="toggleFAQ(this)">
+                            <span class="text-sm font-bold text-white pr-6">I forgot my password. How do I reset it?</span>
+                            <span class="material-symbols-outlined text-slate-500 faq-icon shrink-0">add</span>
+                        </button>
+                        <div class="faq-answer px-7">
+                            <p class="text-slate-400 text-sm leading-relaxed pb-7">Click "Forgot Password" on the login page, enter your registered email address, and Parkiyo will send password reset instructions. If the email exists in the system, you'll receive a secure reset link. Check your spam folder if you don't see it within a few minutes.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-btn w-full flex items-center justify-between p-7 text-left hover:bg-white/[0.02] transition-colors" onclick="toggleFAQ(this)">
+                            <span class="text-sm font-bold text-white pr-6">How does QR code login work?</span>
+                            <span class="material-symbols-outlined text-slate-500 faq-icon shrink-0">add</span>
+                        </button>
+                        <div class="faq-answer px-7">
+                            <p class="text-slate-400 text-sm leading-relaxed pb-7">Parkiyo supports QR code-based entry on the login screen. A unique QR code is generated that you can scan from a connected device to authenticate. This is ideal for fast operator logins at shared terminals where typing credentials is inconvenient.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-btn w-full flex items-center justify-between p-7 text-left hover:bg-white/[0.02] transition-colors" onclick="toggleFAQ(this)">
+                            <span class="text-sm font-bold text-white pr-6">What happens after I log in? Where am I redirected?</span>
+                            <span class="material-symbols-outlined text-slate-500 faq-icon shrink-0">add</span>
+                        </button>
+                        <div class="faq-answer px-7">
+                            <p class="text-slate-400 text-sm leading-relaxed pb-7">Login redirects are role-based. Administrators are taken to the Admin Dashboard with full system controls. Standard users are taken to the User Dashboard with operational tools for vehicle entry, exit, payments, and receipts.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category: Payments & Wallet -->
+            <div class="faq-category mb-12" data-category="payments wallet">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="h-10 w-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-violet-400 text-lg">account_balance_wallet</span>
+                    </div>
+                    <h2 class="text-lg font-black text-white uppercase tracking-wider">Payments & Wallet</h2>
+                </div>
+                <div class="glass-card rounded-[2rem] overflow-hidden divide-y divide-white/5">
+                    <div class="faq-item">
+                        <button class="faq-btn w-full flex items-center justify-between p-7 text-left hover:bg-white/[0.02] transition-colors" onclick="toggleFAQ(this)">
+                            <span class="text-sm font-bold text-white pr-6">How are parking fees calculated?</span>
+                            <span class="material-symbols-outlined text-slate-500 faq-icon shrink-0">add</span>
+                        </button>
+                        <div class="faq-answer px-7">
+                            <p class="text-slate-400 text-sm leading-relaxed pb-7">Fees are calculated automatically based on the total parking duration when a vehicle exits. The system uses the configured hourly or flat rate for each slot category. The amount due is displayed before payment is confirmed.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-btn w-full flex items-center justify-between p-7 text-left hover:bg-white/[0.02] transition-colors" onclick="toggleFAQ(this)">
+                            <span class="text-sm font-bold text-white pr-6">Can I get a receipt for my parking session?</span>
+                            <span class="material-symbols-outlined text-slate-500 faq-icon shrink-0">add</span>
+                        </button>
+                        <div class="faq-answer px-7">
+                            <p class="text-slate-400 text-sm leading-relaxed pb-7">Yes. After payment is confirmed, a digital receipt is generated automatically. It includes your ticket number, plate, slot, entry/exit times, duration, and total amount paid. Receipts are accessible from your receipt history and can be printed or downloaded.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category: Reservations -->
+            <div class="faq-category mb-12" data-category="reservations">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-amber-400 text-lg">calendar_month</span>
+                    </div>
+                    <h2 class="text-lg font-black text-white uppercase tracking-wider">Reservations</h2>
+                </div>
+                <div class="glass-card rounded-[2rem] overflow-hidden divide-y divide-white/5">
+                    <div class="faq-item">
+                        <button class="faq-btn w-full flex items-center justify-between p-7 text-left hover:bg-white/[0.02] transition-colors" onclick="toggleFAQ(this)">
+                            <span class="text-sm font-bold text-white pr-6">How far in advance can I reserve a slot?</span>
+                            <span class="material-symbols-outlined text-slate-500 faq-icon shrink-0">add</span>
+                        </button>
+                        <div class="faq-answer px-7">
+                            <p class="text-slate-400 text-sm leading-relaxed pb-7">Advance reservations can be made for any future date and time where slots are available. You select your preferred date, time, and slot type. The system checks real-time availability before confirming. Reservations are visible to the admin and attached to your profile.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-btn w-full flex items-center justify-between p-7 text-left hover:bg-white/[0.02] transition-colors" onclick="toggleFAQ(this)">
+                            <span class="text-sm font-bold text-white pr-6">What happens if I don't show up for my reservation?</span>
+                            <span class="material-symbols-outlined text-slate-500 faq-icon shrink-0">add</span>
+                        </button>
+                        <div class="faq-answer px-7">
+                            <p class="text-slate-400 text-sm leading-relaxed pb-7">Reservation management policies are configured by your facility administrator. Depending on settings, no-show reservations may be automatically released after a grace period, making the slot available for other drivers. Contact your facility admin for specific cancellation and no-show policies.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category: Entry / Exit -->
+            <div class="faq-category mb-12" data-category="entry exit vehicle">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="h-10 w-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-rose-400 text-lg">directions_car</span>
+                    </div>
+                    <h2 class="text-lg font-black text-white uppercase tracking-wider">Entry & Exit</h2>
+                </div>
+                <div class="glass-card rounded-[2rem] overflow-hidden divide-y divide-white/5">
+                    <div class="faq-item">
+                        <button class="faq-btn w-full flex items-center justify-between p-7 text-left hover:bg-white/[0.02] transition-colors" onclick="toggleFAQ(this)">
+                            <span class="text-sm font-bold text-white pr-6">How does a vehicle get logged into the system on entry?</span>
+                            <span class="material-symbols-outlined text-slate-500 faq-icon shrink-0">add</span>
+                        </button>
+                        <div class="faq-answer px-7">
+                            <p class="text-slate-400 text-sm leading-relaxed pb-7">An operator enters the vehicle's plate number, selects or assigns a slot, and confirms entry. The system records the entry time automatically and generates a parking ticket. The vehicle session becomes active and appears in live operations on the admin dashboard.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-btn w-full flex items-center justify-between p-7 text-left hover:bg-white/[0.02] transition-colors" onclick="toggleFAQ(this)">
+                            <span class="text-sm font-bold text-white pr-6">What do I need to process a vehicle exit?</span>
+                            <span class="material-symbols-outlined text-slate-500 faq-icon shrink-0">add</span>
+                        </button>
+                        <div class="faq-answer px-7">
+                            <p class="text-slate-400 text-sm leading-relaxed pb-7">Search for the vehicle by plate number or ticket ID. The system shows the session duration and calculates the fee. After confirming payment, the slot is freed and a receipt is generated. The vehicle session moves from active to exited in the operations log.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No results -->
+            <div id="noResults" class="hidden text-center py-20">
+                <span class="material-symbols-outlined text-4xl text-slate-600 mb-4 block">search_off</span>
+                <p class="text-slate-500 font-bold">No matching questions found.</p>
+                <p class="text-slate-600 text-sm mt-2">Try different keywords or browse all categories above.</p>
+            </div>
+
+            <!-- Support CTA -->
+            <div class="glass-card rounded-[2.5rem] p-12 text-center mt-8">
+                <span class="material-symbols-outlined text-primary text-4xl mb-5 block">support_agent</span>
+                <h3 class="text-2xl font-black text-white mb-3">Still need help?</h3>
+                <p class="text-slate-400 mb-8 max-w-sm mx-auto">Our support team is available to help with any platform questions or operational issues.</p>
+                <a href="mailto:support@parkiyo.com" class="inline-flex items-center gap-3 bg-primary text-white font-black px-10 py-4 rounded-2xl hover:scale-105 transition-all shadow-lg shadow-primary/20">
+                    Contact Support
+                    <span class="material-symbols-outlined text-lg">mail</span>
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="border-t border-white/5 bg-background-dark pt-24 pb-12">
+    <div class="container mx-auto px-6 lg:px-12">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-16 mb-20">
+            <div class="col-span-2">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]">
+                        <span class="material-symbols-outlined font-bold text-2xl">local_parking</span>
+                    </div>
+                    <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+                </div>
+                <p class="text-slate-500 max-w-sm leading-relaxed mb-8 text-sm font-medium">Premium parking management software for secure operations, cleaner workflows and real-time visibility across modern facilities.</p>
+            </div>
+            <div>
+                <h5 class="text-white font-black mb-8 text-[11px] uppercase tracking-[0.2em] opacity-80">Platform</h5>
+                <ul class="space-y-4 text-slate-500 text-sm font-bold">
+                    <li><a th:href="@{/features}" class="hover:text-primary transition-colors">Features</a></li>
+                    <li><a th:href="@{/solutions}" class="hover:text-primary transition-colors">Solutions</a></li>
+                    <li><a th:href="@{/analytics}" class="hover:text-primary transition-colors">Analytics</a></li>
+                    <li><a th:href="@{/faq}" class="hover:text-primary transition-colors">Support</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="text-white font-black mb-8 text-[11px] uppercase tracking-[0.2em] opacity-80">Company</h5>
+                <ul class="space-y-4 text-slate-500 text-sm font-bold">
+                    <li><a th:href="@{/faq}" class="hover:text-primary transition-colors">Help & FAQ</a></li>
+                    <li><a th:href="@{/privacy}" class="hover:text-primary transition-colors">Privacy</a></li>
+                    <li><a th:href="@{/login}" class="hover:text-primary transition-colors">Login</a></li>
+                    <li><a th:href="@{/register}" class="hover:text-primary transition-colors">Register</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+            <p class="text-slate-600 text-[9px] tracking-[0.3em] uppercase font-bold">© 2026 Parkiyo. All rights reserved.</p>
+            <div class="flex gap-8">
+                <a th:href="@{/home}" class="material-symbols-outlined text-slate-600 hover:text-white transition-colors">language</a>
+                <a th:href="@{/privacy}" class="material-symbols-outlined text-slate-600 hover:text-white transition-colors">shield_person</a>
+                <a th:href="@{/faq}" class="material-symbols-outlined text-slate-600 hover:text-white transition-colors">support_agent</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function toggleFAQ(btn) {
+        const item = btn.parentElement;
+        const answer = item.querySelector('.faq-answer');
+        const icon = btn.querySelector('.faq-icon');
+        const isOpen = answer.classList.contains('open');
+        document.querySelectorAll('.faq-answer.open').forEach(a => a.classList.remove('open'));
+        document.querySelectorAll('.faq-icon.open').forEach(i => i.classList.remove('open'));
+        if (!isOpen) { answer.classList.add('open'); icon.classList.add('open'); }
+    }
+
+    function filterFAQ(val) {
+        const query = val.toLowerCase().trim();
+        const categories = document.querySelectorAll('.faq-category');
+        let anyVisible = false;
+        categories.forEach(cat => {
+            const items = cat.querySelectorAll('.faq-item');
+            let catVisible = false;
+            items.forEach(item => {
+                const q = item.querySelector('.faq-btn span:first-child').textContent.toLowerCase();
+                const a = item.querySelector('.faq-answer p').textContent.toLowerCase();
+                const match = !query || q.includes(query) || a.includes(query) || cat.dataset.category.includes(query);
+                item.style.display = match ? '' : 'none';
+                if (match) catVisible = true;
+            });
+            cat.style.display = catVisible ? '' : 'none';
+            if (catVisible) anyVisible = true;
+        });
+        document.getElementById('noResults').classList.toggle('hidden', anyVisible);
+    }
+</script>
+</body>
+</html>

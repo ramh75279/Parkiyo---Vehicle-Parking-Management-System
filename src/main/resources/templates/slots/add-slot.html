@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Parkiyo | Add Slot</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { primary: "#1f68f9", "background-dark": "#020617" },
+                    fontFamily: { display: ["Public Sans", "sans-serif"] },
+                    borderRadius: { squircle: "14px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Public Sans', sans-serif; background-color: #020617; }
+        a { cursor: pointer; }
+        .premium-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .bg-subtle-radial { background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .sidebar-container { width: 80px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(2, 6, 23, 0.6); overflow: hidden; white-space: nowrap; }
+        .sidebar-container:hover { width: 280px; background: rgba(2, 6, 23, 0.95); }
+        .nav-label { opacity: 0; transition: opacity 0.3s ease; margin-left: 1rem; }
+        .sidebar-container:hover .nav-label { opacity: 1; }
+        .input-glass { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); color: white; border-radius: 12px; padding: 11px 16px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; outline: none; width: 100%; }
+        .input-glass:focus { border-color: rgba(31, 104, 249, 0.5); box-shadow: 0 0 0 3px rgba(31, 104, 249, 0.1); }
+        .input-glass::placeholder { color: rgba(255, 255, 255, 0.18); }
+        select.input-glass option { background: #0f172a; }
+        label.field-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 6px; display: block; }
+        .type-card { background: rgba(255, 255, 255, 0.03); border: 2px solid rgba(255, 255, 255, 0.07); border-radius: 16px; padding: 16px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .type-card:hover { border-color: rgba(31, 104, 249, 0.4); background: rgba(31, 104, 249, 0.05); }
+        .type-card.selected { border-color: #1f68f9; background: rgba(31, 104, 249, 0.1); }
+        .type-card p { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; }
+        .type-card.selected p { color: #60a5fa; }
+        .preview-slot { width: 80px; height: 110px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 2px solid; transition: all 0.3s; }
+        ::-webkit-scrollbar { width: 5px; display: none; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+    </style>
+</head>
+
+<body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+<div class="flex flex-1 overflow-hidden">
+
+    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
+        <div class="p-6 mb-4 flex items-center">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+                <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
+            </div>
+            <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+        </div>
+        <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+            <a th:href="@{/admin/dashboard}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">dashboard</span><span class="nav-label text-sm">Dashboard</span></a>
+            <a th:href="@{/admin/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle Entry</span></a>
+            <a th:href="@{/admin/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span></a>
+            <a th:href="@{/admin/vehicles}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">directions_car</span><span class="nav-label text-sm">Vehicles</span></a>
+            <a th:href="@{/admin/slots}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span class="material-symbols-outlined shrink-0">grid_view</span><span class="nav-label text-sm">Parking Slots</span></a>
+            <a th:href="@{/admin/users}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">group</span><span class="nav-label text-sm">Users</span></a>
+            <a th:href="@{/admin/payments}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">payments</span><span class="nav-label text-sm">Payments</span></a>
+            <a th:href="@{/admin/reports}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">bar_chart</span><span class="nav-label text-sm">Reports</span></a>
+            <a th:href="@{/admin/settings}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">settings</span><span class="nav-label text-sm">Settings</span></a>
+        </nav>
+        <div class="p-4 border-t border-white/5">
+            <a th:href="@{/logout}" class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                <span class="material-symbols-outlined shrink-0">power_settings_new</span><span class="nav-label">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
+            <div class="flex items-center gap-4">
+                <button onclick="saveSlot()" class="px-8 py-3.5 rounded-2xl bg-primary text-white font-black text-sm hover:bg-primary/80 transition-all shadow-[0_0_20px_rgba(31,104,249,0.3)] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">save</span> Save Changes
+                </button>
+                <div>
+                    <h2 class="text-xl font-black text-white">Add Parking Slot</h2>
+                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Create a new slot in the facility</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <a th:href="@{/admin/slots/batch}" class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
+                    <span class="material-symbols-outlined text-lg">auto_awesome</span> Batch Generate
+                </a>
+                <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
+                    <div class="h-full w-full rounded-squircle bg-background-dark flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white/50">person</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-10">
+            <div class="max-w-3xl mx-auto space-y-8">
+
+                <!-- Slot identity -->
+                <div class="glass-card rounded-[2.5rem] p-8">
+                    <h3 class="text-base font-black text-white mb-6">Slot Identity</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="field-label">Slot Code <span class="text-rose-400">*</span></label>
+                            <input type="text" id="slotCode" name="slotCode" oninput="updatePreview()" placeholder="e.g. A-25" class="input-glass px-4 h-12 rounded-2xl uppercase tracking-widest bg-white/5" />
+                            <p class="text-[10px] text-slate-500 font-bold mt-2">Format: Zone letter + hyphen + number (e.g. A-25, B-04)</p>
+                        </div>
+                        <div>
+                            <label class="field-label">Zone <span class="text-rose-400">*</span></label>
+                            <select name="zone" class="input-glass px-4 h-12 rounded-2xl" onchange="updatePreview()">
+                                <option value="">Select zone…</option>
+                                <option selected>Zone A — Ground Floor</option>
+                                <option>Zone B — Level 1</option>
+                                <option>Zone C — Level 2</option>
+                                <option>Zone D — Rooftop</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="field-label">Floor / Level</label>
+                            <select name="floor" class="input-glass px-4 h-12 rounded-2xl">
+                                <option>Ground Floor</option>
+                                <option>Level 1</option>
+                                <option>Level 2</option>
+                                <option>Rooftop</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="field-label">Row / Section</label>
+                            <input type="text" name="rowSection" placeholder="e.g. Row 3, Section North" class="input-glass px-4 h-12 rounded-2xl bg-white/5" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slot type -->
+                <div class="glass-card rounded-[2.5rem] p-8">
+                    <h3 class="text-base font-black text-white mb-6">Slot Type</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="type-card selected" onclick="selectType(this)" data-type="Standard">
+                            <span class="material-symbols-outlined text-primary text-2xl">directions_car</span>
+                            <p>Standard</p>
+                        </div>
+                        <div class="type-card" onclick="selectType(this)" data-type="Disabled">
+                            <span class="material-symbols-outlined text-slate-400 text-2xl">accessible</span>
+                            <p>Disabled</p>
+                        </div>
+                        <div class="type-card" onclick="selectType(this)" data-type="EV Charging">
+                            <span class="material-symbols-outlined text-slate-400 text-2xl">electric_car</span>
+                            <p>EV Charging</p>
+                        </div>
+                        <div class="type-card" onclick="selectType(this)" data-type="Oversized">
+                            <span class="material-symbols-outlined text-slate-400 text-2xl">local_shipping</span>
+                            <p>Oversized</p>
+                        </div>
+                    </div>
+                    <input type="hidden" id="slotType" name="slotType" value="Standard" />
+                </div>
+
+                <!-- Pricing & settings -->
+                <div class="glass-card rounded-[2.5rem] p-8">
+                    <h3 class="text-base font-black text-white mb-6">Pricing & Settings</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="field-label">Hourly Rate ($)</label>
+                            <input type="number" name="hourlyRate" placeholder="e.g. 5.50" step="0.50" class="input-glass px-4 h-12 rounded-2xl bg-white/10" />
+                        </div>
+                        <div>
+                            <label class="field-label">Daily Max Rate ($)</label>
+                            <input type="number" name="dailyMaxRate" placeholder="e.g. 30.00" step="1.00" class="input-glass px-4 h-12 rounded-2xl bg-white/10" />
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="field-label">Notes</label>
+                            <textarea name="notes" rows="2" placeholder="Any special notes about this slot (optional)…" class="input-glass rounded-2xl px-4 py-3 resize-none"></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/5">
+                        <div>
+                            <p class="text-sm font-black text-white">Activate Immediately</p>
+                            <p class="text-[11px] text-slate-500 font-bold mt-0.5">Slot becomes available for parking upon creation</p>
+                        </div>
+                        <button id="activeToggle" type="button" onclick="toggleActive()" class="relative h-7 w-14 rounded-full bg-primary transition-all">
+                            <span id="activeThumb" class="absolute top-1 right-1 h-5 w-5 rounded-full bg-white shadow transition-all"></span>
+                        </button>
+                    </div>
+                    <input type="hidden" id="activeStatus" name="activeStatus" value="true" />
+                </div>
+
+                <!-- Live preview -->
+                <div class="glass-card rounded-[2.5rem] p-8">
+                    <h3 class="text-base font-black text-white mb-6">Slot Preview</h3>
+                    <div class="flex items-center gap-8">
+                        <div class="preview-slot bg-emerald-500/10 border-emerald-500/40" id="previewSlot">
+                            <span class="material-symbols-outlined text-emerald-400 text-2xl">directions_car</span>
+                            <p class="text-xs font-black text-emerald-300 tracking-wider" id="previewCode">A-25</p>
+                            <p class="text-[9px] font-bold text-emerald-500/60 uppercase tracking-wider">Available</p>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-3">
+                                <div class="preview-slot scale-75 origin-left bg-rose-500/10 border-rose-500/30">
+                                    <span class="material-symbols-outlined text-rose-400 text-xl">directions_car</span>
+                                    <p class="text-[10px] font-black text-rose-300">B-04</p>
+                                    <p class="text-[8px] font-bold text-rose-500/60 uppercase">Occupied</p>
+                                </div>
+                                <div class="preview-slot scale-75 origin-left bg-amber-500/10 border-amber-500/30">
+                                    <span class="material-symbols-outlined text-amber-400 text-xl">build</span>
+                                    <p class="text-[10px] font-black text-amber-300">C-11</p>
+                                    <p class="text-[8px] font-bold text-amber-500/60 uppercase">Maintenance</p>
+                                </div>
+                            </div>
+                            <p class="text-[11px] text-slate-500 font-bold">Your new slot will appear in the overview grid alongside existing slots.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-end gap-4 pb-4">
+                    <a th:href="@{/admin/slots}" class="px-8 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-black text-sm hover:bg-white/10 transition-all">Cancel</a>
+                    <button onclick="submitSlot()" class="px-8 py-3.5 rounded-2xl bg-primary text-white font-black text-sm hover:bg-primary/80 transition-all shadow-[0_0_20px_rgba(31,104,249,0.3)] flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">add_circle</span> Create Slot
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function selectType(el) {
+        document.querySelectorAll('.type-card').forEach(c => {
+            c.classList.remove('selected');
+            c.querySelector('span').classList.remove('text-primary');
+            c.querySelector('span').classList.add('text-slate-400');
+        });
+        el.classList.add('selected');
+        el.querySelector('span').classList.add('text-primary');
+        el.querySelector('span').classList.remove('text-slate-400');
+        document.getElementById('slotType').value = el.dataset.type;
+    }
+
+    let active = true;
+    function toggleActive() {
+        active = !active;
+        const btn = document.getElementById('activeToggle');
+        const thumb = document.getElementById('activeThumb');
+        const status = document.getElementById('activeStatus');
+        if (active) {
+            btn.classList.add('bg-primary'); btn.classList.remove('bg-white/10');
+            thumb.style.right = '4px'; thumb.style.left = 'auto';
+            status.value = 'true';
+        } else {
+            btn.classList.remove('bg-primary'); btn.classList.add('bg-white/10');
+            thumb.style.left = '4px'; thumb.style.right = 'auto';
+            status.value = 'false';
+        }
+    }
+
+    function updatePreview() {
+        const code = document.getElementById('slotCode').value || 'A-25';
+        document.getElementById('previewCode').textContent = code.toUpperCase();
+    }
+
+    function saveSlot() {
+        const slotCode = document.getElementById('slotCode').value.trim();
+        if (!slotCode) {
+            document.getElementById('slotCode').style.borderColor = 'rgba(244,63,94,0.6)';
+            document.getElementById('slotCode').style.boxShadow = '0 0 0 3px rgba(244,63,94,0.12)';
+            return;
+        }
+        submitSlot();
+    }
+
+    function submitSlot() {
+        // Form submits via th:action on a real form — this triggers it programmatically
+        // In Spring Boot, wrap the content in a <form th:action="@{/admin/slots/create}" method="post">
+        // and replace this with form.submit()
+        window.location.href = '/admin/slots';
+    }
+</script>
+</body>
+
+</html>

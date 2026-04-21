@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Parkiyo | Notifications</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet" />
+    <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+            rel="stylesheet" />
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#1f68f9", "background-dark": "#020617" }, fontFamily: { display: ["Public Sans", "sans-serif"] } } } }</script>
+    <style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: #020617;
+        }
+
+        .premium-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .bg-subtle-radial {
+            background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-container {
+            width: 80px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(2, 6, 23, 0.6);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .sidebar-container:hover {
+            width: 280px;
+            background: rgba(2, 6, 23, 0.95);
+        }
+
+        .nav-label {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            margin-left: 1rem;
+        }
+
+        .sidebar-container:hover .nav-label {
+            opacity: 1;
+        }
+
+        .notif-row {
+            display: flex;
+            gap: 16px;
+            padding: 18px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .notif-row:hover {
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+        .notif-row.unread {
+            background: rgba(31, 104, 249, 0.03);
+        }
+
+        .notif-row.unread:hover {
+            background: rgba(31, 104, 249, 0.06);
+        }
+
+        .filter-btn {
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .filter-btn.active {
+            background: rgba(31, 104, 249, 0.1);
+            color: #60a5fa;
+            border-color: rgba(31, 104, 249, 0.2);
+        }
+
+        .filter-btn:not(.active):hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            display: none;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        a { cursor: pointer; }
+    </style>
+</head>
+
+<body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+<div class="flex flex-1 overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
+        <div class="p-6 mb-4 flex items-center">
+            <div
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+                <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
+            </div>
+            <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+        </div>
+        <nav class="flex-1 px-3 space-y-2 overflow-y-auto" id="sidebarNav"></nav>
+        <div class="p-4 border-t border-white/5">
+            <button onclick="window.location.href='/logout'"
+                    class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                <span class="material-symbols-outlined shrink-0">power_settings_new</span>
+                <span class="nav-label">Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
+        <header
+                class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
+            <div>
+                <h2 class="text-xl font-black text-white">Notifications</h2>
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">System & account
+                    alerts</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="markAllRead()"
+                        class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
+                    <span class="material-symbols-outlined text-base">done_all</span> Mark all read
+                </button>
+                <div class="h-10 w-10 rounded-[14px] bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
+                    <div class="h-full w-full rounded-[14px] bg-background-dark flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white/50">person</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-10">
+            <div class="max-w-3xl mx-auto space-y-6">
+
+                <!-- KPI strip -->
+                <div class="grid grid-cols-3 gap-5">
+                    <div class="glass-card p-5 rounded-3xl text-center">
+                        <p class="text-2xl font-black text-primary">3</p>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-1">Unread</p>
+                    </div>
+                    <div class="glass-card p-5 rounded-3xl text-center">
+                        <p class="text-2xl font-black text-white">6</p>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-1">Total</p>
+                    </div>
+                    <div class="glass-card p-5 rounded-3xl text-center">
+                        <p class="text-2xl font-black text-emerald-400">2</p>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-1">Today</p>
+                    </div>
+                </div>
+
+                <!-- Filter tabs -->
+                <div class="flex gap-2 flex-wrap">
+                    <button class="filter-btn active" onclick="filterNotifs('all',this)">All</button>
+                    <button class="filter-btn" onclick="filterNotifs('unread',this)">Unread</button>
+                    <button class="filter-btn" onclick="filterNotifs('payment',this)">Payments</button>
+                    <button class="filter-btn" onclick="filterNotifs('system',this)">System</button>
+                    <button class="filter-btn" onclick="filterNotifs('alert',this)">Alerts</button>
+                </div>
+
+                <!-- Notifications list -->
+                <div class="glass-card rounded-[2.5rem] overflow-hidden">
+
+                    <!-- Unread -->
+                    <div class="notif-row unread" data-cat="alert" id="n1">
+                        <div
+                                class="h-11 w-11 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-rose-400">error</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between gap-3">
+                                <p class="text-sm font-black text-white">Slot B-12 sensor fault</p>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <span class="h-2 w-2 bg-primary rounded-full unread-dot"></span>
+                                    <span class="text-[9px] font-black text-slate-600 uppercase tracking-widest">2
+                                            min ago</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-400 font-bold mt-1">Sensor fault detected on slot B-12.
+                                Automated maintenance request raised.</p>
+                            <div class="flex gap-2 mt-3">
+                                <button onclick="markRead(document.getElementById('n1'))"
+                                        class="text-[10px] font-black text-primary hover:brightness-125 transition-all">Mark
+                                    read</button>
+                                <span class="text-slate-700">·</span>
+                                <a th:href="@{/admin/slots/edit}"
+                                   class="text-[10px] font-black text-slate-400 hover:text-white transition-all">View
+                                    slot</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="notif-row unread" data-cat="payment" id="n2">
+                        <div
+                                class="h-11 w-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-emerald-400">payments</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between gap-3">
+                                <p class="text-sm font-black text-white">Payment received · $16.50</p>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <span class="h-2 w-2 bg-primary rounded-full unread-dot"></span>
+                                    <span class="text-[9px] font-black text-slate-600 uppercase tracking-widest">14
+                                            min ago</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-400 font-bold mt-1">XYZ-8899 reservation payment collected
+                                via Parkiyo Wallet. TXN-88291047.</p>
+                            <div class="flex gap-2 mt-3">
+                                <button onclick="markRead(document.getElementById('n2'))"
+                                        class="text-[10px] font-black text-primary hover:brightness-125 transition-all">Mark
+                                    read</button>
+                                <span class="text-slate-700">·</span>
+                                <a th:href="@{/user/receipt}"
+                                   class="text-[10px] font-black text-slate-400 hover:text-white transition-all">View
+                                    receipt</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="notif-row unread" data-cat="alert" id="n3">
+                        <div
+                                class="h-11 w-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-amber-400">local_parking</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between gap-3">
+                                <p class="text-sm font-black text-white">Occupancy at 92%</p>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <span class="h-2 w-2 bg-primary rounded-full unread-dot"></span>
+                                    <span class="text-[9px] font-black text-slate-600 uppercase tracking-widest">31
+                                            min ago</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-400 font-bold mt-1">Only 8 slots remaining across all
+                                zones. Consider activating overflow parking.</p>
+                            <div class="flex gap-2 mt-3">
+                                <button onclick="markRead(document.getElementById('n3'))"
+                                        class="text-[10px] font-black text-primary hover:brightness-125 transition-all">Mark
+                                    read</button>
+                                <span class="text-slate-700">·</span>
+                                <a th:href="@{/admin/slots/overview}"
+                                   class="text-[10px] font-black text-slate-400 hover:text-white transition-all">View
+                                    map</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Read -->
+                    <div class="notif-row opacity-60" data-cat="system" id="n4">
+                        <div
+                                class="h-11 w-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-primary">system_update</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between gap-3">
+                                <p class="text-sm font-black text-white">Scheduled maintenance window</p>
+                                <span
+                                        class="text-[9px] font-black text-slate-600 uppercase tracking-widest shrink-0">2
+                                        hrs ago</span>
+                            </div>
+                            <p class="text-xs text-slate-400 font-bold mt-1">System maintenance scheduled 2:00–3:00
+                                AM on 12 Mar 2026. Brief downtime expected.</p>
+                        </div>
+                    </div>
+
+                    <div class="notif-row opacity-60" data-cat="system" id="n5">
+                        <div
+                                class="h-11 w-11 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-violet-400">person_add</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between gap-3">
+                                <p class="text-sm font-black text-white">New user registered</p>
+                                <span
+                                        class="text-[9px] font-black text-slate-600 uppercase tracking-widest shrink-0">Yesterday</span>
+                            </div>
+                            <p class="text-xs text-slate-400 font-bold mt-1">Saman Kumara joined as Operator.
+                                Awaiting role assignment from admin.</p>
+                        </div>
+                    </div>
+
+                    <div class="notif-row opacity-60" data-cat="payment" id="n6">
+                        <div class="h-11 w-11 rounded-xl bg-slate-700/30 border border-white/8 flex items-center justify-center shrink-0 mt-0.5"
+                             style="border-color:rgba(255,255,255,0.08)">
+                            <span class="material-symbols-outlined text-slate-400">receipt_long</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between gap-3">
+                                <p class="text-sm font-black text-white">Daily report ready</p>
+                                <span
+                                        class="text-[9px] font-black text-slate-600 uppercase tracking-widest shrink-0">Yesterday</span>
+                            </div>
+                            <p class="text-xs text-slate-400 font-bold mt-1">Revenue report for 9 Mar 2026 has been
+                                generated and is ready to download.</p>
+                            <a th:href="@{/admin/reports/daily-revenue}"
+                               class="inline-block mt-2 text-[10px] font-black text-slate-400 hover:text-white transition-all">View
+                                report →</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function markRead(el) {
+        if (!el) return;
+        el.classList.remove('unread');
+        el.classList.add('opacity-60');
+        const dot = el.querySelector('.unread-dot');
+        if (dot) dot.remove();
+    }
+
+    function markAllRead() {
+        document.querySelectorAll('.notif-row.unread').forEach(el => markRead(el));
+    }
+
+    function filterNotifs(cat, btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.notif-row').forEach(el => {
+            el.style.display = (cat === 'all' || el.dataset.cat === cat) ? '' : 'none';
+        });
+        if (cat === 'unread') {
+            document.querySelectorAll('.notif-row').forEach(el => {
+                el.style.display = el.classList.contains('unread') ? '' : 'none';
+            });
+        }
+    }
+
+    // ── Role-aware sidebar ──
+    (function buildSidebar() {
+        const params = new URLSearchParams(window.location.search);
+        let role = params.get('role') || localStorage.getItem('parkiyo_role') || 'user';
+        localStorage.setItem('parkiyo_role', role);
+
+        const nav = document.getElementById('sidebarNav');
+        if (!nav) return;
+
+        const a = 'flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group';
+        const n = 'flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group';
+
+        const lnk = (href, icon, label, isActive) =>
+            `<a href="${href}" class="${isActive ? a : n}"><span class="material-symbols-outlined shrink-0">${icon}</span><span class="nav-label text-sm">${label}</span></a>`;
+
+        const userLinks = [
+            lnk('/dashboard/user', 'dashboard', 'Dashboard', false),
+            lnk('/user/entry', 'login', 'Vehicle Entry', false),
+            lnk('/user/exit', 'logout', 'Vehicle Exit', false),
+            lnk('/user/parking', 'local_parking', 'Active Parking', false),
+            lnk('/user/reservation', 'event_available', 'Reservation', false),
+            lnk('/user/payments/history', 'payments', 'Payments', false),
+            lnk('/user/receipt', 'receipt_long', 'Receipts', false),
+            lnk('/user/wallet', 'account_balance_wallet', 'Wallet', false),
+            lnk('/user/notifications', 'notifications', 'Notifications', true),
+            lnk('/user/account-settings', 'settings', 'Account Settings', false),
+        ];
+
+        const adminLinks = [
+            lnk('/admin/dashboard', 'dashboard', 'Dashboard', false),
+            lnk('/admin/entry', 'login', 'Vehicle Entry', false),
+            lnk('/admin/exit', 'logout', 'Vehicle Exit', false),
+            lnk('/admin/slots/overview', 'grid_view', 'Parking Slots', false),
+            lnk('/admin/users', 'group', 'Users', false),
+            lnk('/admin/reports', 'bar_chart', 'Reports', false),
+            lnk('/admin/notifications', 'notifications', 'Notifications', true),
+            lnk('/admin/account-settings', 'settings', 'Settings', false),
+        ];
+
+        nav.innerHTML = (role === 'admin' ? adminLinks : userLinks).join('');
+    })();
+</script>
+</body>
+
+</html>

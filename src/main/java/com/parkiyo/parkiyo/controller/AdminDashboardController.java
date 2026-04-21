@@ -1,0 +1,48 @@
+package com.parkiyo.parkiyo.controller;
+
+import com.parkiyo.service.DashboardService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/admin")
+@PreAuthorize("hasRole('ADMIN')")
+@RequiredArgsConstructor
+public class AdminDashboardController {
+
+    private final DashboardService dashboardService;
+
+    // GET /admin/dashboard
+    @GetMapping("/dashboard")
+    public String adminDashboard(Model model) {
+        model.addAttribute("stats", dashboardService.getAdminDashboardStats());
+        model.addAttribute("recentEntries", dashboardService.getRecentEntries(10));
+        model.addAttribute("recentPayments", dashboardService.getRecentPayments(5));
+        model.addAttribute("slotSummary", dashboardService.getSlotOccupancySummary());
+        return "dashboard-admin";
+    }
+
+    // GET /admin/system-status
+    @GetMapping("/system-status")
+    public String systemStatus(Model model) {
+        model.addAttribute("systemHealth", dashboardService.getSystemHealth());
+        return "systemstatuspage";
+    }
+
+    // GET /admin/notifications
+    @GetMapping("/notifications")
+    public String adminNotifications(Model model) {
+        model.addAttribute("notifications", dashboardService.getAdminNotifications());
+        return "notification";
+    }
+
+    // GET /admin/settings
+    @GetMapping("/settings")
+    public String adminSettings() {
+        return "redirect:/account/settings";
+    }
+}
