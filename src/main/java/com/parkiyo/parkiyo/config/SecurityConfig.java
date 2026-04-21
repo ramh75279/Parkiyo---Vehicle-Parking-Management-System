@@ -1,0 +1,70 @@
+package com.parkiyo.parkiyo.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity   // enables @PreAuthorize on your controllers
+public class SecurityConfig {
+
+    // ─── Public pages (no login required) ────────────────────────────────────
+    private static final String[] PUBLIC_URLS = {
+            "/",
+            "/home",
+            "/features",
+            "/solutions",
+            "/analytics",
+            "/faq",
+            "/privacy",
+            "/login",
+            "/register",
+            "/forgot-password",
+            "/access-denied",
+            "/css/**",
+            "/js/**",
+            "/images/**",
+            "/webjars/**"
+    };
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(PUBLIC_URLS).permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")               // your custom login page
+                        .loginProcessingUrl("/login")      // Spring handles POST /login
+                        .defaultSuccessUrl("/dashboard", true)
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll()
+                )
+                .exceptionHandling(ex -> ex
+                        .accessDeniedPage("/access-denied")
+                );
+
+        return http.build();
+    }
+
+    // BCrypt password encoder — use this everywhere you save/check passwords
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
