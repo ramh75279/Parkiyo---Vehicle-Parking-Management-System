@@ -1,4 +1,7 @@
 package com.parkiyo.parkiyo.repository;
 
-public class ParkingSessionRepository {
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ParkingSessionRepository extends ParkingRecordRepository {
 }
