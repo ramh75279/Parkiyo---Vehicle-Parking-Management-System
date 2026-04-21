@@ -1,6 +1,6 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.service.ReportService;
+import com.parkiyo.parkiyo.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,9 +1,9 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.dto.EntryRequest;
-import com.parkiyo.service.EntryService;
-import com.parkiyo.service.SlotService;
-import com.parkiyo.service.VehicleService;
+import com.parkiyo.parkiyo.dto.EntryRequest;
+import com.parkiyo.parkiyo.service.EntryService;
+import com.parkiyo.parkiyo.service.SlotService;
+import com.parkiyo.parkiyo.service.VehicleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

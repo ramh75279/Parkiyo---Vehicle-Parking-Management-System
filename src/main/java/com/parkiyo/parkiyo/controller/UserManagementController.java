@@ -1,8 +1,8 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.dto.CreateUserRequest;
-import com.parkiyo.dto.EditUserRequest;
-import com.parkiyo.service.UserService;
+import com.parkiyo.parkiyo.dto.CreateUserRequest;
+import com.parkiyo.parkiyo.dto.EditUserRequest;
+import com.parkiyo.parkiyo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

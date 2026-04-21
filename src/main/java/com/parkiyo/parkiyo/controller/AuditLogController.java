@@ -1,6 +1,6 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.service.AuditLogService;
+import com.parkiyo.parkiyo.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;

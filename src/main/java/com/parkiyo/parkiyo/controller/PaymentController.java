@@ -1,7 +1,7 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.service.PaymentService;
-import com.parkiyo.service.WalletService;
+import com.parkiyo.parkiyo.service.PaymentService;
+import com.parkiyo.parkiyo.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;

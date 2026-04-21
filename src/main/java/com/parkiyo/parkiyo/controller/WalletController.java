@@ -1,7 +1,7 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.dto.WalletTopUpRequest;
-import com.parkiyo.service.WalletService;
+import com.parkiyo.parkiyo.dto.WalletTopUpRequest;
+import com.parkiyo.parkiyo.service.WalletService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

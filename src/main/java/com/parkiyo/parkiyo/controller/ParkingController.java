@@ -1,6 +1,6 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.service.ParkingService;
+import com.parkiyo.parkiyo.service.ParkingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;

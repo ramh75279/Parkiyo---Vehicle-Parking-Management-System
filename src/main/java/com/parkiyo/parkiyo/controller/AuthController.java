@@ -1,10 +1,10 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.dto.LoginRequest;
-import com.parkiyo.dto.RegisterRequest;
-import com.parkiyo.dto.PasswordResetRequest;
-import com.parkiyo.service.AuthService;
-import com.parkiyo.service.UserService;
+import com.parkiyo.parkiyo.dto.LoginRequest;
+import com.parkiyo.parkiyo.dto.RegisterRequest;
+import com.parkiyo.parkiyo.dto.PasswordResetRequest;
+import com.parkiyo.parkiyo.service.AuthService;
+import com.parkiyo.parkiyo.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;

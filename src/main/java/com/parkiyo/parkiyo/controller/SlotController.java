@@ -1,8 +1,8 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.dto.SlotRequest;
-import com.parkiyo.dto.BatchSlotRequest;
-import com.parkiyo.service.SlotService;
+import com.parkiyo.parkiyo.dto.SlotRequest;
+import com.parkiyo.parkiyo.dto.BatchSlotRequest;
+import com.parkiyo.parkiyo.service.SlotService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,9 +1,9 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.dto.ProfileUpdateRequest;
-import com.parkiyo.dto.PasswordChangeRequest;
-import com.parkiyo.dto.NotificationPreferenceRequest;
-import com.parkiyo.service.UserService;
+import com.parkiyo.parkiyo.dto.ProfileUpdateRequest;
+import com.parkiyo.parkiyo.dto.PasswordChangeRequest;
+import com.parkiyo.parkiyo.dto.NotificationPreferenceRequest;
+import com.parkiyo.parkiyo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

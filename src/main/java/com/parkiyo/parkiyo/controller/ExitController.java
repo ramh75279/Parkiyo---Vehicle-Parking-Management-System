@@ -1,8 +1,8 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.dto.ExitRequest;
-import com.parkiyo.service.ExitService;
-import com.parkiyo.service.ParkingService;
+import com.parkiyo.parkiyo.dto.ExitRequest;
+import com.parkiyo.parkiyo.service.ExitService;
+import com.parkiyo.parkiyo.service.ParkingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
