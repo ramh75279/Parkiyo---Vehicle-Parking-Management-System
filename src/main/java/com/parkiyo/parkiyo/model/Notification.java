@@ -1,6 +1,6 @@
 package com.parkiyo.parkiyo.model;
 
-import com.parkiyo.enums.NotificationType;
+import com.parkiyo.parkiyo.enums.NotificationType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

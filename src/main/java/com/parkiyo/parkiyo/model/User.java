@@ -1,7 +1,7 @@
 package com.parkiyo.parkiyo.model;
 
-import com.parkiyo.enums.Role;
-import com.parkiyo.enums.UserStatus;
+import com.parkiyo.parkiyo.enums.Role;
+import com.parkiyo.parkiyo.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
