@@ -2,6 +2,7 @@ package com.parkiyo.parkiyo.controller;
 
 import com.parkiyo.parkiyo.dto.VehicleRequest;
 import com.parkiyo.parkiyo.service.VehicleService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -127,16 +128,18 @@ public class VehicleController {
 
     // GET /admin/vehicles/import
     @GetMapping("/import")
-    public String importPage() {
+    public String importPage(HttpSession session, Model model) {
+        model.addAllAttributes(vehicleService.getImportPreview(session));
         return "vehicle-import-page";
     }
 
     // POST /admin/vehicles/import/upload
     @PostMapping("/import/upload")
     public String uploadImport(@RequestParam("file") MultipartFile file,
+                               HttpSession session,
                                RedirectAttributes redirectAttributes) {
         try {
-            vehicleService.uploadImportFile(file);
+            vehicleService.uploadImportFile(file, session);
             redirectAttributes.addFlashAttribute("success", "File uploaded. Review and confirm.");
             return "redirect:/admin/vehicles/import";
         } catch (Exception e) {
@@ -147,9 +150,13 @@ public class VehicleController {
 
     // POST /admin/vehicles/import/confirm
     @PostMapping("/import/confirm")
-    public String confirmImport(RedirectAttributes redirectAttributes) {
+    public String confirmImport(@RequestParam(defaultValue = "false") boolean skipDuplicates,
+                                @RequestParam(defaultValue = "false") boolean importWithWarnings,
+                                @RequestParam(defaultValue = "false") boolean setAllActive,
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes) {
         try {
-            int count = vehicleService.confirmImport();
+            int count = vehicleService.confirmImport(session, skipDuplicates, importWithWarnings, setAllActive);
             redirectAttributes.addFlashAttribute("success", count + " vehicles imported.");
             return "redirect:/admin/vehicles";
         } catch (Exception e) {
@@ -160,8 +167,8 @@ public class VehicleController {
 
     // POST /admin/vehicles/import/remove
     @PostMapping("/import/remove")
-    public String removeImport(RedirectAttributes redirectAttributes) {
-        vehicleService.clearPendingImport();
+    public String removeImport(HttpSession session, RedirectAttributes redirectAttributes) {
+        vehicleService.clearPendingImport(session);
         redirectAttributes.addFlashAttribute("success", "Import file removed.");
         return "redirect:/admin/vehicles/import";
     }
