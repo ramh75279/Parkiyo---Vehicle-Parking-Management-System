@@ -187,9 +187,35 @@ ALTER TABLE wallet_transactions
 -- RECEIPTS  (NEW — was missing entirely)
 -- ─────────────────────────────────────────────────────────────
 CREATE TABLE receipts (
-                          id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-                          payment_id BIGINT NOT NULL UNIQUE,
-                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                          id                    BIGINT AUTO_INCREMENT PRIMARY KEY,
+                          payment_id            BIGINT NOT NULL UNIQUE,
+                          receipt_number        VARCHAR(100),
+                          transaction_id        VARCHAR(100),
+                          payment_date          DATETIME,
+                          customer_name         VARCHAR(255),
+                          customer_email        VARCHAR(255),
+                          plate                 VARCHAR(50),
+                          vehicle_model         VARCHAR(255),
+                          vehicle_license_plate VARCHAR(50),
+                          slot_code             VARCHAR(50),
+                          slot_number           VARCHAR(50),
+                          zone                  VARCHAR(100),
+                          session_type          VARCHAR(100),
+                          date                  DATE,
+                          arrival               DATETIME,
+                          departure             DATETIME,
+                          entry_time            DATETIME,
+                          exit_time             DATETIME,
+                          duration              VARCHAR(100),
+                          parking_duration      INT,
+                          billing_breakdown     VARCHAR(255),
+                          discount              VARCHAR(100),
+                          subtotal              DECIMAL(10,2),
+                          tax                   DECIMAL(10,2),
+                          total                 DECIMAL(10,2),
+                          amount_paid           DECIMAL(10,2),
+                          payment_method        VARCHAR(100),
+                          created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                           CONSTRAINT fk_receipt_payment FOREIGN KEY (payment_id) REFERENCES payments(id)
 );
 

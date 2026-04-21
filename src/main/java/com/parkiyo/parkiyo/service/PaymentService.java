@@ -1,8 +1,10 @@
 package com.parkiyo.parkiyo.service;
 
 import com.parkiyo.parkiyo.enums.PaymentStatus;
+import com.parkiyo.parkiyo.model.ParkingRecord;
 import com.parkiyo.parkiyo.model.Payment;
 import com.parkiyo.parkiyo.model.Receipt;
+import com.parkiyo.parkiyo.model.Reservation;
 import com.parkiyo.parkiyo.model.Wallet;
 import com.parkiyo.parkiyo.model.WalletTransaction;
 import com.parkiyo.parkiyo.repository.PaymentRepository;
@@ -12,9 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,13 +55,25 @@ public class PaymentService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public List<Payment> getUserReceipts(String email) {
-        return paymentRepository.findByUserEmailAndStatus(email, PaymentStatus.SUCCESS);
+    public List<Receipt> getUserReceipts(String email) {
+        return paymentRepository.findByUserEmailAndStatus(email, PaymentStatus.SUCCESS).stream()
+                .map(Payment::getReceipt)
+                .filter(r -> r != null)
+                .collect(Collectors.toList());
     }
 
-    public Payment getReceipt(Long paymentId, String email) {
-        return paymentRepository.findById(paymentId)
+    public Receipt getReceipt(Long paymentId, String email) {
+        Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Receipt not found."));
+
+        if (!payment.getUser().getEmail().equalsIgnoreCase(email)) {
+            throw new RuntimeException("You are not allowed to view this receipt.");
+        }
+
+        if (payment.getReceipt() == null) {
+            throw new RuntimeException("Receipt not found.");
+        }
+        return payment.getReceipt();
     }
 
     public List<Payment> getAllPayments(String status, String dateFrom, String dateTo) {
@@ -117,11 +133,123 @@ public class PaymentService {
         payment.setPaymentMethod("Parkiyo Wallet");
         payment.setPaidAt(LocalDateTime.now());
 
-        // Auto-generate receipt
-        Receipt receipt = Receipt.builder().payment(payment).build();
+        // Save a receipt snapshot so the UI can render without deep lazy-loading chains.
+        Receipt receipt = buildReceiptSnapshot(payment);
         payment.setReceipt(receipt);
         walletRepository.save(wallet);
         paymentRepository.save(payment);
+    }
+
+    private Receipt buildReceiptSnapshot(Payment payment) {
+        ParkingRecord parkingRecord = payment.getParkingRecord();
+        Reservation reservation = payment.getReservation();
+
+        String plate = null;
+        String vehicleModel = null;
+        String slotCode = null;
+        String zone = null;
+        LocalDateTime arrival = null;
+        LocalDateTime departure = null;
+        Integer durationMinutes = null;
+
+        if (parkingRecord != null) {
+            if (parkingRecord.getVehicle() != null) {
+                plate = parkingRecord.getVehicle().getLicensePlate();
+                String make = parkingRecord.getVehicle().getMake();
+                String model = parkingRecord.getVehicle().getModel();
+                if (make != null && model != null) {
+                    vehicleModel = make + " " + model;
+                } else if (model != null) {
+                    vehicleModel = model;
+                } else {
+                    vehicleModel = make;
+                }
+            }
+
+            if (parkingRecord.getSlot() != null) {
+                slotCode = parkingRecord.getSlot().getSlotNumber();
+                zone = parkingRecord.getSlot().getZone();
+            }
+
+            arrival = parkingRecord.getEntryTime();
+            departure = parkingRecord.getExitTime();
+            durationMinutes = parkingRecord.getDurationMinutes();
+        }
+
+        if (reservation != null) {
+            if (plate == null && reservation.getVehicle() != null) {
+                plate = reservation.getVehicle().getLicensePlate();
+                String make = reservation.getVehicle().getMake();
+                String model = reservation.getVehicle().getModel();
+                if (make != null && model != null) {
+                    vehicleModel = make + " " + model;
+                } else if (model != null) {
+                    vehicleModel = model;
+                } else if (vehicleModel == null) {
+                    vehicleModel = make;
+                }
+            }
+
+            if (slotCode == null && reservation.getSlot() != null) {
+                slotCode = reservation.getSlot().getSlotNumber();
+                zone = reservation.getSlot().getZone();
+            }
+
+            if (arrival == null) {
+                arrival = reservation.getStartTime();
+            }
+            if (departure == null) {
+                departure = reservation.getEndTime();
+            }
+        }
+
+        if (durationMinutes == null && arrival != null && departure != null && !departure.isBefore(arrival)) {
+            durationMinutes = (int) Duration.between(arrival, departure).toMinutes();
+        }
+
+        String durationText = "-";
+        if (durationMinutes != null && durationMinutes > 0) {
+            long hours = durationMinutes / 60;
+            long minutes = durationMinutes % 60;
+            durationText = minutes == 0 ? hours + "h" : hours + "h " + minutes + "m";
+        }
+
+        String firstName = payment.getUser() != null ? payment.getUser().getFirstName() : null;
+        String lastName = payment.getUser() != null ? payment.getUser().getLastName() : null;
+        String customerName = ((firstName == null ? "" : firstName) + " " + (lastName == null ? "" : lastName)).trim();
+        if (customerName.isBlank()) {
+            customerName = payment.getUser() != null ? payment.getUser().getEmail() : "-";
+        }
+
+        return Receipt.builder()
+                .payment(payment)
+                .receiptNumber("RCP-" + payment.getTransactionCode())
+                .transactionId(payment.getTransactionCode())
+                .paymentDate(payment.getPaidAt())
+                .customerName(customerName)
+                .customerEmail(payment.getUser() != null ? payment.getUser().getEmail() : null)
+                .plate(plate)
+                .vehicleLicensePlate(plate)
+                .vehicleModel(vehicleModel)
+                .slotCode(slotCode)
+                .slotNumber(slotCode)
+                .zone(zone)
+                .sessionType(payment.getReservation() != null ? "Advance Reservation" : "Walk-in Parking")
+                .date(payment.getPaidAt() != null ? payment.getPaidAt().toLocalDate() : null)
+                .arrival(arrival)
+                .departure(departure)
+                .entryTime(arrival)
+                .exitTime(departure)
+                .duration(durationText)
+                .parkingDuration(durationMinutes)
+                .billingBreakdown(durationText)
+                .discount(null)
+                .subtotal(payment.getAmount())
+                .tax(BigDecimal.ZERO)
+                .total(payment.getAmount())
+                .amountPaid(payment.getAmount())
+                .paymentMethod(payment.getPaymentMethod())
+                .build();
     }
 
     @Transactional
