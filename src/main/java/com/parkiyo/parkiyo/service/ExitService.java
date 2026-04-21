@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,7 +75,10 @@ public class ExitService {
     public List<ParkingRecord> getRecentExits(int limit) {
         return parkingRecordRepository.findAll().stream()
                 .filter(r -> !r.isActive())
-                .sorted((a, b) -> b.getExitTime().compareTo(a.getExitTime()))
+            .sorted(Comparator.comparing(
+                ParkingRecord::getExitTime,
+                Comparator.nullsLast(Comparator.reverseOrder())
+            ))
                 .limit(limit)
                 .toList();
     }
