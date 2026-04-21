@@ -26,6 +26,7 @@ public class EntryService {
     private final ParkingSlotRepository slotRepository;
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
 
     @Transactional
     public void processEntry(EntryRequest request, String operatorEmail) {
@@ -69,6 +70,17 @@ public class EntryService {
         // Mark slot as occupied
         slot.setStatus(SlotStatus.OCCUPIED);
         slotRepository.save(slot);
+
+        auditLogService.logAction(
+            "ENTRY",
+            operatorEmail,
+            "ParkingRecord",
+            record.getId(),
+            "Vehicle " + vehicle.getLicensePlate() + " entered slot " + slot.getSlotNumber(),
+            null,
+            null,
+            null
+        );
     }
 
     public List<ParkingRecord> getRecentEntries(int limit) {

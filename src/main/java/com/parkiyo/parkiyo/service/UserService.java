@@ -21,6 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final WalletRepository walletRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -75,6 +76,13 @@ public class UserService {
         // Create wallet for every new user
         Wallet wallet = Wallet.builder().user(user).build();
         walletRepository.save(wallet);
+
+        auditLogService.logAction(
+            "USER_CREATED",
+            "User",
+            user.getId(),
+            "User account created for " + user.getEmail()
+        );
     }
 
     @Transactional
@@ -86,6 +94,13 @@ public class UserService {
         user.setRole(request.getRole());
         user.setStatus(request.getStatus());
         userRepository.save(user);
+
+        auditLogService.logAction(
+            "USER_UPDATED",
+            "User",
+            user.getId(),
+            "User account updated for " + user.getEmail()
+        );
     }
 
     @Transactional
@@ -127,7 +142,15 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long id) {
+        User user = getUserById(id);
         userRepository.deleteById(id);
+
+        auditLogService.logAction(
+                "USER_DELETED",
+                "User",
+                id,
+                "User account deleted for " + user.getEmail()
+        );
     }
 
     public long getTotalUserCount() {

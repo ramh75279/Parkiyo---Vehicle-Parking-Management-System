@@ -23,6 +23,7 @@ public class SlotService {
 
     private final ParkingSlotRepository slotRepository;
     private final ParkingRecordRepository parkingRecordRepository;
+    private final AuditLogService auditLogService;
 
     public List<ParkingSlot> getAvailableSlots() {
         return slotRepository.findByStatus(SlotStatus.AVAILABLE);
@@ -107,6 +108,13 @@ public class SlotService {
                 .hourlyRate(request.getHourlyRate())
                 .build();
         slotRepository.save(slot);
+
+        auditLogService.logAction(
+            "SLOT_CREATED",
+            "ParkingSlot",
+            slot.getId(),
+            "Parking slot created: " + slot.getSlotNumber()
+        );
     }
 
     @Transactional
@@ -120,7 +128,15 @@ public class SlotService {
 
     @Transactional
     public void deleteSlot(Long id) {
+        ParkingSlot slot = getSlotById(id);
         slotRepository.deleteById(id);
+
+        auditLogService.logAction(
+                "SLOT_DELETED",
+                "ParkingSlot",
+                id,
+                "Parking slot deleted: " + slot.getSlotNumber()
+        );
     }
 
     @Transactional

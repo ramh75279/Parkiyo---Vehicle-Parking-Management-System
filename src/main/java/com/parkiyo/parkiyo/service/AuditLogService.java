@@ -1,9 +1,14 @@
 package com.parkiyo.parkiyo.service;
 
 import com.parkiyo.parkiyo.model.AuditLog;
+import com.parkiyo.parkiyo.model.User;
 import com.parkiyo.parkiyo.repository.AuditLogRepository;
+import com.parkiyo.parkiyo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,6 +24,40 @@ import java.util.stream.Collectors;
 public class AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
+    private final UserRepository userRepository;
+
+    @Transactional
+    public void logAction(String action, String entityType, Long entityId, String description) {
+        logAction(action, resolveCurrentUserEmail(), entityType, entityId, description, null, null, null);
+    }
+
+    @Transactional
+    public void logAction(String action,
+                          String actorEmail,
+                          String entityType,
+                          Long entityId,
+                          String description,
+                          String changeDetails,
+                          String ipAddress,
+                          String userAgent) {
+        User actor = null;
+        if (actorEmail != null && !actorEmail.isBlank()) {
+            actor = userRepository.findByEmail(actorEmail).orElse(null);
+        }
+
+        AuditLog log = AuditLog.builder()
+                .performedBy(actor)
+                .action(action)
+                .entityType(entityType)
+                .entityId(entityId)
+                .description(description)
+                .changeDetails(changeDetails)
+                .ipAddress(ipAddress)
+                .userAgent(userAgent)
+                .build();
+
+        auditLogRepository.save(log);
+    }
 
     public List<Map<String, Object>> getLogs(String action, String user,
                                              String dateFrom, String dateTo) {
@@ -42,11 +81,20 @@ public class AuditLogService {
     }
 
     public List<String> getAllActionTypes() {
-        return auditLogRepository.findDistinctByOrderByActionAsc().stream()
-                .map(AuditLog::getAction)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
+        return auditLogRepository.findDistinctActions();
+    }
+
+    private String resolveCurrentUserEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+
+        String principal = authentication.getName();
+        if (principal == null || principal.isBlank() || "anonymousUser".equals(principal)) {
+            return null;
+        }
+        return principal;
     }
 
     private boolean matchesUser(AuditLog log, String userFilter) {

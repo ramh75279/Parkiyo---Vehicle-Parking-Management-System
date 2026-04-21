@@ -1,6 +1,7 @@
 package com.parkiyo.parkiyo.config;
 
 import com.parkiyo.parkiyo.service.AuthService;
+import com.parkiyo.parkiyo.service.AuditLogService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -16,9 +17,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
         private final AuthService authService;
+        private final AuditLogService auditLogService;
 
-        public SecurityConfig(AuthService authService) {
+        public SecurityConfig(AuthService authService, AuditLogService auditLogService) {
                 this.authService = authService;
+                this.auditLogService = auditLogService;
         }
 
     // ─── Public pages (no login required) ────────────────────────────────────
@@ -52,7 +55,19 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")               // your custom login page
                         .loginProcessingUrl("/login")      // Spring handles POST /login
-                        .defaultSuccessUrl("/dashboard", true)
+                        .successHandler((request, response, authentication) -> {
+                                auditLogService.logAction(
+                                        "LOGIN",
+                                        authentication.getName(),
+                                        "Authentication",
+                                        null,
+                                        "User logged in successfully",
+                                        null,
+                                        request.getRemoteAddr(),
+                                        request.getHeader("User-Agent")
+                                );
+                                response.sendRedirect(request.getContextPath() + "/dashboard");
+                        })
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )

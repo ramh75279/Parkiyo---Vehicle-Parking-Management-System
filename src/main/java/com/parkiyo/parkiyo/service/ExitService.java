@@ -27,6 +27,7 @@ public class ExitService {
     private final ParkingRecordRepository parkingRecordRepository;
     private final ParkingSlotRepository slotRepository;
     private final PaymentRepository paymentRepository;
+    private final AuditLogService auditLogService;
 
     @Transactional
     public Long processExit(ExitRequest request, String operatorEmail) {
@@ -68,6 +69,17 @@ public class ExitService {
                 .status(PaymentStatus.PENDING)
                 .build();
         paymentRepository.save(payment);
+
+        auditLogService.logAction(
+            "EXIT",
+            operatorEmail,
+            "ParkingRecord",
+            record.getId(),
+            "Vehicle " + record.getVehicle().getLicensePlate() + " exited from slot " + slot.getSlotNumber(),
+            null,
+            null,
+            null
+        );
 
         return payment.getId();
     }

@@ -27,6 +27,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final WalletService walletService;
     private final WalletRepository walletRepository;
+    private final AuditLogService auditLogService;
 
     public Payment getPendingPayment(Long id, String email) {
         return paymentRepository.findById(id)
@@ -138,6 +139,17 @@ public class PaymentService {
         payment.setReceipt(receipt);
         walletRepository.save(wallet);
         paymentRepository.save(payment);
+
+        auditLogService.logAction(
+            "PAYMENT",
+            email,
+            "Payment",
+            payment.getId(),
+            "Payment completed for transaction " + payment.getTransactionCode(),
+            null,
+            null,
+            null
+        );
     }
 
     private Receipt buildReceiptSnapshot(Payment payment) {
@@ -284,5 +296,12 @@ public class PaymentService {
         payment.setRefundedAt(LocalDateTime.now());
         walletRepository.save(wallet);
         paymentRepository.save(payment);
+
+        auditLogService.logAction(
+            "PAYMENT_REFUNDED",
+            "Payment",
+            payment.getId(),
+            "Refund completed for transaction " + payment.getTransactionCode()
+        );
     }
 }
