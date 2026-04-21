@@ -1,5 +1,6 @@
 package com.parkiyo.parkiyo.config;
 
+import com.parkiyo.parkiyo.service.AuthService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -13,6 +14,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity   // enables @PreAuthorize on your controllers
 public class SecurityConfig {
+
+        private final AuthService authService;
+
+        public SecurityConfig(AuthService authService) {
+                this.authService = authService;
+        }
 
     // ─── Public pages (no login required) ────────────────────────────────────
     private static final String[] PUBLIC_URLS = {
@@ -36,6 +43,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .userDetailsService(authService)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_URLS).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
