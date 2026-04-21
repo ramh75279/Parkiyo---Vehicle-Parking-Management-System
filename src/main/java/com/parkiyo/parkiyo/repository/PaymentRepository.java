@@ -28,7 +28,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Query("SELECT SUM(p.amount) FROM Payment p WHERE p.status = 'SUCCESS'")
     Double sumTotalRevenue();
 
-    @Query("SELECT SUM(p.amount) FROM Payment p WHERE p.userEmail = :email AND p.status = 'SUCCESS'")
+    @Query("SELECT SUM(p.amount) FROM Payment p WHERE p.user.email = :email AND p.status = 'SUCCESS'")
     Double sumRevenueByUser(String email);
 
     List<Payment> findTop10ByOrderByCreatedAtDesc();
