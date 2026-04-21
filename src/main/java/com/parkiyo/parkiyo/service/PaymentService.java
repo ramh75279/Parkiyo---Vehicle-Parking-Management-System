@@ -3,13 +3,17 @@ package com.parkiyo.parkiyo.service;
 import com.parkiyo.parkiyo.enums.PaymentStatus;
 import com.parkiyo.parkiyo.model.Payment;
 import com.parkiyo.parkiyo.model.Receipt;
+import com.parkiyo.parkiyo.model.Wallet;
+import com.parkiyo.parkiyo.model.WalletTransaction;
 import com.parkiyo.parkiyo.repository.PaymentRepository;
+import com.parkiyo.parkiyo.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,6 +21,8 @@ import java.util.List;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final WalletService walletService;
+    private final WalletRepository walletRepository;
 
     public Payment getPendingPayment(Long id, String email) {
         return paymentRepository.findById(id)
@@ -74,6 +80,39 @@ public class PaymentService {
     public void initiatePayment(Long paymentId, String email) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Payment not found."));
+
+        if (!payment.getUser().getEmail().equalsIgnoreCase(email)) {
+            throw new RuntimeException("You are not allowed to process this payment.");
+        }
+
+        if (payment.getStatus() != PaymentStatus.PENDING) {
+            throw new RuntimeException("Only pending payments can be processed.");
+        }
+
+        Wallet wallet = walletRepository.findByUserEmail(email)
+                .orElseThrow(() -> new RuntimeException("Wallet not found."));
+
+        if (walletService.getBalance(email).compareTo(payment.getAmount()) < 0) {
+            throw new RuntimeException("Insufficient wallet balance.");
+        }
+
+        BigDecimal newBalance = wallet.getBalance().subtract(payment.getAmount());
+        wallet.setBalance(newBalance);
+
+        if (wallet.getTransactions() == null) {
+            wallet.setTransactions(new ArrayList<>());
+        }
+
+        WalletTransaction walletTransaction = WalletTransaction.builder()
+                .wallet(wallet)
+                .type("DEBIT")
+                .amount(payment.getAmount())
+                .balanceAfter(newBalance)
+                .description("Payment for " + payment.getTransactionCode())
+                .payment(payment)
+                .build();
+        wallet.getTransactions().add(walletTransaction);
+
         payment.setStatus(PaymentStatus.SUCCESS);
         payment.setPaymentMethod("Parkiyo Wallet");
         payment.setPaidAt(LocalDateTime.now());
@@ -81,6 +120,7 @@ public class PaymentService {
         // Auto-generate receipt
         Receipt receipt = Receipt.builder().payment(payment).build();
         payment.setReceipt(receipt);
+        walletRepository.save(wallet);
         paymentRepository.save(payment);
     }
 
