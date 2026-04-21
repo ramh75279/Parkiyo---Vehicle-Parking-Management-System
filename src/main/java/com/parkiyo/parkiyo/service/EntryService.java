@@ -2,6 +2,7 @@ package com.parkiyo.parkiyo.service;
 
 import com.parkiyo.parkiyo.dto.EntryRequest;
 import com.parkiyo.parkiyo.enums.SlotStatus;
+import com.parkiyo.parkiyo.enums.VehicleCategory;
 import com.parkiyo.parkiyo.model.ParkingRecord;
 import com.parkiyo.parkiyo.model.ParkingSlot;
 import com.parkiyo.parkiyo.model.User;
@@ -28,12 +29,17 @@ public class EntryService {
 
     @Transactional
     public void processEntry(EntryRequest request, String operatorEmail) {
+        VehicleCategory category = (request.getCategory() != null && !request.getCategory().isBlank())
+            ? VehicleCategory.valueOf(request.getCategory().trim().toUpperCase())
+            : VehicleCategory.CAR;
+
         // Get or create vehicle
         Vehicle vehicle = vehicleRepository.findByLicensePlate(
                         request.getLicensePlate().toUpperCase())
                 .orElseGet(() -> {
                     Vehicle v = Vehicle.builder()
                             .licensePlate(request.getLicensePlate().toUpperCase())
+                    .category(category)
                             .active(true)
                             .build();
                     return vehicleRepository.save(v);
