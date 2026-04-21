@@ -1,6 +1,6 @@
 package com.parkiyo.parkiyo.model;
 
-import com.parkiyo.enums.PaymentStatus;
+import com.parkiyo.parkiyo.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
