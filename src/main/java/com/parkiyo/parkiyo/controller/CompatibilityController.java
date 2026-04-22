@@ -32,6 +32,24 @@ public class CompatibilityController {
         return "redirect:/admin/slots";
     }
 
+    @GetMapping("/admin/slots/edit/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String slotEditByIdAlias(@PathVariable Long id) {
+        return "redirect:/admin/slots/" + id + "/edit";
+    }
+
+    @GetMapping({"/admin/slots/history", "/admin/slots/history/export"})
+    @PreAuthorize("hasRole('ADMIN')")
+    public String slotHistoryAlias() {
+        return "redirect:/admin/slots";
+    }
+
+    @GetMapping("/admin/slots/history/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String slotHistoryByIdAlias(@PathVariable Long id) {
+        return "redirect:/admin/slots/" + id + "/usage-history";
+    }
+
     @GetMapping("/admin/vehicles/by-category")
     @PreAuthorize("hasRole('ADMIN')")
     public String vehicleCategoryAlias() {
@@ -54,5 +72,49 @@ public class CompatibilityController {
     @PreAuthorize("hasRole('ADMIN')")
     public String adminExitAlias() {
         return "redirect:/admin/exit";
+    }
+
+    @GetMapping({"/admin/payments/export", "/admin/receipts"})
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminPaymentExportAlias() {
+        return "redirect:/admin/payments";
+    }
+
+    @GetMapping("/admin/receipts/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminReceiptAlias(@PathVariable Long id) {
+        return "redirect:/admin/payments";
+    }
+
+    @GetMapping({"/admin/reports/audit-log", "/admin/reports/daily/export"})
+    @PreAuthorize("hasRole('ADMIN')")
+    public String reportShortcutAlias() {
+        return "redirect:/admin/reports";
+    }
+
+    @GetMapping("/admin/users/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String userDetailsAlias(@PathVariable Long id) {
+        return "redirect:/admin/users/" + id + "/edit";
+    }
+
+    @GetMapping({"/payments", "/payments/pending", "/payments/processing"})
+    public String paymentShortcutAlias() {
+        return "redirect:/payments/history";
+    }
+
+    @GetMapping({"/parking/record", "/parking/record-details"})
+    public String parkingShortcutAlias() {
+        return "redirect:/parking";
+    }
+
+    @GetMapping({"/slots", "/slots/select"})
+    public String slotSelectionAlias() {
+        return "redirect:/reservations/slot-selection";
+    }
+
+    @GetMapping("/vehicle/profile")
+    public String vehicleProfileAlias() {
+        return "redirect:/parking";
     }
 }

@@ -22,6 +22,12 @@ public class ParkingService {
         return parkingRecordRepository.findByActiveTrue();
     }
 
+    public List<ParkingRecord> getAllPastRecords() {
+        return parkingRecordRepository.findAll().stream()
+                .filter(record -> !record.isActive())
+                .toList();
+    }
+
     public List<ParkingRecord> getPastRecordsByUser(String email) {
         return parkingRecordRepository.findByUserEmail(email).stream()
                 .filter(r -> !r.isActive())

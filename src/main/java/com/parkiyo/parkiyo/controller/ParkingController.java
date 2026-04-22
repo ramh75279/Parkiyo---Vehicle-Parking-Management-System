@@ -23,6 +23,14 @@ public class ParkingController {
         return "parking/parking";
     }
 
+    @GetMapping("/admin/parking")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminParkingPage(Model model) {
+        model.addAttribute("activeRecords", parkingService.getAllActiveRecords());
+        model.addAttribute("pastRecords", parkingService.getAllPastRecords());
+        return "parking/parking";
+    }
+
     // GET /parking/{id}  - record details
     @GetMapping("/parking/{id}")
     @PreAuthorize("isAuthenticated()")
@@ -47,6 +55,16 @@ public class ParkingController {
     @PreAuthorize("hasRole('ADMIN')")
     public String adminParkingTicket(@PathVariable Long id, Model model) {
         model.addAttribute("ticket", parkingService.getAdminTicket(id));
+        return "parking/parkingticket";
+    }
+
+    @GetMapping("/admin/parking/ticket")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminParkingTicketQuery(@RequestParam(required = false) Long recordId, Model model) {
+        if (recordId == null) {
+            return "redirect:/admin/parking";
+        }
+        model.addAttribute("ticket", parkingService.getAdminTicket(recordId));
         return "parking/parkingticket";
     }
 }

@@ -33,6 +33,7 @@ public class SecurityConfig {
             "/login",
             "/register",
             "/forgot-password",
+            "/reset-password",
             "/access-denied",
             "/css/**",
             "/js/**",
@@ -85,7 +86,7 @@ public class SecurityConfig {
                 )
 
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
+                        .logoutUrl("/perform-logout")
                         .logoutSuccessUrl("/login?logout=true")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")

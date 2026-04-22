@@ -1,15 +1,15 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.parkiyo.dto.LoginRequest;
 import com.parkiyo.parkiyo.dto.RegisterRequest;
 import com.parkiyo.parkiyo.dto.PasswordResetRequest;
 import com.parkiyo.parkiyo.service.AuthService;
-import com.parkiyo.parkiyo.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,7 +21,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AuthController {
 
     private final AuthService authService;
-    private final UserService userService;
 
     // GET /login
     @GetMapping("/login")
@@ -69,19 +68,48 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public String forgotPassword(@RequestParam String email,
                                  RedirectAttributes redirectAttributes) {
-        try {
-            authService.sendPasswordResetLink(email);
-            redirectAttributes.addFlashAttribute("success",
-                    "If this email exists, a reset link has been sent.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-        }
+        authService.sendPasswordResetLink(email);
+        redirectAttributes.addFlashAttribute("success",
+                "If this email exists, password reset instructions have been prepared.");
         return "redirect:/forgot-password";
     }
 
-    // GET /logout  (Spring Security handles POST /logout; this renders the animated page)
+    @GetMapping("/reset-password")
+    public String resetPasswordPage(@RequestParam String token, Model model) {
+        model.addAttribute("token", token);
+        model.addAttribute("passwordResetRequest", new PasswordResetRequest());
+        return "auth/reset-password";
+    }
+
+    @PostMapping("/reset-password")
+    public String resetPassword(@Valid @ModelAttribute PasswordResetRequest request,
+                                BindingResult result,
+                                RedirectAttributes redirectAttributes,
+                                Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("token", request.getToken());
+            return "auth/reset-password";
+        }
+        try {
+            authService.resetPassword(request);
+            redirectAttributes.addFlashAttribute("success", "Password reset successfully. Please log in.");
+            return "redirect:/login";
+        } catch (Exception e) {
+            model.addAttribute("token", request.getToken());
+            model.addAttribute("error", e.getMessage());
+            return "auth/reset-password";
+        }
+    }
+
+    // GET /logout renders the animated page after clearing the security session.
     @GetMapping("/logout")
-    public String logoutPage() {
+    public String logoutPage(HttpServletRequest request,
+                             HttpServletResponse response,
+                             Authentication authentication) {
+        if (authentication != null) {
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        }
+        SecurityContextHolder.clearContext();
         return "auth/logout";
     }
 
