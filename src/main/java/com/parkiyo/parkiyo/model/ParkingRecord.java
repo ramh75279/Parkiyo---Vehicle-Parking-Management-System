@@ -50,6 +50,7 @@ public class ParkingRecord {
     private String entryOperator;
     private String exitOperator;
 
+    @Builder.Default
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean active = true;
 

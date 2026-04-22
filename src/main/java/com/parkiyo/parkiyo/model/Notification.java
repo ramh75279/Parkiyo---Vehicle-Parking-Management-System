@@ -33,6 +33,7 @@ public class Notification {
     // Optional deep-link inside the app
     private String actionUrl;
 
+    @Builder.Default
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean read = false;
 

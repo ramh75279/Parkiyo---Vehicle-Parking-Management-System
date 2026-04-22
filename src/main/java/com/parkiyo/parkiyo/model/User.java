@@ -44,9 +44,11 @@ public class User {
     private String passwordResetToken;
     private LocalDateTime passwordResetTokenExpiry;
 
+    @Builder.Default
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean emailNotificationsEnabled = true;
 
+    @Builder.Default
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean smsNotificationsEnabled = true;
 

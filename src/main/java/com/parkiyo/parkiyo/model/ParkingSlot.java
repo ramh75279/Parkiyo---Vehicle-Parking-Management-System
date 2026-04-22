@@ -25,9 +25,11 @@ public class ParkingSlot {
     private String zone;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     @Column(nullable = false)
     private SlotStatus status = SlotStatus.AVAILABLE;
 
+    @Builder.Default
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal hourlyRate = BigDecimal.ZERO;
 

@@ -28,6 +28,7 @@ public class Vehicle {
     private String make;
     private String model;
     private String color;
+    @Column(name = "manufacture_year")
     private Integer year;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,6 +38,7 @@ public class Vehicle {
     @OneToMany(mappedBy = "vehicle", fetch = FetchType.LAZY)
     private List<ParkingRecord> parkingRecords;
 
+    @Builder.Default
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean active = true;
 
