@@ -20,9 +20,8 @@ public class SecurityConfig {
 
     private final AuthService authService;
     private final AuditLogService auditLogService;
-    private final PasswordEncoder passwordEncoder; // 🔥 injected from AppConfig
+    private final PasswordEncoder passwordEncoder;
 
-    // Public URLs (no authentication required)
     private static final String[] PUBLIC_URLS = {
             "/",
             "/home",
@@ -41,7 +40,6 @@ public class SecurityConfig {
             "/webjars/**"
     };
 
-    // 🔐 Authentication Provider (NO circular dependency)
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -50,11 +48,10 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    // 🔐 Security Filter Chain
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authenticationProvider(authenticationProvider()) // ✅ correct usage
+                .authenticationProvider(authenticationProvider())
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_URLS).permitAll()
@@ -65,6 +62,11 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
+
+                        // 🔥 THIS IS THE FIX
+                        .usernameParameter("email")
+                        .passwordParameter("password")
+
                         .successHandler((request, response, authentication) -> {
                             auditLogService.logAction(
                                     "LOGIN",
