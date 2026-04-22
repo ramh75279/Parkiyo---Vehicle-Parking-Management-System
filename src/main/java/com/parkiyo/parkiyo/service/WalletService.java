@@ -46,6 +46,10 @@ public class WalletService {
         BigDecimal newBalance = wallet.getBalance().add(amount);
         wallet.setBalance(newBalance);
 
+        if (wallet.getTransactions() == null) {
+            wallet.setTransactions(new java.util.ArrayList<>());
+        }
+
         WalletTransaction transaction = WalletTransaction.builder()
                 .wallet(wallet)
                 .type("CREDIT")

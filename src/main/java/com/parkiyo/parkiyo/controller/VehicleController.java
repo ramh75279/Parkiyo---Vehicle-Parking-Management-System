@@ -27,7 +27,7 @@ public class VehicleController {
                               Model model) {
         model.addAttribute("vehicles", vehicleService.getAllVehicles(search, category));
         model.addAttribute("categories", vehicleService.getAllCategories());
-        return "vehicle-list-page";
+        return "vehicles/vehicle-list-page";
     }
 
     // GET /admin/vehicles/browse
@@ -36,7 +36,7 @@ public class VehicleController {
         model.addAttribute("categories", vehicleService.getAllCategories());
         model.addAttribute("vehicles", vehicleService.getVehiclesByCategory(category));
         model.addAttribute("selectedCategory", category);
-        return "browse-vehicle-by-category";
+        return "vehicles/browse-vehicle-by-category";
     }
 
     // GET /admin/vehicles/add
@@ -44,7 +44,7 @@ public class VehicleController {
     public String addVehiclePage(Model model) {
         model.addAttribute("vehicleRequest", new VehicleRequest());
         model.addAttribute("categories", vehicleService.getAllCategories());
-        return "add-vehicle-page";
+        return "vehicles/add-vehicle-page";
     }
 
     // POST /admin/vehicles/create
@@ -66,7 +66,7 @@ public class VehicleController {
     public String vehicleDetails(@PathVariable Long id, Model model) {
         model.addAttribute("vehicle", vehicleService.getVehicleById(id));
         model.addAttribute("parkingHistory", vehicleService.getVehicleParkingHistory(id));
-        return "vehicle-details-page";
+        return "vehicles/vehicle-details-page";
     }
 
     // GET /admin/vehicles/{id}/edit
@@ -74,7 +74,7 @@ public class VehicleController {
     public String editVehiclePage(@PathVariable Long id, Model model) {
         model.addAttribute("vehicle", vehicleService.getVehicleById(id));
         model.addAttribute("categories", vehicleService.getAllCategories());
-        return "edit-vehicle-page";
+        return "vehicles/edit-vehicle-page";
     }
 
     // POST /admin/vehicles/{id}/update
@@ -107,7 +107,7 @@ public class VehicleController {
     // GET /admin/vehicles/quick-register
     @GetMapping("/quick-register")
     public String quickRegisterPage() {
-        return "quick-register-by-plate";
+        return "vehicles/quick-register-by-plate";
     }
 
     // POST /admin/vehicles/quick-register
@@ -130,7 +130,7 @@ public class VehicleController {
     @GetMapping("/import")
     public String importPage(HttpSession session, Model model) {
         model.addAllAttributes(vehicleService.getImportPreview(session));
-        return "vehicle-import-page";
+        return "vehicles/vehicle-import-page";
     }
 
     // POST /admin/vehicles/import/upload

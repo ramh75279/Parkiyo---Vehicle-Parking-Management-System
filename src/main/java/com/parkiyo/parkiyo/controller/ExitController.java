@@ -27,7 +27,7 @@ public class ExitController {
     public String userExitPage(Authentication auth, Model model) {
         model.addAttribute("activeRecords", parkingService.getActiveRecordsByUser(auth.getName()));
         model.addAttribute("exitRequest", new ExitRequest());
-        return "exitvehicle";
+        return "parking/exitvehicle";
     }
 
     // POST /exit
@@ -55,7 +55,7 @@ public class ExitController {
         model.addAttribute("activeRecords", parkingService.getAllActiveRecords());
         model.addAttribute("recentExits", exitService.getRecentExits(20));
         model.addAttribute("exitRequest", new ExitRequest());
-        return "exitvehicle-admin";
+        return "parking/exitvehicle-admin";
     }
 
     // POST /admin/exit

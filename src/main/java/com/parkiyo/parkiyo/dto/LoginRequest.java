@@ -5,17 +5,15 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
 public class LoginRequest {
+    @Email
+    @NotBlank
+    private String email;
 
-    @Getter @Setter
-    public class LoginRequest {
-        @Email
-        @NotBlank
-        private String email;
+    @NotBlank
+    private String password;
 
-        @NotBlank
-        private String password;
-
-        private boolean rememberMe;
-    }
+    private boolean rememberMe;
 }

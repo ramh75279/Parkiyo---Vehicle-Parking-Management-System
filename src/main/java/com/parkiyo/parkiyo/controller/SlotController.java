@@ -26,7 +26,7 @@ public class SlotController {
                            Model model) {
         model.addAttribute("slots", slotService.getSlots(status, zone));
         model.addAttribute("zones", slotService.getAllZones());
-        return "slot-list";
+        return "slots/slot-list";
     }
 
     // GET /admin/slots/overview
@@ -34,7 +34,7 @@ public class SlotController {
     public String slotOverview(Model model) {
         model.addAttribute("overview", slotService.getSlotOverview());
         model.addAttribute("zones", slotService.getZoneSummaries());
-        return "slot-overview";
+        return "slots/slot-overview";
     }
 
     // GET /admin/slots/add
@@ -42,7 +42,7 @@ public class SlotController {
     public String addSlotPage(Model model) {
         model.addAttribute("slotRequest", new SlotRequest());
         model.addAttribute("zones", slotService.getAllZones());
-        return "add-slot";
+        return "slots/add-slot";
     }
 
     // POST /admin/slots/create
@@ -64,7 +64,7 @@ public class SlotController {
     public String editSlotPage(@PathVariable Long id, Model model) {
         model.addAttribute("slot", slotService.getSlotById(id));
         model.addAttribute("zones", slotService.getAllZones());
-        return "edit-slot";
+        return "slots/edit-slot";
     }
 
     // POST /admin/slots/update
@@ -99,7 +99,7 @@ public class SlotController {
     public String batchSlotPage(Model model) {
         model.addAttribute("batchRequest", new BatchSlotRequest());
         model.addAttribute("zones", slotService.getAllZones());
-        return "batchslot-generate";
+        return "slots/batchslot-generate";
     }
 
     // POST /admin/slots/batch
@@ -121,6 +121,6 @@ public class SlotController {
     public String slotUsageHistory(@PathVariable Long id, Model model) {
         model.addAttribute("slot", slotService.getSlotById(id));
         model.addAttribute("history", slotService.getSlotUsageHistory(id));
-        return "slot-usage-history";
+        return "slots/slot-usage-history";
     }
 }

@@ -30,14 +30,14 @@ public class AuthController {
                             Model model) {
         if (error != null) model.addAttribute("error", "Invalid email or password.");
         if (logout != null) model.addAttribute("success", "You have been logged out.");
-        return "login";
+        return "auth/login";
     }
 
     // GET /register
     @GetMapping("/register")
     public String registerPage(Model model) {
         model.addAttribute("registerRequest", new RegisterRequest());
-        return "register";
+        return "auth/register";
     }
 
     // POST /register
@@ -47,7 +47,7 @@ public class AuthController {
                            RedirectAttributes redirectAttributes,
                            Model model) {
         if (result.hasErrors()) {
-            return "register";
+            return "auth/register";
         }
         try {
             authService.register(request);
@@ -55,14 +55,14 @@ public class AuthController {
             return "redirect:/login";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
-            return "register";
+            return "auth/register";
         }
     }
 
     // GET /forgot-password
     @GetMapping("/forgot-password")
     public String forgotPasswordPage() {
-        return "forgot-password";
+        return "auth/forgot-password";
     }
 
     // POST /forgot-password
@@ -82,13 +82,13 @@ public class AuthController {
     // GET /logout  (Spring Security handles POST /logout; this renders the animated page)
     @GetMapping("/logout")
     public String logoutPage() {
-        return "logout";
+        return "auth/logout";
     }
 
     // GET /access-denied
     @GetMapping("/access-denied")
     public String accessDenied() {
-        return "accessdenied";
+        return "auth/accessdenied";
     }
 
     // GET /dashboard  (role-based redirect)

@@ -8,31 +8,31 @@ public class PublicPageController {
 
     @GetMapping({"/", "/home"})
     public String home() {
-        return "home";
+        return "public/home";
     }
 
     @GetMapping("/features")
     public String features() {
-        return "features";
+        return "public/features";
     }
 
     @GetMapping("/solutions")
     public String solutions() {
-        return "solutions";
+        return "public/solutions";
     }
 
     @GetMapping("/analytics")
     public String analytics() {
-        return "analytics";
+        return "public/analytics";
     }
 
     @GetMapping("/faq")
     public String faq() {
-        return "faq";
+        return "public/faq";
     }
 
     @GetMapping("/privacy")
     public String privacy() {
-        return "privacy";
+        return "public/privacy";
     }
 }

@@ -30,7 +30,7 @@ public class EntryController {
         model.addAttribute("availableSlots", slotService.getAvailableSlots());
         model.addAttribute("userVehicles", vehicleService.getVehiclesByUser(auth.getName()));
         model.addAttribute("entryRequest", new EntryRequest());
-        return "entry";
+        return "parking/entry";
     }
 
     // POST /entry
@@ -58,7 +58,7 @@ public class EntryController {
         model.addAttribute("availableSlots", slotService.getAvailableSlots());
         model.addAttribute("recentEntries", entryService.getRecentEntries(20));
         model.addAttribute("entryRequest", new EntryRequest());
-        return "entry-admin";
+        return "parking/entry-admin";
     }
 
     // POST /admin/entry

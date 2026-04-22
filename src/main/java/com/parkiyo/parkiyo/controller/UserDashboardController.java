@@ -27,7 +27,7 @@ public class UserDashboardController {
         model.addAttribute("activeReservation", dashboardService.getUserActiveReservation(email));
         model.addAttribute("walletBalance", walletService.getBalance(email));
         model.addAttribute("pendingPayments", dashboardService.getUserPendingPayments(email));
-        return "dashboard-user";
+        return "dashboard/dashboard-user";
     }
 
     // GET /notifications  (user)
@@ -35,12 +35,12 @@ public class UserDashboardController {
     public String userNotifications(Authentication auth, Model model) {
         model.addAttribute("notifications",
                 notificationService.getUserNotifications(auth.getName()));
-        return "notification-user";
+        return "account/notification-user";
     }
 
     // GET /assistant
     @GetMapping("/assistant")
     public String assistant() {
-        return "assistant";
+        return "assistant/assistant";
     }
 }

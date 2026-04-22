@@ -24,13 +24,13 @@ public class AuditLogController {
                            Model model) {
         model.addAttribute("logs", auditLogService.getLogs(action, user, dateFrom, dateTo));
         model.addAttribute("actions", auditLogService.getAllActionTypes());
-        return "auditlog";
+        return "admin/auditlog";
     }
 
     // GET /admin/audit/{id}
     @GetMapping("/{id}")
     public String auditLogDetails(@PathVariable Long id, Model model) {
         model.addAttribute("log", auditLogService.getLogById(id));
-        return "auditlogdeatils";
+        return "admin/auditlogdeatils";
     }
 }

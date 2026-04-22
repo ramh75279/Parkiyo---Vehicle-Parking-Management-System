@@ -23,21 +23,21 @@ public class AdminDashboardController {
         model.addAttribute("recentEntries", dashboardService.getRecentEntries(10));
         model.addAttribute("recentPayments", dashboardService.getRecentPayments(5));
         model.addAttribute("slotSummary", dashboardService.getSlotOccupancySummary());
-        return "dashboard-admin";
+        return "dashboard/dashboard-admin";
     }
 
     // GET /admin/system-status
     @GetMapping("/system-status")
     public String systemStatus(Model model) {
         model.addAttribute("systemHealth", dashboardService.getSystemHealth());
-        return "systemstatuspage";
+        return "admin/systemstatuspage";
     }
 
     // GET /admin/notifications
     @GetMapping("/notifications")
     public String adminNotifications(Model model) {
         model.addAttribute("notifications", dashboardService.getAdminNotifications());
-        return "notification";
+        return "account/notification";
     }
 
     // GET /admin/settings

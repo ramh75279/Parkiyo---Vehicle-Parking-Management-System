@@ -28,14 +28,14 @@ public class UserManagementController {
         model.addAttribute("users", userService.getAllUsers(search, role, status));
         model.addAttribute("totalUsers", userService.getTotalUserCount());
         model.addAttribute("activeUsers", userService.getActiveUserCount());
-        return "usermanagement";
+        return "admin/usermanagement";
     }
 
     // GET /admin/users/create
     @GetMapping("/create")
     public String createUserPage(Model model) {
         model.addAttribute("createUserRequest", new CreateUserRequest());
-        return "createuser";
+        return "admin/createuser";
     }
 
     // POST /admin/users/create
@@ -57,7 +57,7 @@ public class UserManagementController {
     @GetMapping("/{id}/edit")
     public String editUserPage(@PathVariable Long id, Model model) {
         model.addAttribute("user", userService.getUserById(id));
-        return "edituser";
+        return "admin/edituser";
     }
 
     // POST /admin/users/{id}/update

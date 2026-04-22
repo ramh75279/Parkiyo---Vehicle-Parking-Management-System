@@ -27,7 +27,7 @@ public class PaymentController {
                                  Model model) {
         model.addAttribute("pendingPayment", paymentService.getPendingPayment(id, auth.getName()));
         model.addAttribute("walletBalance", walletService.getBalance(auth.getName()));
-        return "pendingpayment";
+        return "payments/pendingpayment";
     }
 
     // POST /payments/processing
@@ -52,7 +52,7 @@ public class PaymentController {
                                         Authentication auth,
                                         Model model) {
         model.addAttribute("payment", paymentService.getPaymentById(id, auth.getName()));
-        return "paymentprocessing";
+        return "payments/paymentprocessing";
     }
 
     // GET /payment/success
@@ -62,7 +62,7 @@ public class PaymentController {
                                  Authentication auth,
                                  Model model) {
         model.addAttribute("payment", paymentService.getLatestSuccessfulPayment(auth.getName()));
-        return "paymentsuccess";
+        return "payments/paymentsuccess";
     }
 
     // GET /payments/history  (user)
@@ -71,7 +71,7 @@ public class PaymentController {
     public String userPaymentHistory(Authentication auth, Model model) {
         model.addAttribute("payments", paymentService.getUserPaymentHistory(auth.getName()));
         model.addAttribute("totalSpent", paymentService.getUserTotalSpent(auth.getName()));
-        return "paymenthistory-user";
+        return "payments/paymenthistory-user";
     }
 
     // GET /receipts  (list)
@@ -79,7 +79,7 @@ public class PaymentController {
     @PreAuthorize("isAuthenticated()")
     public String receipts(Authentication auth, Model model) {
         model.addAttribute("receipts", paymentService.getUserReceipts(auth.getName()));
-        return "receipt";
+        return "payments/receipt";
     }
 
     // GET /receipt  (single receipt)
@@ -89,7 +89,7 @@ public class PaymentController {
                           Authentication auth,
                           Model model) {
         model.addAttribute("receipt", paymentService.getReceipt(paymentId, auth.getName()));
-        return "receipt";
+        return "payments/receipt";
     }
 
     // ─── ADMIN ───────────────────────────────────────────────────────────────
@@ -103,7 +103,7 @@ public class PaymentController {
                                 Model model) {
         model.addAttribute("payments", paymentService.getAllPayments(status, dateFrom, dateTo));
         model.addAttribute("totalRevenue", paymentService.getTotalRevenue());
-        return "paymenthistory";
+        return "payments/paymenthistory";
     }
 
     // GET /admin/payments/history
@@ -111,7 +111,7 @@ public class PaymentController {
     @PreAuthorize("hasRole('ADMIN')")
     public String adminPaymentHistory(Model model) {
         model.addAttribute("payments", paymentService.getAllPaymentHistory());
-        return "paymenthistory";
+        return "payments/paymenthistory";
     }
 
     // POST /admin/payments/{id}/refund

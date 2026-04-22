@@ -28,14 +28,14 @@ public class ReservationController {
     @GetMapping("/reservations")
     public String reservations(Authentication auth, Model model) {
         model.addAttribute("reservations", reservationService.getUserReservations(auth.getName()));
-        return "advancereservation";
+        return "parking/advancereservation";
     }
 
     // GET /reservation  (single active reservation view)
     @GetMapping("/reservation")
     public String activeReservation(Authentication auth, Model model) {
         model.addAttribute("reservation", reservationService.getActiveReservation(auth.getName()));
-        return "advancereservation";
+        return "parking/advancereservation";
     }
 
     // GET /reservations/slot-selection
@@ -48,7 +48,7 @@ public class ReservationController {
         model.addAttribute("userVehicles", vehicleService.getVehiclesByUser(auth.getName()));
         model.addAttribute("zones", slotService.getAllZones());
         model.addAttribute("selectedDate", date);
-        return "slotselection";
+        return "slots/slotselection";
     }
 
     // POST /reservations/create

@@ -26,7 +26,7 @@ public class AccountSettingsController {
     @GetMapping("/account/settings")
     public String adminSettings(Authentication auth, Model model) {
         model.addAttribute("user", userService.getUserByEmail(auth.getName()));
-        return "accountsetting";
+        return "account/accountsetting";
     }
 
     // POST /account/settings/profile  (admin)
@@ -78,7 +78,7 @@ public class AccountSettingsController {
     @GetMapping("/settings/profile")
     public String userSettings(Authentication auth, Model model) {
         model.addAttribute("user", userService.getUserByEmail(auth.getName()));
-        return "accountsetting-user";
+        return "account/accountsetting-user";
     }
 
     // POST /settings/profile  (user)

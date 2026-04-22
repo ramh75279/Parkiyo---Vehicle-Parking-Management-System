@@ -23,7 +23,7 @@ public class WalletController {
     public String walletOverview(Authentication auth, Model model) {
         model.addAttribute("wallet", walletService.getWalletOverview(auth.getName()));
         model.addAttribute("transactions", walletService.getTransactionHistory(auth.getName()));
-        return "walletoverview";
+        return "payments/walletoverview";
     }
 
     // POST /wallet/topup

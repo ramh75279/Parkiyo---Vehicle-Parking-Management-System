@@ -22,7 +22,7 @@ public class ReportController {
     @GetMapping
     public String reportsHub(Model model) {
         model.addAttribute("summaryStats", reportService.getSummaryStats());
-        return "repportshubpage";
+        return "reports/repportshubpage";
     }
 
     // GET /admin/reports/revenue
@@ -36,7 +36,7 @@ public class ReportController {
         model.addAttribute("totalRevenue", reportService.getTotalRevenue(from, to));
         model.addAttribute("from", from);
         model.addAttribute("to", to);
-        return "revenuerepoartpage";
+        return "reports/revenuerepoartpage";
     }
 
     // GET /admin/reports/occupancy
@@ -49,7 +49,7 @@ public class ReportController {
         model.addAttribute("peakHours", reportService.getPeakHours());
         model.addAttribute("from", from);
         model.addAttribute("to", to);
-        return "occupancyrepoartpage";
+        return "reports/occupancyrepoartpage";
     }
 
     // GET /admin/reports/daily-revenue
@@ -61,7 +61,7 @@ public class ReportController {
         LocalDate reportDate = (date != null) ? date : LocalDate.now();
         model.addAttribute("dailyRevenue", reportService.getDailyRevenueReport(reportDate));
         model.addAttribute("reportDate", reportDate);
-        return "dailyrevenuereport";
+        return "reports/dailyrevenuereport";
     }
 
     // GET /admin/reports/export  (CSV/PDF download)

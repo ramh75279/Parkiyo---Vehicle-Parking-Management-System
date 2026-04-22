@@ -20,7 +20,7 @@ public class ParkingController {
     public String parkingPage(Authentication auth, Model model) {
         model.addAttribute("activeRecords", parkingService.getActiveRecordsByUser(auth.getName()));
         model.addAttribute("pastRecords", parkingService.getPastRecordsByUser(auth.getName()));
-        return "parking";
+        return "parking/parking";
     }
 
     // GET /parking/{id}  - record details
@@ -30,7 +30,7 @@ public class ParkingController {
                                        Authentication auth,
                                        Model model) {
         model.addAttribute("record", parkingService.getRecordByIdAndUser(id, auth.getName()));
-        return "parkingrecorddetails";
+        return "parking/parkingrecorddetails";
     }
 
     // GET /parking/ticket  - printable ticket for current session
@@ -40,6 +40,6 @@ public class ParkingController {
                                 Authentication auth,
                                 Model model) {
         model.addAttribute("ticket", parkingService.getTicket(recordId, auth.getName()));
-        return "parkingticket";
+        return "parking/parkingticket";
     }
 }

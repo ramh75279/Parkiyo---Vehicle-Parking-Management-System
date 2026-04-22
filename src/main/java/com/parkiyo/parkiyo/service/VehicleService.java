@@ -549,5 +549,4 @@ public class VehicleService {
             String fileSizeLabel,
             List<StagedVehicleRow> rows
     ) {}
-    }
 }
