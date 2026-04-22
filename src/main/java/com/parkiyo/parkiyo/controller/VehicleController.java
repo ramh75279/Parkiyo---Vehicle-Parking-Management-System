@@ -5,6 +5,9 @@ import com.parkiyo.parkiyo.service.VehicleService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -110,6 +113,11 @@ public class VehicleController {
         return "vehicles/quick-register-by-plate";
     }
 
+    @GetMapping("/quick-register/step1")
+    public String quickRegisterStepOne() {
+        return "redirect:/admin/vehicles/quick-register";
+    }
+
     // POST /admin/vehicles/quick-register
     @PostMapping("/quick-register")
     public String quickRegister(@RequestParam String licensePlate,
@@ -131,6 +139,17 @@ public class VehicleController {
     public String importPage(HttpSession session, Model model) {
         model.addAllAttributes(vehicleService.getImportPreview(session));
         return "vehicles/vehicle-import-page";
+    }
+
+    @GetMapping("/import/template")
+    @ResponseBody
+    public ResponseEntity<String> importTemplate() {
+        String csv = "licensePlate,category,make,model,color,year,ownerEmail\n"
+                + "ABC-1234,CAR,Toyota,Axio,White,2021,user@parkiyo.com\n";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=parkiyo-vehicle-import-template.csv")
+                .contentType(new MediaType("text", "csv"))
+                .body(csv);
     }
 
     // POST /admin/vehicles/import/upload

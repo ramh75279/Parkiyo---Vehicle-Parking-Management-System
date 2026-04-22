@@ -77,8 +77,15 @@ public class PaymentController {
     // GET /receipts  (list)
     @GetMapping("/receipts")
     @PreAuthorize("isAuthenticated()")
-    public String receipts(Authentication auth, Model model) {
-        model.addAttribute("receipts", paymentService.getUserReceipts(auth.getName()));
+    public String receipts(Authentication auth,
+                           Model model,
+                           RedirectAttributes redirectAttributes) {
+        try {
+            model.addAttribute("receipt", paymentService.getLatestReceipt(auth.getName()));
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/payments/history";
+        }
         return "payments/receipt";
     }
 
@@ -87,9 +94,24 @@ public class PaymentController {
     @PreAuthorize("isAuthenticated()")
     public String receipt(@RequestParam(required = false) Long paymentId,
                           Authentication auth,
-                          Model model) {
-        model.addAttribute("receipt", paymentService.getReceipt(paymentId, auth.getName()));
+                          Model model,
+                          RedirectAttributes redirectAttributes) {
+        try {
+            model.addAttribute("receipt", paymentService.getReceipt(paymentId, auth.getName()));
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/payments/history";
+        }
         return "payments/receipt";
+    }
+
+    @GetMapping("/user/receipt")
+    @PreAuthorize("isAuthenticated()")
+    public String userReceiptShortcut(@RequestParam(required = false) Long paymentId,
+                                      Authentication auth,
+                                      Model model,
+                                      RedirectAttributes redirectAttributes) {
+        return receipt(paymentId, auth, model, redirectAttributes);
     }
 
     // ─── ADMIN ───────────────────────────────────────────────────────────────

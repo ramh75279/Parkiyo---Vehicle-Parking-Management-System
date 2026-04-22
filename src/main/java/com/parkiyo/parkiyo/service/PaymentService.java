@@ -65,7 +65,33 @@ public class PaymentService {
                 .collect(Collectors.toList());
     }
 
+    public Receipt getLatestReceipt(String email) {
+        return paymentRepository.findByUserEmailAndStatus(email, PaymentStatus.SUCCESS).stream()
+                .filter(payment -> payment.getReceipt() != null)
+                .sorted((left, right) -> {
+                    LocalDateTime leftPaidAt = left.getPaidAt();
+                    LocalDateTime rightPaidAt = right.getPaidAt();
+                    if (leftPaidAt == null && rightPaidAt == null) {
+                        return 0;
+                    }
+                    if (leftPaidAt == null) {
+                        return 1;
+                    }
+                    if (rightPaidAt == null) {
+                        return -1;
+                    }
+                    return rightPaidAt.compareTo(leftPaidAt);
+                })
+                .map(Payment::getReceipt)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No receipt found."));
+    }
+
     public Receipt getReceipt(Long paymentId, String email) {
+        if (paymentId == null) {
+            return getLatestReceipt(email);
+        }
+
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Receipt not found."));
 

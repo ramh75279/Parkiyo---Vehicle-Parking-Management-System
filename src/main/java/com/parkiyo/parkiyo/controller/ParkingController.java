@@ -42,4 +42,11 @@ public class ParkingController {
         model.addAttribute("ticket", parkingService.getTicket(recordId, auth.getName()));
         return "parking/parkingticket";
     }
+
+    @GetMapping("/admin/tickets/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminParkingTicket(@PathVariable Long id, Model model) {
+        model.addAttribute("ticket", parkingService.getAdminTicket(id));
+        return "parking/parkingticket";
+    }
 }

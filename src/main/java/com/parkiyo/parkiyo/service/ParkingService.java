@@ -33,8 +33,22 @@ public class ParkingService {
                 .orElseThrow(() -> new RuntimeException("Parking record not found."));
     }
 
+    public ParkingRecord getRecordById(Long id) {
+        return parkingRecordRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Parking record not found."));
+    }
+
     public Map<String, Object> getTicket(Long recordId, String email) {
         ParkingRecord record = getRecordByIdAndUser(recordId, email);
+        return Map.of(
+                "record", record,
+                "vehicle", record.getVehicle(),
+                "slot", record.getSlot()
+        );
+    }
+
+    public Map<String, Object> getAdminTicket(Long recordId) {
+        ParkingRecord record = getRecordById(recordId);
         return Map.of(
                 "record", record,
                 "vehicle", record.getVehicle(),
