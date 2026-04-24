@@ -11,7 +11,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -103,12 +108,76 @@ public class UserService {
     }
 
     @Transactional
-    public void updateProfile(String email, ProfileUpdateRequest request) {
+    public void updateProfileWithPhoto(String email, ProfileUpdateRequest request) {
         User user = getUserByEmail(email);
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setPhone(request.getPhone());
+
+        if (request.getFirstName() != null && !request.getFirstName().isBlank())
+            user.setFirstName(request.getFirstName());
+
+        if (request.getLastName() != null && !request.getLastName().isBlank())
+            user.setLastName(request.getLastName());
+
+        if (request.getPhone() != null && !request.getPhone().isBlank())
+            user.setPhone(request.getPhone());
+
+        if (request.getProfilePicture() != null && !request.getProfilePicture().isEmpty()) {
+            String filePath = saveProfilePicture(request.getProfilePicture(), user.getId());
+
+            if (user.getProfilePicturePath() != null) {
+                deleteOldProfilePicture(user.getProfilePicturePath());
+            }
+
+            user.setProfilePicturePath(filePath);
+            System.out.println("✅ Profile picture path updated in DB: " + filePath);
+        }
+
         userRepository.save(user);
+    }
+
+    private String saveProfilePicture(MultipartFile file, Long userId) {
+        try {
+            String projectRoot = System.getProperty("user.dir");
+            // Most reliable path construction
+            String staticDir = projectRoot + File.separator + "src" + File.separator + "main"
+                    + File.separator + "resources" + File.separator + "static"
+                    + File.separator + "uploads" + File.separator + "profile-pics";
+
+            Path uploadPath = Paths.get(staticDir);
+            System.out.println("📍 Attempting to save in: " + uploadPath.toAbsolutePath());
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+                System.out.println("✅ Directory created successfully");
+            }
+
+            String originalName = file.getOriginalFilename();
+            String extension = originalName.substring(originalName.lastIndexOf(".")).toLowerCase();
+            String newFileName = userId + "-" + System.currentTimeMillis() + extension;
+
+            Path filePath = uploadPath.resolve(newFileName);
+            System.out.println("💾 Saving file to: " + filePath.toAbsolutePath());
+
+            file.transferTo(filePath.toFile());
+
+            System.out.println("🎉 SUCCESS! Photo saved: " + filePath.toAbsolutePath());
+
+            return "/uploads/profile-pics/" + newFileName;
+
+        } catch (Exception e) {
+            System.err.println("❌ FAILED to save photo: " + e.getClass().getSimpleName());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to save profile picture: " + e.getMessage());
+        }
+    }
+
+    private void deleteOldProfilePicture(String oldPath) {
+        if (oldPath == null || !oldPath.startsWith("/uploads")) return;
+        try {
+            String projectRoot = System.getProperty("user.dir");
+            String fullPath = projectRoot + "/src/main/resources/static" + oldPath;
+            Files.deleteIfExists(Paths.get(fullPath));
+            System.out.println("🗑️ Deleted old photo");
+        } catch (Exception ignored) {}
     }
 
     @Transactional
@@ -132,7 +201,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // Fixed: now takes currentAdminEmail to prevent self-lockout
     @Transactional
     public void toggleUserStatus(Long id, String currentAdminEmail) {
         User user = getUserById(id);
@@ -150,7 +218,6 @@ public class UserService {
         );
     }
 
-    // Fixed: catches FK violations and gives a meaningful error message
     @Transactional
     public void deleteUser(Long id) {
         User user = getUserById(id);

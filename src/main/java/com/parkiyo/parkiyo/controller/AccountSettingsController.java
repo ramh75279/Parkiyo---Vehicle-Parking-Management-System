@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -20,30 +21,44 @@ public class AccountSettingsController {
 
     private final UserService userService;
 
-    // ─── ADMIN SETTINGS ───────────────────────────────────────────────────────
-
-    // GET /account/settings  (admin)
+    // GET Admin Settings
     @GetMapping("/account/settings")
     public String adminSettings(Authentication auth, Model model) {
         model.addAttribute("user", userService.getUserByEmail(auth.getName()));
         return "account/accountsetting";
     }
 
-    // POST /account/settings/profile  (admin)
+    // POST Profile Update (with photo support)
     @PostMapping("/account/settings/profile")
     public String updateAdminProfile(@Valid @ModelAttribute ProfileUpdateRequest request,
                                      Authentication auth,
                                      RedirectAttributes redirectAttributes) {
         try {
-            userService.updateProfile(auth.getName(), request);
-            redirectAttributes.addFlashAttribute("success", "Profile updated.");
+            userService.updateProfileWithPhoto(auth.getName(), request);
+            redirectAttributes.addFlashAttribute("success", "Profile updated successfully.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/account/settings";
     }
 
-    // POST /account/settings/password  (admin)
+    // Photo Only Upload (used by the preview form)
+    @PostMapping("/account/settings/photo")
+    public String uploadPhotoOnly(@RequestParam("photo") MultipartFile photo,
+                                  Authentication auth,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            ProfileUpdateRequest request = new ProfileUpdateRequest();
+            request.setProfilePicture(photo);
+            userService.updateProfileWithPhoto(auth.getName(), request);
+            redirectAttributes.addFlashAttribute("success", "Profile photo updated.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to upload photo: " + e.getMessage());
+        }
+        return "redirect:/account/settings";
+    }
+
+    // Password Change
     @PostMapping("/account/settings/password")
     public String changeAdminPassword(@Valid @ModelAttribute PasswordChangeRequest request,
                                       Authentication auth,
@@ -57,7 +72,7 @@ public class AccountSettingsController {
         return "redirect:/account/settings";
     }
 
-    // POST /account/settings/notifications  (admin)
+    // Notifications
     @PostMapping("/account/settings/notifications")
     public String updateAdminNotificationPrefs(
             @ModelAttribute NotificationPreferenceRequest request,
@@ -72,34 +87,23 @@ public class AccountSettingsController {
         return "redirect:/account/settings";
     }
 
-    // ─── USER SETTINGS ────────────────────────────────────────────────────────
-
-    // GET /settings/profile  (user)
+    // ─── USER SIDE (Same logic) ─────────────────────────────────────
     @GetMapping("/settings/profile")
     public String userSettings(Authentication auth, Model model) {
         model.addAttribute("user", userService.getUserByEmail(auth.getName()));
         return "account/accountsetting-user";
     }
 
-    // POST /settings/profile  (user)
     @PostMapping("/settings/profile")
     public String updateUserProfile(@Valid @ModelAttribute ProfileUpdateRequest request,
                                     Authentication auth,
                                     RedirectAttributes redirectAttributes) {
         try {
-            userService.updateProfile(auth.getName(), request);
+            userService.updateProfileWithPhoto(auth.getName(), request);
             redirectAttributes.addFlashAttribute("success", "Profile updated.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/settings/profile";
-    }
-
-    // GET /settings  (user - generic redirect)
-    @GetMapping("/settings")
-    public String settingsRedirect(Authentication auth) {
-        boolean isAdmin = auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        return isAdmin ? "redirect:/account/settings" : "redirect:/settings/profile";
     }
 }

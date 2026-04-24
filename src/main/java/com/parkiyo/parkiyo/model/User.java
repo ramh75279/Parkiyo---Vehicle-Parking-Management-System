@@ -33,6 +33,8 @@ public class User {
 
     private String phone;
 
+    private String profilePicturePath;   // ←←← NEW FIELD
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
