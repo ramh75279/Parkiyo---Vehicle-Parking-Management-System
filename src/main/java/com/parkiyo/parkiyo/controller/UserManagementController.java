@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -26,8 +27,10 @@ public class UserManagementController {
                            @RequestParam(required = false) String status,
                            Model model) {
         model.addAttribute("users", userService.getAllUsers(search, role, status));
-        model.addAttribute("totalUsers", userService.getTotalUserCount());
-        model.addAttribute("activeUsers", userService.getActiveUserCount());
+        model.addAttribute("stats", userService.getUserStats());
+        model.addAttribute("search", search);
+        model.addAttribute("role", role);
+        model.addAttribute("status", status);
         return "admin/usermanagement";
     }
 
@@ -41,7 +44,14 @@ public class UserManagementController {
     // POST /admin/users/create
     @PostMapping("/create")
     public String createUser(@Valid @ModelAttribute CreateUserRequest request,
+                             BindingResult bindingResult,
                              RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("error", bindingResult.getFieldError() != null
+                    ? bindingResult.getFieldError().getDefaultMessage()
+                    : "Unable to create user.");
+            return "redirect:/admin/users/create";
+        }
         try {
             userService.createUser(request);
             redirectAttributes.addFlashAttribute("success",
@@ -64,7 +74,14 @@ public class UserManagementController {
     @PostMapping("/{id}/update")
     public String updateUser(@PathVariable Long id,
                              @Valid @ModelAttribute EditUserRequest request,
+                             BindingResult bindingResult,
                              RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("error", bindingResult.getFieldError() != null
+                    ? bindingResult.getFieldError().getDefaultMessage()
+                    : "Unable to update user.");
+            return "redirect:/admin/users/" + id + "/edit";
+        }
         try {
             userService.updateUser(id, request);
             redirectAttributes.addFlashAttribute("success", "User updated.");
@@ -97,5 +114,16 @@ public class UserManagementController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/admin/users";
+    }
+
+    @PostMapping("/{id}/reset-password")
+    public String resetUserPassword(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            userService.sendPasswordResetForUser(id);
+            redirectAttributes.addFlashAttribute("success", "Password reset link sent.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/users/" + id + "/edit";
     }
 }

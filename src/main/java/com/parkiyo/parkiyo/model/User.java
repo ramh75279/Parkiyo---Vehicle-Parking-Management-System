@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @Entity
 @Table(name = "users")
@@ -52,6 +53,10 @@ public class User {
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean smsNotificationsEnabled = true;
 
+    private String profileImagePath;
+
+    private LocalDateTime lastLoginAt;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Wallet wallet;
 
@@ -72,5 +77,15 @@ public class User {
 
     public String getFullName() {
         return firstName + " " + lastName;
+    }
+
+    public String getInitials() {
+        String firstInitial = firstName != null && !firstName.isBlank()
+                ? firstName.substring(0, 1)
+                : "";
+        String lastInitial = lastName != null && !lastName.isBlank()
+                ? lastName.substring(0, 1)
+                : "";
+        return (firstInitial + lastInitial).toUpperCase(Locale.ROOT);
     }
 }

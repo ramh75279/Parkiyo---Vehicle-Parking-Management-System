@@ -10,9 +10,12 @@ import com.parkiyo.parkiyo.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,8 @@ public class UserService {
     private final WalletRepository walletRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuditLogService auditLogService;
+    private final AuthService authService;
+    private final ProfileImageStorageService profileImageStorageService;
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -53,6 +58,14 @@ public class UserService {
             users = users.stream().filter(u -> u.getStatus() == s).toList();
         }
         return users;
+    }
+
+    public Map<String, Long> getUserStats() {
+        return Map.of(
+                "totalUsers", userRepository.count(),
+                "activeUsers", userRepository.countByStatus(UserStatus.ACTIVE),
+                "adminUsers", userRepository.countByRole(Role.ADMIN)
+        );
     }
 
     @Transactional
@@ -104,11 +117,17 @@ public class UserService {
     }
 
     @Transactional
-    public void updateProfile(String email, ProfileUpdateRequest request) {
+    public void updateProfile(String email, ProfileUpdateRequest request, MultipartFile photo) {
         User user = getUserByEmail(email);
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
-        user.setPhone(request.getPhone());
+        user.setPhone(StringUtils.hasText(request.getPhone()) ? request.getPhone().trim() : null);
+        if (photo != null && !photo.isEmpty()) {
+            String previousImage = user.getProfileImagePath();
+            String storedFilename = profileImageStorageService.store(photo);
+            user.setProfileImagePath(storedFilename);
+            profileImageStorageService.deleteIfExists(previousImage);
+        }
         userRepository.save(user);
     }
 
@@ -143,6 +162,10 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         User user = getUserById(id);
+        if (user.getRole() == Role.ADMIN && userRepository.countByRole(Role.ADMIN) <= 1) {
+            throw new RuntimeException("You cannot delete the last admin account.");
+        }
+        profileImageStorageService.deleteIfExists(user.getProfileImagePath());
         userRepository.deleteById(id);
 
         auditLogService.logAction(
@@ -159,5 +182,15 @@ public class UserService {
 
     public long getActiveUserCount() {
         return userRepository.countByStatus(UserStatus.ACTIVE);
+    }
+
+    public long getAdminUserCount() {
+        return userRepository.countByRole(Role.ADMIN);
+    }
+
+    @Transactional
+    public void sendPasswordResetForUser(Long id) {
+        User user = getUserById(id);
+        authService.sendPasswordResetLink(user.getEmail());
     }
 }

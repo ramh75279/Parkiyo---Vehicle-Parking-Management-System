@@ -126,4 +126,12 @@ public class AuthService implements UserDetailsService {
         String baseUrl = appBaseUrl.endsWith("/") ? appBaseUrl.substring(0, appBaseUrl.length() - 1) : appBaseUrl;
         return baseUrl + "/reset-password?token=" + token;
     }
+
+    @Transactional
+    public void markSuccessfulLogin(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            user.setLastLoginAt(LocalDateTime.now());
+            userRepository.save(user);
+        });
+    }
 }

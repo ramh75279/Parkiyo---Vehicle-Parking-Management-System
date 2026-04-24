@@ -69,6 +69,7 @@ public class SecurityConfig {
                         .passwordParameter("password")
 
                         .successHandler((request, response, authentication) -> {
+                            authService.markSuccessfulLogin(authentication.getName());
                             auditLogService.logAction(
                                     "LOGIN",
                                     authentication.getName(),
