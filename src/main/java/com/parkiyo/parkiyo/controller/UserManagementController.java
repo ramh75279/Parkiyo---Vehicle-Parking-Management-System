@@ -6,6 +6,7 @@ import com.parkiyo.parkiyo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +46,7 @@ public class UserManagementController {
         try {
             userService.createUser(request);
             redirectAttributes.addFlashAttribute("success",
-                    "User " + request.getEmail() + " created.");
+                    "User " + request.getEmail() + " created successfully.");
             return "redirect:/admin/users";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -57,6 +58,11 @@ public class UserManagementController {
     @GetMapping("/{id}/edit")
     public String editUserPage(@PathVariable Long id, Model model) {
         model.addAttribute("user", userService.getUserById(id));
+        // Pass enum values so the template can build the dropdowns
+        model.addAttribute("allRoles",
+                com.parkiyo.parkiyo.enums.Role.values());
+        model.addAttribute("allStatuses",
+                com.parkiyo.parkiyo.enums.UserStatus.values());
         return "admin/edituser";
     }
 
@@ -67,7 +73,7 @@ public class UserManagementController {
                              RedirectAttributes redirectAttributes) {
         try {
             userService.updateUser(id, request);
-            redirectAttributes.addFlashAttribute("success", "User updated.");
+            redirectAttributes.addFlashAttribute("success", "User updated successfully.");
             return "redirect:/admin/users";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -76,10 +82,13 @@ public class UserManagementController {
     }
 
     // POST /admin/users/{id}/toggle-status
+    // Fixed: passes current admin email to prevent self-lockout
     @PostMapping("/{id}/toggle-status")
-    public String toggleUserStatus(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String toggleUserStatus(@PathVariable Long id,
+                                   Authentication auth,
+                                   RedirectAttributes redirectAttributes) {
         try {
-            userService.toggleUserStatus(id);
+            userService.toggleUserStatus(id, auth.getName());
             redirectAttributes.addFlashAttribute("success", "User status updated.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

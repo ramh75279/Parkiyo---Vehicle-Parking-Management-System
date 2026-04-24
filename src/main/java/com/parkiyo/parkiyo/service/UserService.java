@@ -73,15 +73,14 @@ public class UserService {
                 .build();
         userRepository.save(user);
 
-        // Create wallet for every new user
         Wallet wallet = Wallet.builder().user(user).build();
         walletRepository.save(wallet);
 
         auditLogService.logAction(
-            "USER_CREATED",
-            "User",
-            user.getId(),
-            "User account created for " + user.getEmail()
+                "USER_CREATED",
+                "User",
+                user.getId(),
+                "User account created for " + user.getEmail()
         );
     }
 
@@ -96,10 +95,10 @@ public class UserService {
         userRepository.save(user);
 
         auditLogService.logAction(
-            "USER_UPDATED",
-            "User",
-            user.getId(),
-            "User account updated for " + user.getEmail()
+                "USER_UPDATED",
+                "User",
+                user.getId(),
+                "User account updated for " + user.getEmail()
         );
     }
 
@@ -133,24 +132,43 @@ public class UserService {
         userRepository.save(user);
     }
 
+    // Fixed: now takes currentAdminEmail to prevent self-lockout
     @Transactional
-    public void toggleUserStatus(Long id) {
+    public void toggleUserStatus(Long id, String currentAdminEmail) {
         User user = getUserById(id);
+        if (user.getEmail().equalsIgnoreCase(currentAdminEmail)) {
+            throw new RuntimeException("You cannot deactivate your own account.");
+        }
         user.setStatus(user.getStatus() == UserStatus.ACTIVE ? UserStatus.INACTIVE : UserStatus.ACTIVE);
         userRepository.save(user);
+
+        auditLogService.logAction(
+                "USER_STATUS_TOGGLED",
+                "User",
+                user.getId(),
+                "User " + user.getEmail() + " status changed to " + user.getStatus().name()
+        );
     }
 
+    // Fixed: catches FK violations and gives a meaningful error message
     @Transactional
     public void deleteUser(Long id) {
         User user = getUserById(id);
-        userRepository.deleteById(id);
-
-        auditLogService.logAction(
-                "USER_DELETED",
-                "User",
-                id,
-                "User account deleted for " + user.getEmail()
-        );
+        try {
+            userRepository.deleteById(id);
+            auditLogService.logAction(
+                    "USER_DELETED",
+                    "User",
+                    id,
+                    "User account deleted for " + user.getEmail()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "Cannot delete this user because they have existing parking records, " +
+                            "payments, or vehicles linked to their account. " +
+                            "Deactivate the account instead."
+            );
+        }
     }
 
     public long getTotalUserCount() {

@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -39,7 +41,6 @@ public class AuthService implements UserDetailsService {
     @Value("${parkiyo.app-base-url:http://localhost:8080}")
     private String appBaseUrl;
 
-    // Spring Security calls this on every login
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
@@ -78,7 +79,6 @@ public class AuthService implements UserDetailsService {
                 .build();
         userRepository.save(user);
 
-        // Auto-create wallet for every new user
         Wallet wallet = Wallet.builder().user(user).build();
         walletRepository.save(wallet);
     }
@@ -90,7 +90,8 @@ public class AuthService implements UserDetailsService {
             user.setPasswordResetToken(token);
             user.setPasswordResetTokenExpiry(LocalDateTime.now().plusMinutes(RESET_TOKEN_EXPIRY_MINUTES));
             userRepository.save(user);
-            passwordResetDeliveryService.sendResetLink(user.getEmail(), buildResetLink(token));
+            // Now passes email into the reset link so the form can pre-fill it
+            passwordResetDeliveryService.sendResetLink(user.getEmail(), buildResetLink(token, user.getEmail()));
         });
     }
 
@@ -122,8 +123,12 @@ public class AuthService implements UserDetailsService {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    private String buildResetLink(String token) {
-        String baseUrl = appBaseUrl.endsWith("/") ? appBaseUrl.substring(0, appBaseUrl.length() - 1) : appBaseUrl;
-        return baseUrl + "/reset-password?token=" + token;
+    // Fixed: now includes email in the URL so the reset form can pre-fill it
+    private String buildResetLink(String token, String email) {
+        String baseUrl = appBaseUrl.endsWith("/")
+                ? appBaseUrl.substring(0, appBaseUrl.length() - 1)
+                : appBaseUrl;
+        return baseUrl + "/reset-password?token=" + token
+                + "&email=" + URLEncoder.encode(email, StandardCharsets.UTF_8);
     }
 }
