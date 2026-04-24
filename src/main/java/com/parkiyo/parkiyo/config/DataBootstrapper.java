@@ -12,6 +12,7 @@ import com.parkiyo.parkiyo.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ public class DataBootstrapper implements CommandLineRunner {
     private final WalletRepository walletRepository;
     private final ParkingSlotRepository slotRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     @Transactional
@@ -36,6 +38,8 @@ public class DataBootstrapper implements CommandLineRunner {
         if (!properties.isEnabled()) {
             return;
         }
+
+        ensureUsersWalletBalanceHasDefault();
 
         User admin = userRepository.findByEmail(properties.getAdminEmail())
                 .orElseGet(this::createAdminUser);
@@ -81,5 +85,25 @@ public class DataBootstrapper implements CommandLineRunner {
                 .status(SlotStatus.AVAILABLE)
                 .hourlyRate(new BigDecimal(hourlyRate))
                 .build();
+    }
+
+    private void ensureUsersWalletBalanceHasDefault() {
+        Integer hasWalletBalanceColumn = jdbcTemplate.queryForObject(
+                """
+                SELECT COUNT(*)
+                FROM information_schema.columns
+                WHERE table_schema = DATABASE()
+                  AND table_name = 'users'
+                  AND column_name = 'wallet_balance'
+                """,
+                Integer.class
+        );
+
+        if (hasWalletBalanceColumn != null && hasWalletBalanceColumn > 0) {
+            jdbcTemplate.execute("""
+                    ALTER TABLE users
+                    MODIFY COLUMN wallet_balance DECIMAL(10,2) NOT NULL DEFAULT 0.00
+                    """);
+        }
     }
 }
