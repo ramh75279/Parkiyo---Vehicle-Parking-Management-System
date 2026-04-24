@@ -117,12 +117,20 @@
                 <div class="h-8 w-[1px] bg-white/10"></div>
                 <div class="flex items-center gap-4">
                     <div class="text-right">
-                        <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser.fullName}">Alex Johnson</p>
-                        <p class="text-[10px] text-primary font-bold uppercase tracking-tighter" th:text="${currentUser.role}">Admin</p>
+                        <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Alex Johnson'"></p>
+                        <p class="text-[10px] text-primary font-bold uppercase tracking-tighter" th:text="${currentUser?.role} ?: 'ADMIN'"></p>
                     </div>
-                    <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
+                    <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-primary to-blue-400 p-[2px] overflow-hidden">
                         <div class="h-full w-full rounded-squircle bg-background-dark flex items-center justify-center overflow-hidden">
-                            <span class="material-symbols-outlined text-white/50">person</span>
+                            <!-- Profile Picture -->
+                            <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
+                                 th:src="@{${currentUser.profilePicturePath}}"
+                                 class="h-full w-full object-cover"
+                                 alt="Profile"
+                                 onerror="this.style.display='none'; this.parentElement.innerHTML = '<span class=\'material-symbols-outlined text-white/50\'>person</span>'"/>
+                            <!-- Default Icon -->
+                            <span th:unless="${currentUser != null and currentUser.profilePicturePath != null}"
+                                  class="material-symbols-outlined text-white/50">person</span>
                         </div>
                     </div>
                 </div>
