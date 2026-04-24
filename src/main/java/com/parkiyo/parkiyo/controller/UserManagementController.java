@@ -2,10 +2,13 @@ package com.parkiyo.parkiyo.controller;
 
 import com.parkiyo.parkiyo.dto.CreateUserRequest;
 import com.parkiyo.parkiyo.dto.EditUserRequest;
+import com.parkiyo.parkiyo.enums.Role;
+import com.parkiyo.parkiyo.enums.UserStatus;
 import com.parkiyo.parkiyo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,10 +30,9 @@ public class UserManagementController {
                            @RequestParam(required = false) String status,
                            Model model) {
         model.addAttribute("users", userService.getAllUsers(search, role, status));
-        model.addAttribute("stats", userService.getUserStats());
-        model.addAttribute("search", search);
-        model.addAttribute("role", role);
-        model.addAttribute("status", status);
+        model.addAttribute("totalUsers", userService.getTotalUserCount());
+        model.addAttribute("activeUsers", userService.getActiveUserCount());
+        model.addAttribute("adminUsers", userService.getRoleCount(Role.ADMIN));
         return "admin/usermanagement";
     }
 
@@ -38,17 +40,18 @@ public class UserManagementController {
     @GetMapping("/create")
     public String createUserPage(Model model) {
         model.addAttribute("createUserRequest", new CreateUserRequest());
+        model.addAttribute("allRoles", Role.values());
         return "admin/createuser";
     }
 
     // POST /admin/users/create
     @PostMapping("/create")
     public String createUser(@Valid @ModelAttribute CreateUserRequest request,
-                             BindingResult bindingResult,
+                             BindingResult result,
                              RedirectAttributes redirectAttributes) {
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("error", bindingResult.getFieldError() != null
-                    ? bindingResult.getFieldError().getDefaultMessage()
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("error", result.getFieldError() != null
+                    ? result.getFieldError().getDefaultMessage()
                     : "Unable to create user.");
             return "redirect:/admin/users/create";
         }
@@ -67,6 +70,8 @@ public class UserManagementController {
     @GetMapping("/{id}/edit")
     public String editUserPage(@PathVariable Long id, Model model) {
         model.addAttribute("user", userService.getUserById(id));
+        model.addAttribute("allRoles", Role.values());
+        model.addAttribute("allStatuses", UserStatus.values());
         return "admin/edituser";
     }
 
@@ -74,11 +79,11 @@ public class UserManagementController {
     @PostMapping("/{id}/update")
     public String updateUser(@PathVariable Long id,
                              @Valid @ModelAttribute EditUserRequest request,
-                             BindingResult bindingResult,
+                             BindingResult result,
                              RedirectAttributes redirectAttributes) {
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("error", bindingResult.getFieldError() != null
-                    ? bindingResult.getFieldError().getDefaultMessage()
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("error", result.getFieldError() != null
+                    ? result.getFieldError().getDefaultMessage()
                     : "Unable to update user.");
             return "redirect:/admin/users/" + id + "/edit";
         }
@@ -94,9 +99,11 @@ public class UserManagementController {
 
     // POST /admin/users/{id}/toggle-status
     @PostMapping("/{id}/toggle-status")
-    public String toggleUserStatus(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String toggleUserStatus(@PathVariable Long id,
+                                   Authentication auth,
+                                   RedirectAttributes redirectAttributes) {
         try {
-            userService.toggleUserStatus(id);
+            userService.toggleUserStatus(id, auth.getName());
             redirectAttributes.addFlashAttribute("success", "User status updated.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

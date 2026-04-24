@@ -34,6 +34,8 @@ public class User {
 
     private String phone;
 
+    private String profilePicturePath;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -52,8 +54,6 @@ public class User {
     @Builder.Default
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean smsNotificationsEnabled = true;
-
-    private String profileImagePath;
 
     private LocalDateTime lastLoginAt;
 
@@ -80,12 +80,8 @@ public class User {
     }
 
     public String getInitials() {
-        String firstInitial = firstName != null && !firstName.isBlank()
-                ? firstName.substring(0, 1)
-                : "";
-        String lastInitial = lastName != null && !lastName.isBlank()
-                ? lastName.substring(0, 1)
-                : "";
+        String firstInitial = firstName != null && !firstName.isBlank() ? firstName.substring(0, 1) : "";
+        String lastInitial = lastName != null && !lastName.isBlank() ? lastName.substring(0, 1) : "";
         return (firstInitial + lastInitial).toUpperCase(Locale.ROOT);
     }
 }

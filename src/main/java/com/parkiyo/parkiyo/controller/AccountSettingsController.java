@@ -10,7 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -28,28 +27,34 @@ public class AccountSettingsController {
     @GetMapping("/account/settings")
     public String adminSettings(Authentication auth, Model model) {
         model.addAttribute("user", userService.getUserByEmail(auth.getName()));
-        model.addAttribute("notificationPreferenceRequest", new NotificationPreferenceRequest());
         return "account/accountsetting";
     }
 
     // POST /account/settings/profile  (admin)
     @PostMapping("/account/settings/profile")
     public String updateAdminProfile(@Valid @ModelAttribute ProfileUpdateRequest request,
-                                     BindingResult bindingResult,
-                                     @RequestParam(value = "photo", required = false) MultipartFile photo,
                                      Authentication auth,
                                      RedirectAttributes redirectAttributes) {
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("error", bindingResult.getFieldError() != null
-                    ? bindingResult.getFieldError().getDefaultMessage()
-                    : "Profile update failed.");
-            return "redirect:/account/settings";
-        }
         try {
-            userService.updateProfile(auth.getName(), request, photo);
-            redirectAttributes.addFlashAttribute("success", "Profile updated.");
+            userService.updateProfileWithPhoto(auth.getName(), request);
+            redirectAttributes.addFlashAttribute("success", "Profile updated successfully.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/account/settings";
+    }
+
+    @PostMapping("/account/settings/photo")
+    public String uploadPhotoOnly(@RequestParam("photo") MultipartFile photo,
+                                  Authentication auth,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            ProfileUpdateRequest request = new ProfileUpdateRequest();
+            request.setProfilePicture(photo);
+            userService.updateProfileWithPhoto(auth.getName(), request);
+            redirectAttributes.addFlashAttribute("success", "Profile photo updated.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to upload photo: " + e.getMessage());
         }
         return "redirect:/account/settings";
     }
@@ -89,28 +94,34 @@ public class AccountSettingsController {
     @GetMapping("/settings/profile")
     public String userSettings(Authentication auth, Model model) {
         model.addAttribute("user", userService.getUserByEmail(auth.getName()));
-        model.addAttribute("notificationPreferenceRequest", new NotificationPreferenceRequest());
         return "account/accountsetting-user";
     }
 
     // POST /settings/profile  (user)
     @PostMapping("/settings/profile")
     public String updateUserProfile(@Valid @ModelAttribute ProfileUpdateRequest request,
-                                    BindingResult bindingResult,
-                                    @RequestParam(value = "photo", required = false) MultipartFile photo,
                                     Authentication auth,
                                     RedirectAttributes redirectAttributes) {
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("error", bindingResult.getFieldError() != null
-                    ? bindingResult.getFieldError().getDefaultMessage()
-                    : "Profile update failed.");
-            return "redirect:/settings/profile";
-        }
         try {
-            userService.updateProfile(auth.getName(), request, photo);
+            userService.updateProfileWithPhoto(auth.getName(), request);
             redirectAttributes.addFlashAttribute("success", "Profile updated.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/settings/profile";
+    }
+
+    @PostMapping("/settings/photo")
+    public String uploadUserPhotoOnly(@RequestParam("photo") MultipartFile photo,
+                                      Authentication auth,
+                                      RedirectAttributes redirectAttributes) {
+        try {
+            ProfileUpdateRequest request = new ProfileUpdateRequest();
+            request.setProfilePicture(photo);
+            userService.updateProfileWithPhoto(auth.getName(), request);
+            redirectAttributes.addFlashAttribute("success", "Profile photo updated.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to upload photo: " + e.getMessage());
         }
         return "redirect:/settings/profile";
     }

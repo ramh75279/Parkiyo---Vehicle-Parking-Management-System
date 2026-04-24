@@ -3,6 +3,7 @@ package com.parkiyo.parkiyo.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter @Setter
 public class ProfileUpdateRequest {
@@ -13,4 +14,6 @@ public class ProfileUpdateRequest {
     private String lastName;
 
     private String phone;
+
+    private MultipartFile profilePicture;
 }
