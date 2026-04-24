@@ -34,7 +34,7 @@ public class Notification {
     private String actionUrl;
 
     @Builder.Default
-    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Column(name = "is_read", nullable = false, columnDefinition = "boolean default false")
     private boolean read = false;
 
     private LocalDateTime readAt;

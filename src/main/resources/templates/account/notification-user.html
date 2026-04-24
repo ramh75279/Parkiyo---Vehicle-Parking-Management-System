@@ -32,7 +32,7 @@
                           th:classappend="${n.read} ? ' bg-slate-500/10 border-slate-500/20 text-slate-300' : ' bg-emerald-500/10 border-emerald-500/20 text-emerald-300'"
                           th:text="${n.read} ? 'READ' : 'UNREAD'">UNREAD</span>
                 </div>
-                <span class="text-xs text-slate-500" th:text="${#temporals.format(n.createdAt, 'yyyy-MM-dd HH:mm')}">-</span>
+                <span class="text-xs text-slate-500" th:text="${n.createdAt != null ? #temporals.format(n.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">-</span>
             </div>
             <h3 class="font-bold mt-2" th:text="${n.title}">Notification title</h3>
             <p class="text-sm text-slate-300 mt-1" th:text="${n.message}">Notification message</p>

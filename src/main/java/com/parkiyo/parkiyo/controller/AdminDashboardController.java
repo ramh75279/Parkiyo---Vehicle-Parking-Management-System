@@ -26,6 +26,8 @@ public class AdminDashboardController {
         model.addAttribute("recentEntries", dashboardService.getRecentEntries(10));
         model.addAttribute("recentPayments", dashboardService.getRecentPayments(5));
         model.addAttribute("slotSummary", dashboardService.getSlotOccupancySummary());
+        model.addAttribute("adminNotifications", dashboardService.getAdminRecentNotifications(12));
+        model.addAttribute("adminUnreadCount", dashboardService.getAdminUnreadNotificationCount());
         model.addAttribute("currentUser", userService.getUserByEmail(auth.getName())); // ADD THIS LINE
         return "dashboard/dashboard-admin";
     }

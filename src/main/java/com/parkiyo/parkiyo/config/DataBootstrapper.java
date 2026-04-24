@@ -14,7 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+<<<<<<< HEAD
 import org.springframework.context.event.EventListener;
+=======
+import org.springframework.jdbc.core.JdbcTemplate;
+>>>>>>> ad05a9c0b3e692785b11ded84200b636e322d444
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +37,7 @@ public class DataBootstrapper {
     private final WalletRepository walletRepository;
     private final ParkingSlotRepository slotRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JdbcTemplate jdbcTemplate;
 
     @Value("${parkiyo.bootstrap.enabled:false}")
     private boolean bootstrapEnabled;
@@ -46,7 +51,14 @@ public class DataBootstrapper {
             return;
         }
 
+<<<<<<< HEAD
         log.info("🌱 Bootstrap enabled - Seeding initial data...");
+=======
+        ensureUsersWalletBalanceHasDefault();
+
+        User admin = userRepository.findByEmail(properties.getAdminEmail())
+                .orElseGet(this::createAdminUser);
+>>>>>>> ad05a9c0b3e692785b11ded84200b636e322d444
 
         try {
             // Create Admin User if not exists
@@ -106,4 +118,28 @@ public class DataBootstrapper {
                 .hourlyRate(new BigDecimal(hourlyRate))
                 .build();
     }
+<<<<<<< HEAD
 }
+=======
+
+    private void ensureUsersWalletBalanceHasDefault() {
+        Integer hasWalletBalanceColumn = jdbcTemplate.queryForObject(
+                """
+                SELECT COUNT(*)
+                FROM information_schema.columns
+                WHERE table_schema = DATABASE()
+                  AND table_name = 'users'
+                  AND column_name = 'wallet_balance'
+                """,
+                Integer.class
+        );
+
+        if (hasWalletBalanceColumn != null && hasWalletBalanceColumn > 0) {
+            jdbcTemplate.execute("""
+                    ALTER TABLE users
+                    MODIFY COLUMN wallet_balance DECIMAL(10,2) NOT NULL DEFAULT 0.00
+                    """);
+        }
+    }
+}
+>>>>>>> ad05a9c0b3e692785b11ded84200b636e322d444
