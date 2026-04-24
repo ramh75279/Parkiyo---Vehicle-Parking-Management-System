@@ -2,6 +2,8 @@ package com.parkiyo.parkiyo.controller;
 
 import com.parkiyo.parkiyo.dto.CreateUserRequest;
 import com.parkiyo.parkiyo.dto.EditUserRequest;
+import com.parkiyo.parkiyo.enums.Role;
+import com.parkiyo.parkiyo.service.AuthService;
 import com.parkiyo.parkiyo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,23 +21,29 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class UserManagementController {
 
     private final UserService userService;
+    private final AuthService authService;
 
     // GET /admin/users
     @GetMapping
     public String userList(@RequestParam(required = false) String search,
                            @RequestParam(required = false) String role,
                            @RequestParam(required = false) String status,
+                           Authentication auth,
                            Model model) {
         model.addAttribute("users", userService.getAllUsers(search, role, status));
         model.addAttribute("totalUsers", userService.getTotalUserCount());
         model.addAttribute("activeUsers", userService.getActiveUserCount());
+        model.addAttribute("adminUsers", userService.getRoleCount(Role.ADMIN));
+        model.addAttribute("currentUser", userService.getUserByEmail(auth.getName()));
         return "admin/usermanagement";
     }
 
     // GET /admin/users/create
     @GetMapping("/create")
-    public String createUserPage(Model model) {
+    public String createUserPage(Authentication auth, Model model) {
         model.addAttribute("createUserRequest", new CreateUserRequest());
+        model.addAttribute("allRoles", Role.values());
+        model.addAttribute("currentUser", userService.getUserByEmail(auth.getName()));
         return "admin/createuser";
     }
 
@@ -56,13 +64,12 @@ public class UserManagementController {
 
     // GET /admin/users/{id}/edit
     @GetMapping("/{id}/edit")
-    public String editUserPage(@PathVariable Long id, Model model) {
+    public String editUserPage(@PathVariable Long id, Authentication auth, Model model) {
         model.addAttribute("user", userService.getUserById(id));
-        // Pass enum values so the template can build the dropdowns
-        model.addAttribute("allRoles",
-                com.parkiyo.parkiyo.enums.Role.values());
+        model.addAttribute("allRoles", Role.values());
         model.addAttribute("allStatuses",
                 com.parkiyo.parkiyo.enums.UserStatus.values());
+        model.addAttribute("currentUser", userService.getUserByEmail(auth.getName()));
         return "admin/edituser";
     }
 
@@ -106,5 +113,18 @@ public class UserManagementController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/admin/users";
+    }
+
+    @PostMapping("/{id}/reset-password")
+    public String adminResetUserPassword(@PathVariable Long id,
+                                         RedirectAttributes redirectAttributes) {
+        try {
+            String userEmail = userService.getUserById(id).getEmail();
+            authService.sendPasswordResetLink(userEmail);
+            redirectAttributes.addFlashAttribute("success", "Password reset link generated for " + userEmail + ".");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/users/" + id + "/edit";
     }
 }

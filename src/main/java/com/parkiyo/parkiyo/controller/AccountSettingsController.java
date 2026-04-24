@@ -94,6 +94,11 @@ public class AccountSettingsController {
         return "account/accountsetting-user";
     }
 
+    @GetMapping("/settings")
+    public String userSettingsShortcut() {
+        return "redirect:/settings/profile";
+    }
+
     @PostMapping("/settings/profile")
     public String updateUserProfile(@Valid @ModelAttribute ProfileUpdateRequest request,
                                     Authentication auth,
@@ -101,6 +106,47 @@ public class AccountSettingsController {
         try {
             userService.updateProfileWithPhoto(auth.getName(), request);
             redirectAttributes.addFlashAttribute("success", "Profile updated.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/settings/profile";
+    }
+
+    @PostMapping("/settings/photo")
+    public String uploadUserPhotoOnly(@RequestParam("photo") MultipartFile photo,
+                                      Authentication auth,
+                                      RedirectAttributes redirectAttributes) {
+        try {
+            ProfileUpdateRequest request = new ProfileUpdateRequest();
+            request.setProfilePicture(photo);
+            userService.updateProfileWithPhoto(auth.getName(), request);
+            redirectAttributes.addFlashAttribute("success", "Profile photo updated.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to upload photo: " + e.getMessage());
+        }
+        return "redirect:/settings/profile";
+    }
+
+    @PostMapping("/settings/password")
+    public String changeUserPassword(@Valid @ModelAttribute PasswordChangeRequest request,
+                                     Authentication auth,
+                                     RedirectAttributes redirectAttributes) {
+        try {
+            userService.changePassword(auth.getName(), request);
+            redirectAttributes.addFlashAttribute("success", "Password changed successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/settings/profile";
+    }
+
+    @PostMapping("/settings/notifications")
+    public String updateUserNotificationPrefs(@ModelAttribute NotificationPreferenceRequest request,
+                                              Authentication auth,
+                                              RedirectAttributes redirectAttributes) {
+        try {
+            userService.updateNotificationPreferences(auth.getName(), request);
+            redirectAttributes.addFlashAttribute("success", "Notification preferences saved.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }

@@ -28,6 +28,7 @@ public class UserDashboardController {
         model.addAttribute("currentUser", userService.getUserByEmail(email)); // added
         model.addAttribute("recentParking", dashboardService.getUserRecentParking(email, 5));
         model.addAttribute("activeReservation", dashboardService.getUserActiveReservation(email));
+        model.addAttribute("slotSummary", dashboardService.getSlotOccupancySummary());
         model.addAttribute("walletBalance", walletService.getBalance(email));
         model.addAttribute("pendingPayments", dashboardService.getUserPendingPayments(email));
         return "dashboard/dashboard-user";

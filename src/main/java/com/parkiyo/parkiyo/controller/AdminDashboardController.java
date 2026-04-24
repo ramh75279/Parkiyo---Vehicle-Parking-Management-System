@@ -49,4 +49,9 @@ public class AdminDashboardController {
     public String adminSettings() {
         return "redirect:/account/settings";
     }
+
+    @GetMapping("/account-settings")
+    public String adminAccountSettings() {
+        return "redirect:/account/settings";
+    }
 }

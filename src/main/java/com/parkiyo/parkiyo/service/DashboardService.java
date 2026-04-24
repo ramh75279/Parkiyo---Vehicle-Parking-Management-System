@@ -71,7 +71,14 @@ public class DashboardService {
     }
 
     public List<Notification> getAdminNotifications() {
-        return notificationRepository.findAll();
+        return notificationRepository.findAll().stream()
+                .sorted((a, b) -> {
+                    if (a.getCreatedAt() == null && b.getCreatedAt() == null) return 0;
+                    if (a.getCreatedAt() == null) return 1;
+                    if (b.getCreatedAt() == null) return -1;
+                    return b.getCreatedAt().compareTo(a.getCreatedAt());
+                })
+                .toList();
     }
 
     // ─── User dashboard ─────────────────────────────────────────────────────

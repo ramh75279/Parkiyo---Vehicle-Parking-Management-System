@@ -1,6 +1,10 @@
 package com.parkiyo.parkiyo.service;
 
-import com.parkiyo.parkiyo.dto.*;
+import com.parkiyo.parkiyo.dto.CreateUserRequest;
+import com.parkiyo.parkiyo.dto.EditUserRequest;
+import com.parkiyo.parkiyo.dto.NotificationPreferenceRequest;
+import com.parkiyo.parkiyo.dto.PasswordChangeRequest;
+import com.parkiyo.parkiyo.dto.ProfileUpdateRequest;
 import com.parkiyo.parkiyo.enums.Role;
 import com.parkiyo.parkiyo.enums.UserStatus;
 import com.parkiyo.parkiyo.model.User;
@@ -17,7 +21,9 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -42,21 +48,32 @@ public class UserService {
         List<User> users = userRepository.findAll();
 
         if (search != null && !search.isBlank()) {
-            String q = search.toLowerCase();
+            String q = search.toLowerCase(Locale.ROOT);
             users = users.stream()
-                    .filter(u -> u.getFirstName().toLowerCase().contains(q)
-                            || u.getLastName().toLowerCase().contains(q)
-                            || u.getEmail().toLowerCase().contains(q))
+                    .filter(u -> u.getFirstName().toLowerCase(Locale.ROOT).contains(q)
+                            || u.getLastName().toLowerCase(Locale.ROOT).contains(q)
+                            || u.getEmail().toLowerCase(Locale.ROOT).contains(q))
                     .toList();
         }
+
         if (role != null && !role.isBlank()) {
-            Role r = Role.valueOf(role.toUpperCase());
-            users = users.stream().filter(u -> u.getRole() == r).toList();
+            try {
+                Role r = Role.valueOf(role.trim().toUpperCase(Locale.ROOT));
+                users = users.stream().filter(u -> u.getRole() == r).toList();
+            } catch (IllegalArgumentException ignored) {
+                return List.of();
+            }
         }
+
         if (status != null && !status.isBlank()) {
-            UserStatus s = UserStatus.valueOf(status.toUpperCase());
-            users = users.stream().filter(u -> u.getStatus() == s).toList();
+            try {
+                UserStatus s = UserStatus.valueOf(status.trim().toUpperCase(Locale.ROOT));
+                users = users.stream().filter(u -> u.getStatus() == s).toList();
+            } catch (IllegalArgumentException ignored) {
+                return List.of();
+            }
         }
+
         return users;
     }
 
@@ -65,6 +82,7 @@ public class UserService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already in use: " + request.getEmail());
         }
+
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
@@ -111,14 +129,17 @@ public class UserService {
     public void updateProfileWithPhoto(String email, ProfileUpdateRequest request) {
         User user = getUserByEmail(email);
 
-        if (request.getFirstName() != null && !request.getFirstName().isBlank())
+        if (request.getFirstName() != null && !request.getFirstName().isBlank()) {
             user.setFirstName(request.getFirstName());
+        }
 
-        if (request.getLastName() != null && !request.getLastName().isBlank())
+        if (request.getLastName() != null && !request.getLastName().isBlank()) {
             user.setLastName(request.getLastName());
+        }
 
-        if (request.getPhone() != null && !request.getPhone().isBlank())
+        if (request.getPhone() != null && !request.getPhone().isBlank()) {
             user.setPhone(request.getPhone());
+        }
 
         if (request.getProfilePicture() != null && !request.getProfilePicture().isEmpty()) {
             String filePath = saveProfilePicture(request.getProfilePicture(), user.getId());
@@ -128,7 +149,6 @@ public class UserService {
             }
 
             user.setProfilePicturePath(filePath);
-            System.out.println("✅ Profile picture path updated in DB: " + filePath);
         }
 
         userRepository.save(user);
@@ -136,48 +156,41 @@ public class UserService {
 
     private String saveProfilePicture(MultipartFile file, Long userId) {
         try {
-            String projectRoot = System.getProperty("user.dir");
-            // Most reliable path construction
-            String staticDir = projectRoot + File.separator + "src" + File.separator + "main"
-                    + File.separator + "resources" + File.separator + "static"
-                    + File.separator + "uploads" + File.separator + "profile-pics";
-
-            Path uploadPath = Paths.get(staticDir);
-            System.out.println("📍 Attempting to save in: " + uploadPath.toAbsolutePath());
-
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-                System.out.println("✅ Directory created successfully");
+            String originalName = file.getOriginalFilename();
+            if (originalName == null || originalName.isBlank() || !originalName.contains(".")) {
+                throw new RuntimeException("Invalid image file.");
             }
 
-            String originalName = file.getOriginalFilename();
-            String extension = originalName.substring(originalName.lastIndexOf(".")).toLowerCase();
+            String extension = originalName.substring(originalName.lastIndexOf(".")).toLowerCase(Locale.ROOT);
+            List<String> allowedExtensions = List.of(".jpg", ".jpeg", ".png", ".webp");
+            if (!allowedExtensions.contains(extension)) {
+                throw new RuntimeException("Profile picture must be JPG, JPEG, PNG, or WEBP.");
+            }
+
+            String projectRoot = System.getProperty("user.dir");
+            Path uploadPath = Paths.get(projectRoot, "uploads", "profile-pics");
+            Files.createDirectories(uploadPath);
+
             String newFileName = userId + "-" + System.currentTimeMillis() + extension;
-
             Path filePath = uploadPath.resolve(newFileName);
-            System.out.println("💾 Saving file to: " + filePath.toAbsolutePath());
-
-            file.transferTo(filePath.toFile());
-
-            System.out.println("🎉 SUCCESS! Photo saved: " + filePath.toAbsolutePath());
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
             return "/uploads/profile-pics/" + newFileName;
-
         } catch (Exception e) {
-            System.err.println("❌ FAILED to save photo: " + e.getClass().getSimpleName());
-            e.printStackTrace();
             throw new RuntimeException("Failed to save profile picture: " + e.getMessage());
         }
     }
 
     private void deleteOldProfilePicture(String oldPath) {
-        if (oldPath == null || !oldPath.startsWith("/uploads")) return;
+        if (oldPath == null || !oldPath.startsWith("/uploads")) {
+            return;
+        }
         try {
             String projectRoot = System.getProperty("user.dir");
-            String fullPath = projectRoot + "/src/main/resources/static" + oldPath;
+            String fullPath = projectRoot + oldPath.replace("/", File.separator);
             Files.deleteIfExists(Paths.get(fullPath));
-            System.out.println("🗑️ Deleted old photo");
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     @Transactional
@@ -244,5 +257,9 @@ public class UserService {
 
     public long getActiveUserCount() {
         return userRepository.countByStatus(UserStatus.ACTIVE);
+    }
+
+    public long getRoleCount(Role role) {
+        return userRepository.countByRole(role);
     }
 }
