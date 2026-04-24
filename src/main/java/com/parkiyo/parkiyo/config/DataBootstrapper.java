@@ -10,8 +10,11 @@ import com.parkiyo.parkiyo.repository.ParkingSlotRepository;
 import com.parkiyo.parkiyo.repository.UserRepository;
 import com.parkiyo.parkiyo.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +25,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @EnableConfigurationProperties(ParkiyoBootstrapProperties.class)
-public class DataBootstrapper implements CommandLineRunner {
+@Slf4j
+public class DataBootstrapper {
 
     private final ParkiyoBootstrapProperties properties;
     private final UserRepository userRepository;
@@ -30,21 +34,38 @@ public class DataBootstrapper implements CommandLineRunner {
     private final ParkingSlotRepository slotRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Override
+    @Value("${parkiyo.bootstrap.enabled:false}")
+    private boolean bootstrapEnabled;
+
+    @EventListener(ApplicationReadyEvent.class)
     @Transactional
-    public void run(String... args) {
-        if (!properties.isEnabled()) {
+    public void onApplicationReady() {
+        // Respect both property sources for flexibility
+        if (!bootstrapEnabled || !properties.isEnabled()) {
+            log.info("🚫 Bootstrap disabled - Running in REAL production mode");
             return;
         }
 
-        User admin = userRepository.findByEmail(properties.getAdminEmail())
-                .orElseGet(this::createAdminUser);
+        log.info("🌱 Bootstrap enabled - Seeding initial data...");
 
-        walletRepository.findByUserEmail(admin.getEmail())
-                .orElseGet(() -> walletRepository.save(Wallet.builder().user(admin).build()));
+        try {
+            // Create Admin User if not exists
+            User admin = userRepository.findByEmail(properties.getAdminEmail())
+                    .orElseGet(this::createAdminUser);
 
-        if (properties.isDemoSlotsEnabled() && slotRepository.count() == 0) {
-            seedSlots();
+            // Create Wallet for Admin
+            walletRepository.findByUserEmail(admin.getEmail())
+                    .orElseGet(() -> walletRepository.save(Wallet.builder().user(admin).build()));
+
+            // Seed Demo Slots (only if enabled and no slots exist)
+            if (properties.isDemoSlotsEnabled() && slotRepository.count() == 0) {
+                seedSlots();
+            }
+
+            log.info("✅ Bootstrap completed successfully!");
+
+        } catch (Exception e) {
+            log.error("❌ Bootstrap failed", e);
         }
     }
 
@@ -59,7 +80,9 @@ public class DataBootstrapper implements CommandLineRunner {
                 .emailNotificationsEnabled(true)
                 .smsNotificationsEnabled(true)
                 .build();
-        return userRepository.save(admin);
+        User saved = userRepository.save(admin);
+        log.info("👤 Admin user created: {}", saved.getEmail());
+        return saved;
     }
 
     private void seedSlots() {
@@ -72,6 +95,7 @@ public class DataBootstrapper implements CommandLineRunner {
                 slot("EV-001", "EV Charging", "500.00")
         );
         slotRepository.saveAll(slots);
+        log.info("🅿️ {} Demo parking slots seeded", slots.size());
     }
 
     private ParkingSlot slot(String slotNumber, String zone, String hourlyRate) {
