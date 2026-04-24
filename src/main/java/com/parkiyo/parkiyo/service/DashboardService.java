@@ -81,6 +81,14 @@ public class DashboardService {
                 .toList();
     }
 
+    public List<Notification> getAdminRecentNotifications(int limit) {
+        return getAdminNotifications().stream().limit(limit).toList();
+    }
+
+    public long getAdminUnreadNotificationCount() {
+        return notificationRepository.findAll().stream().filter(n -> !n.isRead()).count();
+    }
+
     // ─── User dashboard ─────────────────────────────────────────────────────
 
     public List<ParkingRecord> getUserRecentParking(String email, int limit) {

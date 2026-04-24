@@ -270,7 +270,9 @@
     <div class="flex items-center justify-between px-6 py-5 border-b border-white/5">
         <div>
             <h3 class="text-base font-black text-white">Notifications</h3>
-            <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-0.5">3 unread</p>
+            <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-0.5">
+                <span th:text="${adminUnreadCount}">0</span> unread
+            </p>
         </div>
         <div class="flex items-center gap-2">
             <button onclick="markAllRead()" class="text-[10px] font-black uppercase tracking-widest text-primary hover:brightness-125 transition-all">Mark all read</button>
@@ -285,52 +287,36 @@
         <button onclick="switchTab('system')" id="tabSystem" class="pb-3 pt-3 text-xs font-black uppercase tracking-widest text-slate-500 border-b-2 border-transparent hover:text-white transition-all">System</button>
     </div>
     <div class="flex-1 overflow-y-auto py-3" id="notifList">
-        <div class="notif-item unread px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4" data-type="unread">
-            <div class="h-10 w-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-rose-400 text-lg">error</span></div>
-            <div class="flex-1">
-                <div class="flex items-start justify-between gap-2"><p class="text-sm font-black text-white leading-tight">Slot B-12 offline</p><span class="h-2 w-2 bg-primary rounded-full shrink-0 mt-1.5 notif-dot"></span></div>
-                <p class="text-xs text-slate-400 font-bold mt-1">Sensor fault detected on slot B-12. Maintenance required.</p>
-                <p class="text-[10px] text-slate-600 font-bold mt-2">2 min ago</p>
-            </div>
+        <div th:if="${#lists.isEmpty(adminNotifications)}" class="px-6 py-8 text-sm text-slate-500">
+            No notifications available.
         </div>
-        <div class="notif-item unread px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4" data-type="unread">
-            <div class="h-10 w-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-emerald-400 text-lg">payments</span></div>
-            <div class="flex-1">
-                <div class="flex items-start justify-between gap-2"><p class="text-sm font-black text-white leading-tight">Payment received</p><span class="h-2 w-2 bg-primary rounded-full shrink-0 mt-1.5 notif-dot"></span></div>
-                <p class="text-xs text-slate-400 font-bold mt-1">$16.50 collected from XYZ-8899 via Parkiyo Wallet.</p>
-                <p class="text-[10px] text-slate-600 font-bold mt-2">14 min ago</p>
+        <div th:each="n : ${adminNotifications}"
+             class="notif-item px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4"
+             th:classappend="${n.read} ? ' read opacity-60' : ' unread'"
+             th:attr="data-type=${!n.read} ? 'unread' : (${n.type.name() == 'SYSTEM'} ? 'system' : 'all')">
+            <div class="h-10 w-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+                 th:classappend="${n.type.name() == 'SYSTEM'} ? ' bg-primary/10 border border-primary/20' :
+                                 (${n.type.name() == 'PAYMENT'} ? ' bg-emerald-500/10 border border-emerald-500/20' :
+                                 (${n.type.name() == 'ENTRY' or n.type.name() == 'EXIT'} ? ' bg-amber-500/10 border border-amber-500/20' :
+                                 ' bg-violet-500/10 border border-violet-500/20'))">
+                <span class="material-symbols-outlined text-lg"
+                      th:classappend="${n.type.name() == 'SYSTEM'} ? ' text-primary' :
+                                      (${n.type.name() == 'PAYMENT'} ? ' text-emerald-400' :
+                                      (${n.type.name() == 'ENTRY' or n.type.name() == 'EXIT'} ? ' text-amber-400' :
+                                      ' text-violet-400'))"
+                      th:text="${n.type.name() == 'SYSTEM'} ? 'system_update' :
+                               (${n.type.name() == 'PAYMENT'} ? 'payments' :
+                               (${n.type.name() == 'ENTRY'} ? 'login' :
+                               (${n.type.name() == 'EXIT'} ? 'logout' : 'notifications')))">notifications</span>
             </div>
-        </div>
-        <div class="notif-item unread px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4" data-type="unread">
-            <div class="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-amber-400 text-lg">local_parking</span></div>
             <div class="flex-1">
-                <div class="flex items-start justify-between gap-2"><p class="text-sm font-black text-white leading-tight">Occupancy at 92%</p><span class="h-2 w-2 bg-primary rounded-full shrink-0 mt-1.5 notif-dot"></span></div>
-                <p class="text-xs text-slate-400 font-bold mt-1">Only 8 slots remaining across all zones. Consider opening overflow.</p>
-                <p class="text-[10px] text-slate-600 font-bold mt-2">31 min ago</p>
-            </div>
-        </div>
-        <div class="notif-item read px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4 opacity-60" data-type="system">
-            <div class="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-primary text-lg">system_update</span></div>
-            <div class="flex-1">
-                <p class="text-sm font-black text-white leading-tight">System update scheduled</p>
-                <p class="text-xs text-slate-400 font-bold mt-1">Maintenance window: 2:00–3:00 AM on 12 Mar 2026. Brief downtime expected.</p>
-                <p class="text-[10px] text-slate-600 font-bold mt-2">2 hours ago</p>
-            </div>
-        </div>
-        <div class="notif-item read px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4 opacity-60" data-type="system">
-            <div class="h-10 w-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-violet-400 text-lg">person_add</span></div>
-            <div class="flex-1">
-                <p class="text-sm font-black text-white leading-tight">New user registered</p>
-                <p class="text-xs text-slate-400 font-bold mt-1">Saman Kumara joined as Operator. Awaiting role assignment.</p>
-                <p class="text-[10px] text-slate-600 font-bold mt-2">Yesterday</p>
-            </div>
-        </div>
-        <div class="notif-item read px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4 opacity-60" data-type="unread">
-            <div class="h-10 w-10 rounded-xl bg-slate-700/30 border border-white/10 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-slate-400 text-lg">receipt_long</span></div>
-            <div class="flex-1">
-                <p class="text-sm font-black text-white leading-tight">Daily report ready</p>
-                <p class="text-xs text-slate-400 font-bold mt-1">9 Mar 2026 revenue report has been generated.</p>
-                <p class="text-[10px] text-slate-600 font-bold mt-2">Yesterday</p>
+                <div class="flex items-start justify-between gap-2">
+                    <p class="text-sm font-black text-white leading-tight" th:text="${n.title}">Notification</p>
+                    <span th:unless="${n.read}" class="h-2 w-2 bg-primary rounded-full shrink-0 mt-1.5 notif-dot"></span>
+                </div>
+                <p class="text-xs text-slate-400 font-bold mt-1" th:text="${n.message}">Notification details</p>
+                <p class="text-[10px] text-slate-600 font-bold mt-2"
+                   th:text="${n.createdAt != null ? #temporals.format(n.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">-</p>
             </div>
         </div>
     </div>
