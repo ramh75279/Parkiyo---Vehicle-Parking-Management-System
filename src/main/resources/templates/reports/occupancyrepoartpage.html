@@ -168,10 +168,18 @@
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <button
+                <form action="/admin/reports/occupancy" method="get" class="flex items-center gap-3">
+                    <input type="date" name="from" class="h-10 px-4 rounded-xl text-sm font-bold" th:value="${from}" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color-scheme:dark;color:rgba(148,163,184,0.85);" />
+                    <span class="text-slate-500 font-bold text-sm">to</span>
+                    <input type="date" name="to" class="h-10 px-4 rounded-xl text-sm font-bold" th:value="${to}" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color-scheme:dark;color:rgba(148,163,184,0.85);" />
+                    <button type="submit" class="bg-primary/20 border border-primary/30 text-primary font-black px-4 py-2 rounded-xl hover:bg-primary/30 transition-all text-xs uppercase tracking-widest">
+                        Filter
+                    </button>
+                </form>
+                <a th:href="@{/admin/reports/export(type='occupancy', format='csv')}"
                         class="flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary font-black px-5 py-2.5 rounded-xl hover:bg-primary/20 transition-all text-xs uppercase tracking-widest">
                     <span class="material-symbols-outlined text-lg">download</span> Export
-                </button>
+                </a>
                 <div class="flex items-center gap-4">
                     <div class="text-right hidden xl:block">
                         <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${adminName ?: 'Alex Johnson'}">Alex Johnson</p>

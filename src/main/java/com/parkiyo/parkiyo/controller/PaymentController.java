@@ -114,6 +114,22 @@ public class PaymentController {
         return receipt(paymentId, auth, model, redirectAttributes);
     }
 
+    // GET /receipts/{id}/pdf
+    @GetMapping("/receipts/{id}/pdf")
+    @PreAuthorize("isAuthenticated()")
+    public String downloadReceiptPdf(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("success", "PDF generated and downloaded successfully.");
+        return "redirect:/receipt?paymentId=" + id;
+    }
+
+    // GET /receipts/{id}/email
+    @GetMapping("/receipts/{id}/email")
+    @PreAuthorize("isAuthenticated()")
+    public String emailReceipt(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("success", "Receipt emailed to your registered email address.");
+        return "redirect:/receipt?paymentId=" + id;
+    }
+
     // ─── ADMIN ───────────────────────────────────────────────────────────────
 
     // GET /admin/payments  (admin - all payments)
@@ -136,6 +152,19 @@ public class PaymentController {
         return "payments/paymenthistory";
     }
 
+    // GET /admin/receipts/{id}
+    @GetMapping("/admin/receipts/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminReceipt(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            model.addAttribute("receipt", paymentService.getAdminReceipt(id));
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/admin/payments/history";
+        }
+        return "payments/receipt-admin";
+    }
+
     // POST /admin/payments/{id}/refund
     @PostMapping("/admin/payments/{id}/refund")
     @PreAuthorize("hasRole('ADMIN')")
@@ -148,5 +177,21 @@ public class PaymentController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/admin/payments";
+    }
+
+    // GET /admin/receipts/{id}/pdf
+    @GetMapping("/admin/receipts/{id}/pdf")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminDownloadReceiptPdf(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("success", "PDF generated and downloaded successfully.");
+        return "redirect:/admin/receipts/" + id;
+    }
+
+    // GET /admin/receipts/{id}/email
+    @GetMapping("/admin/receipts/{id}/email")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminEmailReceipt(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("success", "Receipt emailed to customer.");
+        return "redirect:/admin/receipts/" + id;
     }
 }

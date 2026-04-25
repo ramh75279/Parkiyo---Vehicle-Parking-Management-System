@@ -129,15 +129,15 @@
                             <span class="text-[10px] font-black uppercase tracking-widest text-white/50 bg-white/10 px-3 py-1.5 rounded-lg">Active</span>
                         </div>
                         <p class="text-white/60 text-xs font-black uppercase tracking-widest mb-2">Available Balance</p>
-                        <p class="text-6xl font-black text-white mb-6">$48.50</p>
+                        <p class="text-6xl font-black text-white mb-6" th:text="'$' + ${wallet.balance}">$48.50</p>
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-white/50 text-[10px] font-black uppercase tracking-widest">Wallet ID</p>
-                                <p class="text-white/80 font-mono text-sm font-bold mt-0.5">PKW-00441-KP</p>
+                                <p class="text-white/80 font-mono text-sm font-bold mt-0.5" th:text="'PKW-' + ${wallet.wallet.id} + '-KP'">PKW-00441-KP</p>
                             </div>
                             <div class="text-right">
                                 <p class="text-white/50 text-[10px] font-black uppercase tracking-widest">Owner</p>
-                                <p class="text-white font-black text-sm mt-0.5">Kamal Perera</p>
+                                <p class="text-white font-black text-sm mt-0.5" th:text="${wallet.wallet.user.firstName + ' ' + wallet.wallet.user.lastName}">Kamal Perera</p>
                             </div>
                         </div>
                     </div>
@@ -167,103 +167,69 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
                     <div class="glass-card rounded-[2.5rem] p-8" id="topupPanel">
-                        <h3 class="text-base font-black text-white mb-6">Top Up Wallet</h3>
-                        <p class="text-[11px] text-slate-500 font-bold mb-5">Select an amount or enter a custom value.</p>
-                        <div class="grid grid-cols-3 gap-3 mb-5">
-                            <div class="topup-amount" onclick="selectTopup(this,'10')">$10</div>
-                            <div class="topup-amount" onclick="selectTopup(this,'20')">$20</div>
-                            <div class="topup-amount selected" onclick="selectTopup(this,'50')">$50</div>
-                            <div class="topup-amount" onclick="selectTopup(this,'100')">$100</div>
-                            <div class="topup-amount" onclick="selectTopup(this,'200')">$200</div>
-                            <div class="topup-amount" onclick="selectTopup(this,'custom')" id="customBtn">Custom</div>
-                        </div>
-                        <div id="customInput" class="hidden mb-5">
-                            <label class="field-label">Custom Amount ($)</label>
-                            <input type="number" placeholder="e.g. 75" class="input-glass bg-white/5 px-4 h-12 rounded-2xl" min="1" max="500" />
-                        </div>
-                        <div class="mb-6">
-                            <label class="field-label">Payment Method</label>
-                            <select class="input-glass px-4 h-12 rounded-2xl">
-                                <option>Credit / Debit Card</option>
-                                <option>Online Banking</option>
-                            </select>
-                        </div>
-                        <div class="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/15 flex items-center justify-between mb-5">
-                            <p class="text-sm font-black text-white">New Balance After Top-Up</p>
-                            <p class="text-xl font-black text-emerald-400" id="newBalance">$98.50</p>
-                        </div>
-                        <button onclick="topupDone()" class="w-full flex items-center justify-center gap-2 bg-emerald-500 text-white font-black py-4 rounded-2xl hover:bg-emerald-600 transition-all text-sm shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-                            <span class="material-symbols-outlined text-lg">add_circle</span>
-                            Top Up <span id="topupBtnAmt">$50.00</span>
-                        </button>
-                        <div id="topupSuccess" class="hidden mt-4 flex items-center gap-3 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                        <form th:action="@{/wallet/topup}" method="post">
+                            <h3 class="text-base font-black text-white mb-6">Top Up Wallet</h3>
+                            <p class="text-[11px] text-slate-500 font-bold mb-5">Select an amount or enter a custom value.</p>
+                            <div class="grid grid-cols-3 gap-3 mb-5">
+                                <div class="topup-amount" onclick="selectTopup(this,'10')">$10</div>
+                                <div class="topup-amount" onclick="selectTopup(this,'20')">$20</div>
+                                <div class="topup-amount selected" onclick="selectTopup(this,'50')">$50</div>
+                                <div class="topup-amount" onclick="selectTopup(this,'100')">$100</div>
+                                <div class="topup-amount" onclick="selectTopup(this,'200')">$200</div>
+                                <div class="topup-amount" onclick="selectTopup(this,'custom')" id="customBtn">Custom</div>
+                            </div>
+                            <div id="customInput" class="hidden mb-5">
+                                <label class="field-label">Custom Amount ($)</label>
+                                <input type="number" id="customAmtField" placeholder="e.g. 75" class="input-glass bg-white/5 px-4 h-12 rounded-2xl" min="1" max="500" oninput="updateCustomAmount()" />
+                            </div>
+                            
+                            <!-- Hidden input to send the selected amount -->
+                            <input type="hidden" id="selectedAmountField" name="amount" value="50" />
+                            
+                            <div class="mb-6">
+                                <label class="field-label">Payment Method</label>
+                                <select class="input-glass px-4 h-12 rounded-2xl">
+                                    <option>Credit / Debit Card</option>
+                                    <option>Online Banking</option>
+                                </select>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/15 flex items-center justify-between mb-5">
+                                <p class="text-sm font-black text-white">New Balance After Top-Up</p>
+                                <p class="text-xl font-black text-emerald-400" id="newBalance" th:data-balance="${wallet.balance}">$98.50</p>
+                            </div>
+                            <button type="submit" class="w-full flex items-center justify-center gap-2 bg-emerald-500 text-white font-black py-4 rounded-2xl hover:bg-emerald-600 transition-all text-sm shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                                <span class="material-symbols-outlined text-lg">add_circle</span>
+                                Top Up <span id="topupBtnAmt">$50.00</span>
+                            </button>
+                        </form>
+                        <div th:if="${success}" id="topupSuccess" class="mt-4 flex items-center gap-3 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
                             <span class="material-symbols-outlined text-emerald-400">check_circle</span>
-                            <p class="text-sm font-black text-emerald-300">Top-up successful! Balance updated.</p>
+                            <p class="text-sm font-black text-emerald-300" th:text="${success}">Top-up successful! Balance updated.</p>
+                        </div>
+                        <div th:if="${error}" id="topupError" class="mt-4 flex items-center gap-3 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20">
+                            <span class="material-symbols-outlined text-rose-400">error</span>
+                            <p class="text-sm font-black text-rose-300" th:text="${error}">Top-up failed.</p>
                         </div>
                     </div>
 
                     <div class="glass-card rounded-[2.5rem] p-8">
                         <h3 class="text-base font-black text-white mb-6">Recent Activity</h3>
                         <div class="space-y-0 divide-y divide-white/5">
-                            <div class="txn-row py-4 flex items-center gap-4">
-                                <div class="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                            <div th:each="txn : ${transactions}" class="txn-row py-4 flex items-center gap-4">
+                                <div th:if="${txn.type == 'CREDIT'}" class="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
                                     <span class="material-symbols-outlined text-emerald-400 text-lg">add</span>
                                 </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-black text-white">Top-Up</p>
-                                    <p class="text-[10px] text-slate-500 font-bold">08 Mar · Card ending 4512</p>
-                                </div>
-                                <span class="text-emerald-400 font-black">+$50.00</span>
-                            </div>
-                            <div class="txn-row py-4 flex items-center gap-4">
-                                <div class="h-10 w-10 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0">
+                                <div th:if="${txn.type == 'DEBIT'}" class="h-10 w-10 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0">
                                     <span class="material-symbols-outlined text-rose-400 text-lg">local_parking</span>
                                 </div>
                                 <div class="flex-1">
-                                    <p class="text-sm font-black text-white">Parking · XYZ-8899</p>
-                                    <p class="text-[10px] text-slate-500 font-bold">10 Mar · RES-20260311-047</p>
+                                    <p class="text-sm font-black text-white" th:text="${txn.description}">Top-Up</p>
+                                    <p class="text-[10px] text-slate-500 font-bold" th:text="${#temporals.format(txn.createdAt, 'dd MMM yyyy')}">08 Mar</p>
                                 </div>
-                                <span class="text-rose-400 font-black">-$16.50</span>
+                                <span th:classappend="${txn.type == 'CREDIT'} ? 'text-emerald-400' : 'text-rose-400'" class="font-black" th:text="(${txn.type == 'CREDIT'} ? '+' : '-') + '$' + ${txn.amount}">+$50.00</span>
                             </div>
-                            <div class="txn-row py-4 flex items-center gap-4">
-                                <div class="h-10 w-10 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0">
-                                    <span class="material-symbols-outlined text-rose-400 text-lg">local_parking</span>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-black text-white">Parking · GHI-7721</p>
-                                    <p class="text-[10px] text-slate-500 font-bold">08 Mar · Walk-in</p>
-                                </div>
-                                <span class="text-rose-400 font-black">-$13.75</span>
-                            </div>
-                            <div class="txn-row py-4 flex items-center gap-4">
-                                <div class="h-10 w-10 rounded-xl bg-slate-700/30 flex items-center justify-center shrink-0">
-                                    <span class="material-symbols-outlined text-slate-400 text-lg">undo</span>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-black text-white">Refund · TRK-5502</p>
-                                    <p class="text-[10px] text-slate-500 font-bold">05 Mar · TXN-88281044</p>
-                                </div>
-                                <span class="text-slate-300 font-black">+$14.75</span>
-                            </div>
-                            <div class="txn-row py-4 flex items-center gap-4">
-                                <div class="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
-                                    <span class="material-symbols-outlined text-emerald-400 text-lg">add</span>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-black text-white">Top-Up</p>
-                                    <p class="text-[10px] text-slate-500 font-bold">01 Mar · Online Banking</p>
-                                </div>
-                                <span class="text-emerald-400 font-black">+$100.00</span>
-                            </div>
-                            <div class="txn-row py-4 flex items-center gap-4">
-                                <div class="h-10 w-10 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0">
-                                    <span class="material-symbols-outlined text-rose-400 text-lg">local_parking</span>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-black text-white">Parking · ABC-1234</p>
-                                    <p class="text-[10px] text-slate-500 font-bold">28 Feb · Walk-in</p>
-                                </div>
-                                <span class="text-rose-400 font-black">-$18.75</span>
+                            <div th:if="${#lists.isEmpty(transactions)}" class="py-6 text-center">
+                                <p class="text-sm text-slate-500 font-bold">No recent transactions.</p>
                             </div>
                         </div>
                         <a th:href="@{/payments/history}" class="mt-5 flex items-center gap-2 text-primary text-xs font-black hover:brightness-125 transition-all">
@@ -277,27 +243,35 @@
     </main>
 </div>
 
-<script>
+<script th:inline="javascript">
     let selectedAmt = 50;
+    const currentBalance = parseFloat(/*[[${wallet.balance}]]*/ 0);
+
+    // Initialize display with default topup of 50
+    document.getElementById('newBalance').textContent = '$' + (currentBalance + selectedAmt).toFixed(2);
 
     function selectTopup(el, val) {
         document.querySelectorAll('.topup-amount').forEach(a => a.classList.remove('selected'));
         el.classList.add('selected');
         if (val === 'custom') {
             document.getElementById('customInput').classList.remove('hidden');
-            selectedAmt = 0;
+            selectedAmt = parseFloat(document.getElementById('customAmtField').value) || 0;
         } else {
             document.getElementById('customInput').classList.add('hidden');
             selectedAmt = parseFloat(val);
-            document.getElementById('newBalance').textContent = '$' + (48.50 + selectedAmt).toFixed(2);
-            document.getElementById('topupBtnAmt').textContent = '$' + selectedAmt.toFixed(2);
         }
+        updateAmounts();
     }
-
-    function topupDone() {
-        document.getElementById('topupSuccess').classList.remove('hidden');
-        document.getElementById('topupSuccess').style.display = 'flex';
-        setTimeout(() => document.getElementById('topupSuccess').classList.add('hidden'), 3500);
+    
+    function updateCustomAmount() {
+        selectedAmt = parseFloat(document.getElementById('customAmtField').value) || 0;
+        updateAmounts();
+    }
+    
+    function updateAmounts() {
+        document.getElementById('selectedAmountField').value = selectedAmt;
+        document.getElementById('newBalance').textContent = '$' + (currentBalance + selectedAmt).toFixed(2);
+        document.getElementById('topupBtnAmt').textContent = '$' + selectedAmt.toFixed(2);
     }
 </script>
 </body>

@@ -105,6 +105,16 @@ public class PaymentService {
         return payment.getReceipt();
     }
 
+    public Receipt getAdminReceipt(Long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new RuntimeException("Receipt not found."));
+
+        if (payment.getReceipt() == null) {
+            throw new RuntimeException("Receipt not found.");
+        }
+        return payment.getReceipt();
+    }
+
     public List<Payment> getAllPayments(String status, String dateFrom, String dateTo) {
         if (status != null && !status.isBlank()) {
             return paymentRepository.findByStatus(PaymentStatus.valueOf(status.toUpperCase()));

@@ -236,27 +236,22 @@
                             <span class="material-symbols-outlined text-primary text-xl">event_available</span>
                         </div>
                         <div class="flex-1">
-                            <p class="text-lg font-black text-white tracking-widest" th:text="${reservation.plate}">XYZ-8899</p>
-                            <p class="text-slate-400 text-xs font-bold" th:text="${reservation.ownerName + ' · ' + reservation.vehicleModel}">Nimal Silva · Nissan Axio</p>
+                            <p class="text-lg font-black text-white tracking-widest" th:text="${pendingPayment.reservation != null ? pendingPayment.reservation.vehicle.licensePlate : pendingPayment.parkingRecord.vehicle.licensePlate}">XYZ-8899</p>
+                            <p class="text-slate-400 text-xs font-bold" th:text="${pendingPayment.reservation != null ? (pendingPayment.reservation.vehicle.user != null ? pendingPayment.reservation.vehicle.user.firstName : 'Guest') + ' · ' + pendingPayment.reservation.vehicle.make : (pendingPayment.parkingRecord.vehicle.user != null ? pendingPayment.parkingRecord.vehicle.user.firstName : 'Guest') + ' · ' + pendingPayment.parkingRecord.vehicle.make}">Nimal Silva · Nissan Axio</p>
                         </div>
                         <div class="text-right">
                             <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Slot</p>
-                            <p class="text-primary font-black" th:text="${reservation.slotCode}">C-03</p>
+                            <p class="text-primary font-black" th:text="${pendingPayment.reservation != null ? pendingPayment.reservation.slot.slotNumber : pendingPayment.parkingRecord.slot.slotNumber}">C-03</p>
                         </div>
                     </div>
 
                     <div class="mb-2">
-                        <div class="meta-row"><span class="meta-lbl">Reservation ID</span><span
-                                class="meta-val font-mono text-xs text-slate-400" th:text="${reservation.reservationId}">RES-20260311-047</span></div>
-                        <div class="meta-row"><span class="meta-lbl">Date</span><span class="meta-val" th:text="${reservation.date}">11 Mar 2026</span></div>
-                        <div class="meta-row"><span class="meta-lbl">Arrival</span><span class="meta-val" th:text="${reservation.arrival}">09:00 AM</span></div>
-                        <div class="meta-row"><span class="meta-lbl">Departure</span><span class="meta-val" th:text="${reservation.departure}">12:00 PM</span></div>
-                        <div class="meta-row"><span class="meta-lbl">Duration</span><span class="meta-val" th:text="${reservation.duration}">3 hours</span></div>
-                        <div class="meta-row"><span class="meta-lbl">Zone</span><span class="meta-val" th:text="${reservation.zone}">Zone C · Level 2</span></div>
-                        <div class="meta-row"><span class="meta-lbl">Rate</span><span class="meta-val" th:text="'$' + ${reservation.hourlyRate} + ' / hr'">$5.50 / hr</span></div>
+                        <div class="meta-row"><span class="meta-lbl">Transaction ID</span><span
+                                class="meta-val font-mono text-xs text-slate-400" th:text="${pendingPayment.transactionCode}">RES-20260311-047</span></div>
+                        <div class="meta-row"><span class="meta-lbl">Date</span><span class="meta-val" th:text="${#temporals.format(pendingPayment.createdAt, 'dd MMM yyyy')}">11 Mar 2026</span></div>
                         <div class="meta-row border-t border-white/10 pt-4 mt-2">
                             <span class="text-base font-black text-white">Total</span>
-                            <span class="text-3xl font-black text-white" th:text="'$' + ${reservation.total}">$16.50</span>
+                            <span class="text-3xl font-black text-white" th:text="'$' + ${pendingPayment.amount}">$16.50</span>
                         </div>
                     </div>
                 </div>
@@ -273,7 +268,7 @@
                             </div>
                             <div class="flex-1">
                                 <p class="name">Parkiyo Wallet</p>
-                                <p class="sub" th:text="'Balance: $' + ${wallet.balance} + ' · After payment: $' + ${wallet.afterPayment}">Balance: $48.50 · After payment: $32.00</p>
+                                <p class="sub" th:text="'Balance: $' + ${walletBalance} + ' · After payment: $' + (${walletBalance} - ${pendingPayment.amount})">Balance: $48.50 · After payment: $32.00</p>
                             </div>
                             <span
                                     class="text-[10px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">Recommended</span>
@@ -315,16 +310,17 @@
                 </div>
 
                 <!-- Pay CTA -->
-                <div class="space-y-3 pb-4">
-                    <a th:href="@{/payments/processing}"
+                <form th:action="@{/payments/processing}" method="post" class="space-y-3 pb-4">
+                    <input type="hidden" name="paymentId" th:value="${pendingPayment.id}" />
+                    <button type="submit"
                        class="w-full flex items-center justify-center gap-3 bg-primary text-white font-black py-5 rounded-2xl hover:bg-primary/80 transition-all text-lg shadow-[0_0_30px_rgba(31,104,249,0.35)]">
                         <span class="material-symbols-outlined text-xl">lock</span>
-                        Pay <span th:text="'$' + ${reservation.total}" class="ml-1">$16.50</span> Securely
-                    </a>
+                        Pay <span th:text="'$' + ${pendingPayment.amount}" class="ml-1">$16.50</span> Securely
+                    </button>
                     <p class="text-center text-[10px] text-slate-600 font-bold">Your reservation is held for <span
                             class="text-amber-400 font-black" id="countdown">09:47</span> · Protected by Parkiyo Pay
                     </p>
-                </div>
+                </form>
 
             </div>
         </div>

@@ -93,6 +93,8 @@
             <div class="max-w-3xl mx-auto space-y-8">
 
                 <!-- Pattern config -->
+                <form id="batchForm" th:action="@{/admin/slots/batch}" th:object="${batchRequest}" method="post">
+                <input type="hidden" id="count" name="count" value="1" />
                 <div class="glass-card rounded-[2.5rem] p-8">
                     <h3 class="text-base font-black text-white mb-6">Generation Pattern</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -108,12 +110,12 @@
                         </div>
                         <div>
                             <label class="field-label">Zone Prefix <span class="text-rose-400">*</span></label>
-                            <input type="text" id="prefixInput" name="prefix" placeholder="A" maxlength="2" class="input-glass bg-white/5 px-4 h-12 rounded-2xl uppercase tracking-widest" oninput="updatePreview()" />
+                            <input type="text" id="prefixInput" name="prefix" th:field="*{prefix}" placeholder="A" maxlength="2" class="input-glass bg-white/5 px-4 h-12 rounded-2xl uppercase tracking-widest" oninput="updatePreview()" />
                             <p class="text-[10px] text-slate-500 font-bold mt-1.5">Single letter, e.g. A, B, E</p>
                         </div>
                         <div>
                             <label class="field-label">Start Number <span class="text-rose-400">*</span></label>
-                            <input type="text" id="startNum" name="startNum" placeholder="26" class="input-glass bg-white/5 px-4 h-12 rounded-2xl" oninput="this.value=this.value.replace(/[^0-9]/g,''); updatePreview();" />
+                            <input type="text" id="startNum" name="startFrom" th:field="*{startFrom}" placeholder="26" class="input-glass bg-white/5 px-4 h-12 rounded-2xl" oninput="this.value=this.value.replace(/[^0-9]/g,''); updatePreview();" />
                         </div>
                         <div>
                             <label class="field-label">End Number <span class="text-rose-400">*</span></label>
@@ -145,7 +147,7 @@
                     <div class="grid grid-cols-2 gap-6">
                         <div>
                             <label class="field-label">Hourly Rate ($)</label>
-                            <input type="number" name="hourlyRate" value="5.50" step="0.50" class="input-glass bg-white/5 px-4 h-12 rounded-2xl" />
+                            <input type="number" name="hourlyRate" th:field="*{hourlyRate}" step="0.50" class="input-glass bg-white/5 px-4 h-12 rounded-2xl" />
                         </div>
                         <div>
                             <label class="field-label">Daily Max Rate ($)</label>
@@ -189,7 +191,7 @@
                     <div class="flex items-center gap-3">
                         <p class="text-xs text-slate-500 font-bold">Need one slot?</p>
                         <a th:href="@{/admin/slots/add}" class="text-primary text-xs font-black hover:brightness-125 transition-all">Single slot →</a>
-                        <button onclick="generate()" class="px-8 py-3.5 rounded-2xl bg-primary text-white font-black text-sm hover:bg-primary/80 transition-all shadow-[0_0_20px_rgba(31,104,249,0.3)] flex items-center gap-2">
+                        <button type="submit" class="px-8 py-3.5 rounded-2xl bg-primary text-white font-black text-sm hover:bg-primary/80 transition-all shadow-[0_0_20px_rgba(31,104,249,0.3)] flex items-center gap-2">
                             <span class="material-symbols-outlined text-lg">auto_awesome</span>
                             <span id="generateBtnText">Generate 25 Slots</span>
                         </button>
@@ -210,6 +212,7 @@
                         </div>
                     </div>
                 </div>
+                </form>
 
             </div>
         </div>
@@ -247,6 +250,7 @@
         const end = parseInt(document.getElementById('endNum').value) || 1;
         const padSize = parseInt(document.getElementById('padSelect').value) || 0;
         const count = Math.max(0, end - start + 1);
+        document.getElementById('count').value = count;
 
         document.getElementById('previewCount').textContent = `${count} slot${count !== 1 ? 's' : ''} will be created`;
         document.getElementById('generateBtnText').textContent = `Generate ${count} Slot${count !== 1 ? 's' : ''}`;
@@ -276,8 +280,7 @@
     }
 
     function generate() {
-        document.getElementById('successBanner').classList.remove('hidden');
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        document.getElementById('batchForm').submit();
     }
 
     updatePreview();
