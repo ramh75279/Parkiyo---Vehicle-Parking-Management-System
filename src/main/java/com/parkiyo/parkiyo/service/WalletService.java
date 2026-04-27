@@ -37,7 +37,11 @@ public class WalletService {
     @Transactional
     public List<WalletTransaction> getTransactionHistory(String email) {
         Wallet wallet = getOrCreateWallet(email);
-        return wallet.getTransactions();
+        List<WalletTransaction> transactions = wallet.getTransactions();
+        transactions.size(); // force-loads the lazy collection
+        return transactions;
+
+
     }
 
     @Transactional
