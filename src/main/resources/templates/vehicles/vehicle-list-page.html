@@ -181,7 +181,7 @@
                         <option value="Parked" th:selected="${param.status == 'Parked'}">Parked</option>
                         <option value="Blocked" th:selected="${param.status == 'Blocked'}">Blocked</option>
                     </select>
-                    <a th:href="@{/admin/vehicles/by-category}" class="text-primary font-black text-xs uppercase tracking-widest hover:brightness-125 transition-all flex items-center gap-1">
+                    <a th:href="@{/admin/vehicles/browse}" class="text-primary font-black text-xs uppercase tracking-widest hover:brightness-125 transition-all flex items-center gap-1">
                         <span class="material-symbols-outlined text-sm">category</span> Browse by Category
                     </a>
                 </div>

@@ -1,6 +1,7 @@
 package com.parkiyo.parkiyo.controller;
 
 import com.parkiyo.parkiyo.dto.VehicleRequest;
+import com.parkiyo.parkiyo.model.Vehicle;
 import com.parkiyo.parkiyo.service.VehicleService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -15,6 +16,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 @Controller
 @RequestMapping("/admin/vehicles")
 @PreAuthorize("hasRole('ADMIN')")
@@ -28,8 +35,13 @@ public class VehicleController {
     public String vehicleList(@RequestParam(required = false) String search,
                               @RequestParam(required = false) String category,
                               Model model) {
-        model.addAttribute("vehicles", vehicleService.getAllVehicles(search, category));
+        List<Vehicle> vehicles = vehicleService.getAllVehicles(search, category);
+        model.addAttribute("vehicles", vehicles.stream().map(this::toVehicleRow).toList());
         model.addAttribute("categories", vehicleService.getAllCategories());
+        model.addAttribute("stats", buildVehicleStats(vehicles));
+        model.addAttribute("currentPage", 1);
+        model.addAttribute("totalPages", 1);
+        model.addAttribute("pageNumbers", List.of(1));
         return "vehicles/vehicle-list-page";
     }
 
@@ -190,5 +202,73 @@ public class VehicleController {
         vehicleService.clearPendingImport(session);
         redirectAttributes.addFlashAttribute("success", "Import file removed.");
         return "redirect:/admin/vehicles/import";
+    }
+
+    private Map<String, Object> toVehicleRow(Vehicle vehicle) {
+        Map<String, Object> row = new HashMap<>();
+        row.put("id", vehicle.getId());
+        row.put("plate", vehicle.getLicensePlate());
+        row.put("ownerName", vehicle.getUser() != null ? vehicle.getUser().getFirstName() : "Guest");
+        row.put("category", vehicle.getCategory() != null ? formatCategory(vehicle.getCategory().name()) : "-");
+        row.put("makeModel", buildMakeModel(vehicle.getMake(), vehicle.getModel()));
+        row.put("color", vehicle.getColor() != null && !vehicle.getColor().isBlank() ? vehicle.getColor() : "-");
+        row.put("colorHex", colorToHex(vehicle.getColor()));
+        row.put("status", vehicle.isActive() ? "Active" : "Blocked");
+        row.put("registeredOn", vehicle.getCreatedAt() != null
+                ? vehicle.getCreatedAt().toLocalDate().format(DateTimeFormatter.ISO_DATE)
+                : "-");
+        return row;
+    }
+
+    private Map<String, Object> buildVehicleStats(List<Vehicle> vehicles) {
+        long activeCount = vehicles.stream().filter(Vehicle::isActive).count();
+        long blockedCount = vehicles.size() - activeCount;
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("total", vehicles.size());
+        stats.put("parked", 0);
+        stats.put("active", activeCount);
+        stats.put("blocked", blockedCount);
+        return stats;
+    }
+
+    private String buildMakeModel(String make, String model) {
+        boolean hasMake = make != null && !make.isBlank();
+        boolean hasModel = model != null && !model.isBlank();
+        if (!hasMake && !hasModel) {
+            return "-";
+        }
+        if (!hasMake) {
+            return model;
+        }
+        if (!hasModel) {
+            return make;
+        }
+        return make + " " + model;
+    }
+
+    private String formatCategory(String category) {
+        return category.substring(0, 1).toUpperCase(Locale.ROOT)
+                + category.substring(1).toLowerCase(Locale.ROOT);
+    }
+
+    private String colorToHex(String color) {
+        if (color == null || color.isBlank()) {
+            return "#94a3b8";
+        }
+
+        return switch (color.trim().toLowerCase(Locale.ROOT)) {
+            case "white" -> "#f8fafc";
+            case "black" -> "#0f172a";
+            case "silver", "gray", "grey" -> "#94a3b8";
+            case "blue" -> "#3b82f6";
+            case "red" -> "#ef4444";
+            case "green" -> "#22c55e";
+            case "yellow" -> "#eab308";
+            case "orange" -> "#f97316";
+            case "brown" -> "#92400e";
+            case "purple" -> "#a855f7";
+            default -> "#94a3b8";
+        };
     }
 }
