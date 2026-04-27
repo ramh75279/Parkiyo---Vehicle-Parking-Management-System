@@ -3,8 +3,8 @@ package com.parkiyo.parkiyo.service;
 import com.parkiyo.parkiyo.dto.*;
 import com.parkiyo.parkiyo.exception.*;
 import com.parkiyo.parkiyo.model.User;
-import com.parkiyo.parkiyo.model.UserRole;
-import com.parkiyo.parkiyo.model.UserStatus;
+import com.parkiyo.parkiyo.enums.UserRole;
+import com.parkiyo.parkiyo.enums.UserStatus;
 import com.parkiyo.parkiyo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -139,7 +139,7 @@ public class UserService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setPhone(request.getPhone());
-        user.setRole(UserRole.valueOf(request.getRole().toUpperCase()));
+        user.setRole(UserRole.valueOf(request.getRole().toString().toUpperCase()));
         user.setStatus(UserStatus.ACTIVE);
 
         return userRepository.save(user);
