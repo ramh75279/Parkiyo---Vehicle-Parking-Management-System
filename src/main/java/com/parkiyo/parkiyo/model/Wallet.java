@@ -26,7 +26,8 @@ public class Wallet {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
 
-    @OneToMany(mappedBy = "wallet", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "wallet", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OrderBy("createdAt DESC")
     private List<WalletTransaction> transactions;
 
     @CreationTimestamp
