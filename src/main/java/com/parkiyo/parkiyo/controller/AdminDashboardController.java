@@ -47,7 +47,9 @@ public class AdminDashboardController {
 
     @GetMapping("/notifications")
     public String adminNotifications(Model model) {
-        model.addAttribute("notifications", dashboardService.getAdminRecentNotifications(20));
+        var notifications = dashboardService.getAdminRecentNotifications(20);
+        model.addAttribute("notifications", notifications);
+        model.addAttribute("todayCount", 0);
         return "account/notification";
     }
 
