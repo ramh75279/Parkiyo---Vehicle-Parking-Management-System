@@ -1,9 +1,8 @@
 package com.parkiyo.parkiyo.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter @Setter
+@Data
 public class NotificationPreferenceRequest {
     private boolean emailNotificationsEnabled;
     private boolean smsNotificationsEnabled;
