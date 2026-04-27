@@ -69,8 +69,10 @@
                 <span class="material-symbols-outlined shrink-0">logout</span>
                 <span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a th:href="@{/admin/slots}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
-                <span class="material-symbols-outlined shrink-0">grid_view</span><span class="nav-label text-sm">Parking Slots</span>
+            <a th:href="@{/admin/slots/overview}"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">grid_view</span>
+                <span class="nav-label text-sm">Parking Slots</span>
             </a>
             <a th:href="@{/admin/vehicles}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                 <span class="material-symbols-outlined shrink-0">directions_car</span>
