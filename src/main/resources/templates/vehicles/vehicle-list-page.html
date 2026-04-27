@@ -69,7 +69,8 @@
                 <span class="material-symbols-outlined shrink-0">logout</span>
                 <span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a th:href="@{/admin/slots}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a th:href="@{/admin/slots/overview}"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">grid_view</span>
                 <span class="nav-label text-sm">Parking Slots</span>
             </a>
@@ -260,7 +261,8 @@
                             <a th:href="@{/admin/vehicles(page=${p}, search=${param.search}, category=${param.category}, status=${param.status})}"
                                th:text="${p}"
                                th:classappend="${p == currentPage} ? 'bg-primary text-white' : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'"
-                               class="h-9 px-4 rounded-xl font-black text-xs transition-all">1</a>
+                               class="h-9 min-w-[2.25rem] px-4 rounded-xl font-black text-xs flex items-center justify-center transition-all">
+                            </a>
                         </th:block>
                         <a th:href="@{/admin/vehicles(page=${currentPage + 1}, search=${param.search}, category=${param.category}, status=${param.status})}"
                            th:classappend="${currentPage >= totalPages} ? 'pointer-events-none opacity-40' : ''"
