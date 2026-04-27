@@ -276,7 +276,7 @@
             </div>
             <div class="flex items-center gap-4">
                 <div class="text-right hidden xl:block">
-                    <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${adminName != null ? adminName : 'Maria Santos'}">Maria Santos</p>
+                    <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Admin'">Admin</p>
                     <p class="text-[10px] text-primary font-bold uppercase tracking-tighter">Admin</p>
                 </div>
                 <div class="h-10 w-10 rounded-[14px] bg-gradient-to-tr from-emerald-400 to-primary p-[2px]">
