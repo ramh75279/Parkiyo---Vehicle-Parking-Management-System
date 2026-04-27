@@ -277,7 +277,7 @@
             </div>
             <div class="flex items-center gap-4">
                 <div class="text-right hidden xl:block">
-                    <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${adminName != null ? adminName : 'Maria Santos'}">Maria Santos</p>
+                    <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Admin'">Admin</p>
                     <p class="text-[10px] text-primary font-bold uppercase tracking-tighter">Admin</p>
                 </div>
                 <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-emerald-400 to-primary p-[2px]">
@@ -423,7 +423,7 @@
                             </div>
                             <div class="p-4 rounded-2xl bg-black/20 border border-white/5">
                                 <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">Operator</p>
-                                <p class="text-white font-black" th:text="${adminName != null ? adminName : 'Maria Santos'}">Maria Santos</p>
+                                <p class="text-white font-black" th:text="${currentUser?.fullName} ?: 'Admin'">Admin</p>
                             </div>
                             <div class="p-4 rounded-2xl bg-black/20 border border-white/5">
                                 <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">Session ID</p>
