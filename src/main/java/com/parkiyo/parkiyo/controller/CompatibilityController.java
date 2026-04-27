@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 @PreAuthorize("isAuthenticated()")
 public class CompatibilityController {
 
+    // ================== ALIASES FOR OLD LINKS ==================
+
     @GetMapping("/admin/audit-log")
     @PreAuthorize("hasRole('ADMIN')")
     public String auditLogAlias() {
@@ -80,11 +82,11 @@ public class CompatibilityController {
         return "redirect:/admin/payments";
     }
 
-    @GetMapping("/admin/receipts/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String adminReceiptAlias(@PathVariable Long id) {
-        return "redirect:/admin/payments";
-    }
+    // REMOVED DUPLICATE MAPPING (this was causing the crash)
+    // @GetMapping("/admin/receipts/{id}")
+    // public String adminReceiptAlias(@PathVariable Long id) {
+    //     return "redirect:/admin/payments";
+    // }
 
     @GetMapping({"/admin/reports/audit-log", "/admin/reports/daily/export"})
     @PreAuthorize("hasRole('ADMIN')")
