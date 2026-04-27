@@ -6,33 +6,52 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Long> {
 
-    // Active records
-    List<ParkingRecord> findByActiveTrue();
+    // === Dashboard ===
+    @Query("SELECT COUNT(pr) FROM ParkingRecord pr WHERE pr.exitTime IS NULL")
+    long countActiveRecords();
 
-    List<ParkingRecord> findByUserEmailAndActiveTrue(String email);
+    // TEMPORARY SAFE VERSION - returns 0 until we fix the entity
+    @Query("SELECT COALESCE(SUM(0), 0)")
+    BigDecimal calculateTodayRevenue();
 
+    @Query("SELECT pr FROM ParkingRecord pr ORDER BY pr.entryTime DESC LIMIT :limit")
+    List<ParkingRecord> findTopRecentEntries(@Param("limit") int limit);
+
+    @Query("SELECT pr FROM ParkingRecord pr ORDER BY pr.createdAt DESC LIMIT 20")
+    List<ParkingRecord> findTop20ByOrderByCreatedAtDesc();
+
+    @Query("SELECT pr FROM ParkingRecord pr WHERE pr.payment IS NOT NULL " +
+            "ORDER BY pr.exitTime DESC LIMIT :limit")
+    List<ParkingRecord> findRecentPaid(@Param("limit") int limit);
+
+    // History
+    List<ParkingRecord> findByVehicleId(Long vehicleId);
+    List<ParkingRecord> findBySlotId(Long slotId);
+
+    // User
     List<ParkingRecord> findByUserEmail(String email);
+    List<ParkingRecord> findByUserEmailAndActiveTrue(String email);
+    List<ParkingRecord> findByActiveTrue();
 
     Optional<ParkingRecord> findByIdAndUserEmail(Long id, String email);
 
-    List<ParkingRecord> findByVehicleId(Long vehicleId);
+    @Query("SELECT pr FROM ParkingRecord pr WHERE pr.user.email = :email " +
+            "ORDER BY pr.entryTime DESC LIMIT :limit")
+    List<ParkingRecord> findByUserEmailRecent(@Param("email") String email, @Param("limit") int limit);
 
-    List<ParkingRecord> findBySlotId(Long slotId);
+    @Query("SELECT pr FROM ParkingRecord pr WHERE pr.user.email = :email AND pr.exitTime IS NULL")
+    Optional<ParkingRecord> findActiveByUserEmail(@Param("email") String email);
 
-    // Recent entries (for admin dashboard)
-    List<ParkingRecord> findTop20ByOrderByCreatedAtDesc();
+    @Query("SELECT pr FROM ParkingRecord pr WHERE pr.user.email = :email " +
+            "AND pr.payment IS NULL ORDER BY pr.entryTime DESC")
+    List<ParkingRecord> findPendingPaymentsByUser(@Param("email") String email);
 
-    // Revenue queries
-    @Query("SELECT SUM(p.amountCharged) FROM ParkingRecord p WHERE p.exitTime BETWEEN :from AND :to")
-    Double sumRevenueByDateRange(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
-
-    @Query("SELECT COUNT(p) FROM ParkingRecord p WHERE p.entryTime BETWEEN :from AND :to")
-    long countEntriesByDateRange(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+    List<ParkingRecord> findTop10ByOrderByEntryTimeDesc();
 }
