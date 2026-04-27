@@ -39,37 +39,29 @@ public class DataBootstrapper {
     @Transactional
     public void onApplicationReady() {
         if (!bootstrapEnabled) {
-            log.info("🚫 Bootstrap disabled. Running in clean production mode.");
+            log.info("🚫 Bootstrap disabled.");
             return;
         }
 
-        try {
-            log.info("🚀 Starting Parkiyo Bootstrap...");
+        log.info("🚀 Parkiyo Bootstrap Starting...");
 
-            // Create Admin if not exists
-            User admin = userRepository.findByEmail(properties.getAdminEmail())
-                    .orElseGet(this::createAdminUser);
+        // Create Admin
+        createAdminIfNotExists();
 
-            // Ensure wallet exists
-            if (walletRepository.findByUserEmail(admin.getEmail()).isEmpty()) {
-                Wallet wallet = Wallet.builder().user(admin).build();
-                walletRepository.save(wallet);
-                log.info("💰 Wallet created for admin");
-            }
-
-            // Seed demo slots
-            if (properties.isDemoSlotsEnabled() && slotRepository.count() == 0) {
-                seedDemoSlots();
-            }
-
-            log.info("✅ Bootstrap completed successfully!");
-
-        } catch (Exception e) {
-            log.error("❌ Bootstrap failed", e);
+        // Seed slots only if enabled and none exist
+        if (properties.isDemoSlotsEnabled() && slotRepository.count() == 0) {
+            seedDemoSlots();
         }
+
+        log.info("✅ Bootstrap completed successfully!");
     }
 
-    private User createAdminUser() {
+    private void createAdminIfNotExists() {
+        if (userRepository.findByEmail(properties.getAdminEmail()).isPresent()) {
+            log.info("👑 Admin already exists.");
+            return;
+        }
+
         User admin = User.builder()
                 .firstName(properties.getAdminFirstName())
                 .lastName(properties.getAdminLastName())
@@ -81,9 +73,13 @@ public class DataBootstrapper {
                 .smsNotificationsEnabled(true)
                 .build();
 
-        User saved = userRepository.save(admin);
-        log.info("👑 Admin user created: {}", saved.getEmail());
-        return saved;
+        userRepository.save(admin);
+        log.info("✅ Admin user created: {}", admin.getEmail());
+
+        // Create wallet for admin
+        Wallet wallet = Wallet.builder().user(admin).balance(BigDecimal.valueOf(5000)).build();
+        walletRepository.save(wallet);
+        log.info("💰 Admin wallet created with balance 5000");
     }
 
     private void seedDemoSlots() {
@@ -91,13 +87,13 @@ public class DataBootstrapper {
                 createSlot("A-001", "Ground Floor", "250.00"),
                 createSlot("A-002", "Ground Floor", "250.00"),
                 createSlot("A-003", "Ground Floor", "250.00"),
-                createSlot("B-001", "Covered", "350.00"),
-                createSlot("B-002", "Covered", "350.00"),
-                createSlot("EV-001", "EV Charging", "500.00")
+                createSlot("B-001", "First Floor", "300.00"),
+                createSlot("B-002", "First Floor", "300.00"),
+                createSlot("EV-001", "EV Section", "450.00")
         );
 
         slotRepository.saveAll(slots);
-        log.info("🅿️ {} Demo parking slots seeded", slots.size());
+        log.info("🅿️ {} Demo parking slots created", slots.size());
     }
 
     private ParkingSlot createSlot(String slotNumber, String zone, String rate) {

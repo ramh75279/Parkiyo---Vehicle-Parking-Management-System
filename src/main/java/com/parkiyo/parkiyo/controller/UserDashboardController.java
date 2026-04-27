@@ -25,7 +25,7 @@ public class UserDashboardController {
     @GetMapping("/dashboard/user")
     public String userDashboard(Authentication auth, Model model) {
         String email = auth.getName();
-        model.addAttribute("currentUser", userService.getUserByEmail(email)); // added
+        model.addAttribute("currentUser", userService.getUserByEmail(email));
         model.addAttribute("recentParking", dashboardService.getUserRecentParking(email, 5));
         model.addAttribute("activeReservation", dashboardService.getUserActiveReservation(email));
         model.addAttribute("slotSummary", dashboardService.getSlotOccupancySummary());

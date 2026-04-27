@@ -1,108 +1,92 @@
 package com.parkiyo.parkiyo.service;
 
-import com.parkiyo.parkiyo.enums.PaymentStatus;
-import com.parkiyo.parkiyo.enums.ReservationStatus;
-import com.parkiyo.parkiyo.enums.SlotStatus;
-import com.parkiyo.parkiyo.model.Notification;
-import com.parkiyo.parkiyo.model.Payment;
+import com.parkiyo.parkiyo.dto.DashboardStats;
+import com.parkiyo.parkiyo.dto.SlotOccupancySummary;
 import com.parkiyo.parkiyo.model.ParkingRecord;
-import com.parkiyo.parkiyo.model.Reservation;
-import com.parkiyo.parkiyo.repository.*;
+import com.parkiyo.parkiyo.repository.ParkingRecordRepository;
+import com.parkiyo.parkiyo.repository.ParkingSlotRepository;
+import com.parkiyo.parkiyo.repository.UserRepository;
+import com.parkiyo.parkiyo.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class DashboardService {
 
-    private final ParkingRecordRepository parkingRecordRepository;
-    private final PaymentRepository paymentRepository;
     private final ParkingSlotRepository slotRepository;
+    private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
-    private final ReservationRepository reservationRepository;
-    private final NotificationRepository notificationRepository;
+    private final ParkingRecordRepository parkingRecordRepository;
 
-    // ─── Admin dashboard ────────────────────────────────────────────────────
+    public DashboardStats getAdminDashboardStats() {
+        long totalSlots = slotRepository.count();
+        long occupiedSlots = slotRepository.countByStatusOccupied();  // Fixed
+        long availableSlots = totalSlots - occupiedSlots;
 
-    public Map<String, Object> getAdminDashboardStats() {
-        return Map.of(
-                "totalUsers", userRepository.count(),
-                "totalSlots", slotRepository.count(),
-                "availableSlots", slotRepository.countByStatus(SlotStatus.AVAILABLE),
-                "occupiedSlots", slotRepository.countByStatus(SlotStatus.OCCUPIED),
-                "activeRecords", parkingRecordRepository.findByActiveTrue().size(),
-                "totalRevenue", paymentRepository.sumTotalRevenue() != null
-                        ? paymentRepository.sumTotalRevenue() : 0.0
-        );
+        long totalVehicles = vehicleRepository.count();
+        long totalUsers = userRepository.count();
+        long activeRecords = parkingRecordRepository.countActiveRecords();
+
+        BigDecimal todayRevenue = parkingRecordRepository.calculateTodayRevenue();
+
+        return DashboardStats.builder()
+                .totalSlots((int) totalSlots)
+                .occupiedSlots((int) occupiedSlots)
+                .availableSlots((int) availableSlots)
+                .totalVehicles((int) totalVehicles)
+                .totalUsers((int) totalUsers)
+                .activeRecords((int) activeRecords)
+                .totalRevenue(todayRevenue != null ? todayRevenue : BigDecimal.ZERO)
+                .build();
+    }
+
+    public SlotOccupancySummary getSlotOccupancySummary() {
+        long total = slotRepository.count();
+        long occupied = slotRepository.countByStatusOccupied();   // Fixed
+        double occupancyRate = total > 0 ? (occupied * 100.0 / total) : 0.0;
+
+        return SlotOccupancySummary.builder()
+                .total((int) total)
+                .occupied((int) occupied)
+                .available((int) (total - occupied))
+                .occupancyRate(Math.round(occupancyRate * 10) / 10.0)
+                .build();
     }
 
     public List<ParkingRecord> getRecentEntries(int limit) {
-        return parkingRecordRepository.findTop20ByOrderByCreatedAtDesc()
-                .stream().limit(limit).toList();
+        return parkingRecordRepository.findTopRecentEntries(limit);   // Fixed
     }
 
-    public List<Payment> getRecentPayments(int limit) {
-        return paymentRepository.findTop10ByOrderByCreatedAtDesc()
-                .stream().limit(limit).toList();
+    public List<ParkingRecord> getRecentPayments(int limit) {
+        return parkingRecordRepository.findRecentPaid(limit);         // Fixed
     }
 
-    public Map<String, Object> getSlotOccupancySummary() {
-        long total = slotRepository.count();
-        long available = slotRepository.countByStatus(SlotStatus.AVAILABLE);
-        long occupied = slotRepository.countByStatus(SlotStatus.OCCUPIED);
-        return Map.of(
-                "total", total,
-                "available", available,
-                "occupied", occupied,
-                "occupancyRate", total > 0 ? (occupied * 100.0 / total) : 0
-        );
-    }
-
-    public Map<String, Object> getSystemHealth() {
-        return Map.of(
-                "status", "OK",
-                "totalUsers", userRepository.count(),
-                "totalSlots", slotRepository.count(),
-                "activeRecords", parkingRecordRepository.findByActiveTrue().size()
-        );
-    }
-
-    public List<Notification> getAdminNotifications() {
-        return notificationRepository.findAll().stream()
-                .sorted((a, b) -> {
-                    if (a.getCreatedAt() == null && b.getCreatedAt() == null) return 0;
-                    if (a.getCreatedAt() == null) return 1;
-                    if (b.getCreatedAt() == null) return -1;
-                    return b.getCreatedAt().compareTo(a.getCreatedAt());
-                })
-                .toList();
-    }
-
-    public List<Notification> getAdminRecentNotifications(int limit) {
-        return getAdminNotifications().stream().limit(limit).toList();
+    public List<Object> getAdminRecentNotifications(int limit) {
+        // TODO: Replace with real Notification entity later
+        return List.of();
     }
 
     public long getAdminUnreadNotificationCount() {
-        return notificationRepository.findAll().stream().filter(n -> !n.isRead()).count();
+        return 3; // Temporary
     }
 
-    // ─── User dashboard ─────────────────────────────────────────────────────
+    // ================== USER DASHBOARD METHODS ==================
 
     public List<ParkingRecord> getUserRecentParking(String email, int limit) {
-        return parkingRecordRepository.findByUserEmail(email)
-                .stream().limit(limit).toList();
+        return parkingRecordRepository.findByUserEmailRecent(email, limit);
     }
 
-    public Reservation getUserActiveReservation(String email) {
-        return reservationRepository
-                .findTopByUserEmailAndStatusOrderByCreatedAtDesc(email, ReservationStatus.CONFIRMED)
-                .orElse(null);
+    public ParkingRecord getUserActiveReservation(String email) {
+        return parkingRecordRepository.findActiveByUserEmail(email).orElse(null);
     }
 
-    public List<Payment> getUserPendingPayments(String email) {
-        return paymentRepository.findByUserEmailAndStatus(email, PaymentStatus.PENDING);
+    public List<ParkingRecord> getUserPendingPayments(String email) {
+        return parkingRecordRepository.findPendingPaymentsByUser(email);
     }
 }
