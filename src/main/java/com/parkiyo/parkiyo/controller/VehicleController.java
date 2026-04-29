@@ -208,7 +208,7 @@ public class VehicleController {
         Map<String, Object> row = new HashMap<>();
         row.put("id", vehicle.getId());
         row.put("plate", vehicle.getLicensePlate());
-        row.put("ownerName", vehicle.getUser() != null ? vehicle.getUser().getFirstName() : "Guest");
+        row.put("ownerName", resolveOwnerName(vehicle));
         row.put("category", vehicle.getCategory() != null ? formatCategory(vehicle.getCategory().name()) : "-");
         row.put("makeModel", buildMakeModel(vehicle.getMake(), vehicle.getModel()));
         row.put("color", vehicle.getColor() != null && !vehicle.getColor().isBlank() ? vehicle.getColor() : "-");
@@ -218,6 +218,18 @@ public class VehicleController {
                 ? vehicle.getCreatedAt().toLocalDate().format(DateTimeFormatter.ISO_DATE)
                 : "-");
         return row;
+    }
+
+    private String resolveOwnerName(Vehicle vehicle) {
+        try {
+            if (vehicle.getUser() == null) {
+                return "Guest";
+            }
+            String firstName = vehicle.getUser().getFirstName();
+            return (firstName == null || firstName.isBlank()) ? "User" : firstName;
+        } catch (Exception ignored) {
+            return "Guest";
+        }
     }
 
     private Map<String, Object> buildVehicleStats(List<Vehicle> vehicles) {

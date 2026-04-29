@@ -28,6 +28,8 @@ public class EntryController {
     @PreAuthorize("isAuthenticated()")
     public String userEntryPage(Authentication auth, Model model) {
         model.addAttribute("availableSlots", slotService.getAvailableSlots());
+        model.addAttribute("availableSlotCount", slotService.getAvailableSlots().size());
+        model.addAttribute("occupiedSlotCount", slotService.getSlotOverview().get("occupied"));
         model.addAttribute("userVehicles", vehicleService.getVehiclesByUser(auth.getName()));
         model.addAttribute("entryRequest", new EntryRequest());
         return "parking/entry";
@@ -56,6 +58,8 @@ public class EntryController {
     @PreAuthorize("hasRole('ADMIN')")
     public String adminEntryPage(Model model) {
         model.addAttribute("availableSlots", slotService.getAvailableSlots());
+        model.addAttribute("availableSlotCount", slotService.getAvailableSlots().size());
+        model.addAttribute("occupiedSlotCount", slotService.getSlotOverview().get("occupied"));
         model.addAttribute("recentEntries", entryService.getRecentEntries(20));
         model.addAttribute("entryRequest", new EntryRequest());
         return "parking/entry-admin";
