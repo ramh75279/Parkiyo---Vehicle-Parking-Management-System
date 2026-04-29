@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8" />
@@ -163,13 +163,23 @@
             </div>
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
-        <nav class="flex-1 px-3 space-y-1 overflow-y-auto" id="sidebarNav"></nav>
+        <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+            <a th:href="@{/admin/dashboard}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group"><span class="material-symbols-outlined shrink-0">dashboard</span><span class="nav-label text-sm">Dashboard</span></a>
+            <a th:href="@{/admin/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group"><span class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle Entry</span></a>
+            <a th:href="@{/admin/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group"><span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span></a>
+            <a th:href="@{/admin/slots/overview}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group"><span class="material-symbols-outlined shrink-0">grid_view</span><span class="nav-label text-sm">Parking Slots</span></a>
+            <a th:href="@{/admin/vehicles}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group"><span class="material-symbols-outlined shrink-0">directions_car</span><span class="nav-label text-sm">Vehicles</span></a>
+            <a th:href="@{/admin/users}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group"><span class="material-symbols-outlined shrink-0">group</span><span class="nav-label text-sm">Users</span></a>
+            <a th:href="@{/admin/payments}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group"><span class="material-symbols-outlined shrink-0">payments</span><span class="nav-label text-sm">Payments</span></a>
+            <a th:href="@{/admin/reports}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group"><span class="material-symbols-outlined shrink-0">bar_chart</span><span class="nav-label text-sm">Reports</span></a>
+            <a th:href="@{/admin/notifications}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group"><span class="material-symbols-outlined shrink-0">notifications</span><span class="nav-label text-sm">Notifications</span></a>
+            <a th:href="@{/admin/system-status}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group"><span class="material-symbols-outlined shrink-0">monitor_heart</span><span class="nav-label text-sm">System Status</span></a>
+            <a th:href="@{/account/settings}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group"><span class="material-symbols-outlined shrink-0">settings</span><span class="nav-label text-sm">Settings</span></a>
+        </nav>
         <div class="p-4 border-t border-white/5">
-            <button onclick="window.location.href='logout.html'"
-                    class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
-                <span class="material-symbols-outlined shrink-0"><a href="logout.html">power_settings_new</a></span><span
-                    class="nav-label"><a href="logout.html">Logout</a></span>
-            </button>
+            <a th:href="@{/logout}" class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                <span class="material-symbols-outlined shrink-0">power_settings_new</span><span class="nav-label">Logout</span>
+            </a>
         </div>
     </aside>
 
@@ -496,106 +506,6 @@
         }
     }
 
-    // ── Role-aware sidebar ─────────────────────────────────
-    (function buildSidebar() {
-        const params = new URLSearchParams(window.location.search);
-        let role = params.get('role') || localStorage.getItem('parkiyo_role') || 'user';
-        localStorage.setItem('parkiyo_role', role);
-
-        const nav = document.getElementById('sidebarNav');
-        const a = 'flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold';
-        const n = 'flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all';
-
-        const lnk = (href, icon, label, active) =>
-            `<a href="${href}" class="${active ? a : n}"><span class="material-symbols-outlined shrink-0">${icon}</span><span class="nav-label text-sm">${label}</span></a>`;
-
-        const adminLinks = [
-            lnk('dashboard_admin.html', 'dashboard', 'Dashboard', false),
-            lnk('entry_admin.html', 'login', 'Vehicle Entry', false),
-            lnk('exitvehicle_admin.html', 'logout', 'Vehicle Exit', false),
-            lnk('slot_overview.html', 'grid_view', 'Parking Slots', false),
-            lnk('Vehicle_List_Page.html', 'directions_car', 'Vehicles', false),
-            lnk('usermanagement.html', 'group', 'Users', false),
-            lnk('paymenthistory.html', 'payments', 'Payments', false),
-            lnk('Repportshubpage.html', 'bar_chart', 'Repports', false),
-            lnk('notification.html', 'notifications', 'Notifications', false),
-            lnk('systemstatuspage.html', 'monitor_heart', 'System Status', false),
-            lnk('accountsetting.html', 'settings', 'Account Settings', true),
-        ];
-
-        const userLinks = [
-            lnk('dashboard_admin.html', 'dashboard', 'Dashboard', false),
-            lnk('entry_admin.html', 'login', 'Vehicle Entry', false),
-            lnk('exitvehicle_admin.html', 'logout', 'Vehicle Exit', false),
-            lnk('slot_overview.html', 'grid_view', 'Parking Slots', false),
-            lnk('Vehicle_List_Page.html', 'directions_car', 'Vehicles', false),
-            lnk('usermanagement.html', 'group', 'Users', false),
-            lnk('paymenthistory.html', 'payments', 'Payments', false),
-            lnk('Repportshubpage.html', 'bar_chart', 'Repports', false),
-            lnk('notification.html', 'notifications', 'Notifications', false),
-            lnk('systemstatuspage.html', 'monitor_heart', 'System Status', false),
-            lnk('accountsetting.html', 'settings', 'Account Settings', true),
-        ];
-
-        nav.innerHTML = (role === 'admin' ? adminLinks : userLinks).join('');
-
-        // Update header badges
-        document.getElementById('roleBadge').textContent = role === 'admin' ? 'Admin' : 'User';
-        document.getElementById('headerName').textContent = role === 'admin' ? 'Alex Johnson' : 'Kamal Perera';
-        document.getElementById('avatarName').textContent = role === 'admin' ? 'Alex Johnson' : 'Kamal Perera';
-        document.getElementById('avatarRole').textContent = role === 'admin' ? 'Admin · PKW-00441-AJ' : 'User · PKW-00441-KP';
-        document.getElementById('roleField').value = role === 'admin' ? 'Administrator' : 'User';
-    })();
-</script>
-
-<script>
-    (function buildSidebar() {
-        const params = new URLSearchParams(window.location.search);
-        let role = params.get('role') || localStorage.getItem('parkiyo_role') || 'user';
-        localStorage.setItem('parkiyo_role', role);
-
-        const nav = document.getElementById('sidebarNav');
-        if (!nav) return;
-
-        const a = 'flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group';
-        const n = 'flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group';
-
-        const lnk = (href, icon, label, isActive) =>
-            `<a href="${href}" class="${isActive ? a : n}"><span class="material-symbols-outlined shrink-0">${icon}</span><span class="nav-label text-sm">${label}</span></a>`;
-
-        // ── USER SIDEBAR (exact from dashboard_user.html reference) ──
-        const userLinks = [
-            lnk('dashboard_admin.html', 'dashboard', 'Dashboard', false),
-            lnk('entry_admin.html', 'login', 'Vehicle Entry', false),
-            lnk('exitvehicle_admin.html', 'logout', 'Vehicle Exit', false),
-            lnk('slot_overview.html', 'grid_view', 'Parking Slots', false),
-            lnk('Vehicle_List_Page.html', 'directions_car', 'Vehicles', false),
-            lnk('usermanagement.html', 'group', 'Users', false),
-            lnk('paymenthistory.html', 'payments', 'Payments', false),
-            lnk('Repportshubpage.html', 'bar_chart', 'Repports', false),
-            lnk('notification.html', 'notifications', 'Notifications', false),
-            lnk('systemstatuspage.html', 'monitor_heart', 'System Status', false),
-            lnk('accountsetting.html', 'settings', 'Account Settings', true),
-        ];
-
-        // ── ADMIN SIDEBAR ──
-        const adminLinks = [
-            lnk('dashboard_admin.html', 'dashboard', 'Dashboard', false),
-            lnk('entry.html', 'login', 'Vehicle Entry', false),
-            lnk('exitvehicle.html', 'logout', 'Vehicle Exit', false),
-            lnk('slot_overview.html', 'grid_view', 'Parking Slots', false),
-            lnk('usermanagement.html', 'group', 'Users', false),
-            lnk('Repportshubpage.html', 'bar_chart', 'Reports', false),
-            lnk('notification.html', 'notifications', 'Notifications', false),
-            lnk('accountsetting.html', 'settings', 'Settings', true),
-        ];
-
-        nav.innerHTML = (role === 'admin' ? adminLinks : userLinks).join('');
-
-        // Update role badge if present
-        const badge = document.getElementById('roleBadge');
-        if (badge) badge.textContent = role === 'admin' ? 'Admin' : 'User';
-    })();
 </script>
 
 </body>
