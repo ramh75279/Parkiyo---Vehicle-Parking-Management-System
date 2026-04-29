@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ParkingSlotRepository extends JpaRepository<ParkingSlot, Long> {
@@ -16,6 +17,7 @@ public interface ParkingSlotRepository extends JpaRepository<ParkingSlot, Long> 
     List<ParkingSlot> findByStatus(SlotStatus status);
 
     boolean existsBySlotNumber(String slotNumber);
+    Optional<ParkingSlot> findBySlotNumber(String slotNumber);
 
     List<ParkingSlot> findByZone(String zone);
 

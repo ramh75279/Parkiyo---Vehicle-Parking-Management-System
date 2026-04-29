@@ -1,19 +1,17 @@
-package com.parkiyo.parkiyo.dto;   // make sure package is correct
+package com.parkiyo.parkiyo.dto;
 
-import lombok.Data;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;  // optional but recommended
+import com.parkiyo.parkiyo.enums.Role;
+import com.parkiyo.parkiyo.enums.UserStatus;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class EditUserRequest {
-
-    @Email(message = "Invalid email format")
-    private String email;
 
     private String firstName;
     private String lastName;
     private String phone;
-    private String role;        // or whatever fields you allow for update
-
-    // You can add more fields as needed (e.g. status, etc.)
+    private Role role;
+    private UserStatus status;
 }

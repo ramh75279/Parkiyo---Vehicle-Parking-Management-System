@@ -240,6 +240,23 @@
         </div>
     </main>
 </div>
+<script>
+    document.querySelectorAll('.slot-cell').forEach((cell) => {
+        const codeEl = cell.querySelector('.slot-code');
+        if (!codeEl) {
+            return;
+        }
+        const slotCode = codeEl.textContent.trim();
+        if (!slotCode) {
+            return;
+        }
+
+        cell.removeAttribute('onclick');
+        cell.addEventListener('click', () => {
+            window.location.href = `/admin/slots/number/${encodeURIComponent(slotCode)}/edit`;
+        });
+    });
+</script>
 </body>
 
 </html>

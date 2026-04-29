@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,6 +57,28 @@ public class SlotService {
                 .orElseThrow(() -> new RuntimeException("Slot not found: " + id));
     }
 
+    public ParkingSlot getSlotByNumber(String slotNumber) {
+        return slotRepository.findBySlotNumber(slotNumber)
+                .orElseThrow(() -> new RuntimeException("Slot not found: " + slotNumber));
+    }
+
+    public Optional<ParkingSlot> findSlotByNumber(String slotNumber) {
+        return slotRepository.findBySlotNumber(slotNumber);
+    }
+
+    @Transactional
+    public ParkingSlot getOrCreateSlotByNumber(String slotNumber) {
+        return slotRepository.findBySlotNumber(slotNumber)
+                .orElseGet(() -> {
+                    ParkingSlot slot = ParkingSlot.builder()
+                            .slotNumber(slotNumber)
+                            .zone(inferZoneForSlot(slotNumber))
+                            .status(SlotStatus.AVAILABLE)
+                            .build();
+                    return slotRepository.save(slot);
+                });
+    }
+
     public List<String> getAllZones() {
         return slotRepository.findAll().stream()
                 .map(ParkingSlot::getZone)
@@ -62,6 +86,26 @@ public class SlotService {
                 .distinct()
                 .sorted()
                 .toList();
+    }
+
+    private String inferZoneForSlot(String slotNumber) {
+        if (slotNumber == null || slotNumber.isBlank()) {
+            return "Zone A — Ground Floor";
+        }
+        String normalized = slotNumber.trim().toUpperCase(Locale.ROOT);
+        if (normalized.startsWith("A-")) {
+            return "Zone A — Ground Floor";
+        }
+        if (normalized.startsWith("B-")) {
+            return "Zone B — Level 1";
+        }
+        if (normalized.startsWith("C-")) {
+            return "Zone C — Level 2";
+        }
+        if (normalized.startsWith("D-")) {
+            return "Zone D — Rooftop";
+        }
+        return "Zone A — Ground Floor";
     }
 
     public Map<String, Object> getSlotOverview() {
