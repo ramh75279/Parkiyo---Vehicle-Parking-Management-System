@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.time.LocalDate;
+
 @Controller
 @PreAuthorize("isAuthenticated()")
 @RequiredArgsConstructor
@@ -38,8 +40,12 @@ public class UserDashboardController {
     @GetMapping("/notifications")
     public String userNotifications(Authentication auth, Model model) {
         String email = auth.getName();
+        var notifications = notificationService.getUserNotifications(email);
         model.addAttribute("currentUser", userService.getUserByEmail(email)); // added
-        model.addAttribute("notifications", notificationService.getUserNotifications(email));
+        model.addAttribute("notifications", notifications);
+        model.addAttribute("todayCount", notifications.stream()
+                .filter(n -> n.getCreatedAt() != null && n.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
+                .count());
         return "account/notification-user";
     }
 
