@@ -112,6 +112,21 @@ public class PaymentController {
         }
     }
 
+    @PostMapping("/receipt")
+    @PreAuthorize("isAuthenticated()")
+    public String receiptPostRedirect(@RequestParam(required = false) Long paymentId) {
+        if (paymentId != null) {
+            return "redirect:/receipt?paymentId=" + paymentId;
+        }
+        return "redirect:/receipt";
+    }
+
+    @PostMapping("/receipts")
+    @PreAuthorize("isAuthenticated()")
+    public String receiptsPostRedirect() {
+        return "redirect:/receipts";
+    }
+
     @GetMapping("/user/receipt")
     public String userReceiptShortcut(@RequestParam(required = false) Long paymentId,
                                       Authentication auth,
