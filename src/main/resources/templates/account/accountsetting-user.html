@@ -38,29 +38,67 @@
     <!-- Fixed: Thymeleaf sidebar, not JS-built -->
     <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
         <div class="p-6 mb-4 flex items-center">
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+            <div
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
                 <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
             </div>
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
-        <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a th:href="@{/dashboard/user}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">dashboard</span><span class="nav-label text-sm">Dashboard</span></a>
-            <a th:href="@{/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle Entry</span></a>
-            <a th:href="@{/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span></a>
-            <a th:href="@{/parking}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">local_parking</span><span class="nav-label text-sm">Active Parking</span></a>
-            <a th:href="@{/reservations}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">event_available</span><span class="nav-label text-sm">Reservations</span></a>
-            <a th:href="@{/payments/history}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">payments</span><span class="nav-label text-sm">Payments</span></a>
+        <nav class="flex-1 px-3 space-y-2 overflow-y-auto">
+            <a th:href="@{/dashboard/user}"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">dashboard</span>
+                <span class="nav-label text-sm">Dashboard</span>
+            </a>
+            <a th:href="@{/entry}"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">login</span>
+                <span class="nav-label text-sm">Vehicle Entry</span>
+            </a>
+            <a th:href="@{/exit}"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">logout</span>
+                <span class="nav-label text-sm">Vehicle Exit</span>
+            </a>
+            <a th:href="@{/parking}"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">local_parking</span>
+                <span class="nav-label text-sm">Active Parking</span>
+            </a>
+            <a th:href="@{/reservation}"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">event_available</span>
+                <span class="nav-label text-sm">Reservation</span>
+            </a>
+            <a th:href="@{/payments/history}"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">payments</span>
+                <span class="nav-label text-sm">Payments</span>
+            </a>
             <a th:href="@{/receipts}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">receipt_long</span>
                 <span class="nav-label text-sm">Receipts</span>
             </a>
-            <a th:href="@{/wallet}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">account_balance_wallet</span><span class="nav-label text-sm">Wallet</span></a>
-            <a th:href="@{/notifications}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">notifications</span><span class="nav-label text-sm">Notifications</span></a>
-            <a th:href="@{/settings/profile}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span class="material-symbols-outlined shrink-0">settings</span><span class="nav-label text-sm">Account Settings</span></a>
+            <a th:href="@{/wallet}"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">account_balance_wallet</span>
+                <span class="nav-label text-sm">Wallet</span>
+            </a>
+            <a th:href="@{/notifications}"
+               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">notifications</span>
+                <span class="nav-label text-sm">Notifications</span>
+            </a>
+            <a th:href="@{/settings/profile}"
+               class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
+                <span class="material-symbols-outlined shrink-0">settings</span>
+                <span class="nav-label text-sm">Account Settings</span>
+            </a>
         </nav>
         <div class="p-4 border-t border-white/5">
-            <a th:href="@{/logout}" class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+            <a th:href="@{/logout}"
+               class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
                 <span class="material-symbols-outlined shrink-0">power_settings_new</span>
                 <span class="nav-label">Logout</span>
             </a>
@@ -158,30 +196,30 @@
                                     <label class="field-label">First Name</label>
                                     <input type="text" name="firstName"
                                            th:value="${user != null ? user.firstName : ''}"
-                                           class="input-glass rounded-2xl" placeholder="First name"/>
+                                           class="input-glass bg-white/5 rounded-2xl" placeholder="First name"/>
                                 </div>
                                 <div>
                                     <label class="field-label">Last Name</label>
                                     <input type="text" name="lastName"
                                            th:value="${user != null ? user.lastName : ''}"
-                                           class="input-glass rounded-2xl" placeholder="Last name"/>
+                                           class="input-glass bg-white/5 rounded-2xl" placeholder="Last name"/>
                                 </div>
                             </div>
                             <div>
                                 <label class="field-label">Phone Number</label>
                                 <input type="tel" name="phone"
                                        th:value="${user != null ? user.phone : ''}"
-                                       class="input-glass rounded-2xl" placeholder="+94 77 123 4567"/>
+                                       class="input-glass bg-white/5 rounded-2xl" placeholder="+94 77 123 4567"/>
                             </div>
                             <div>
                                 <label class="field-label">Email Address <span class="ml-1 text-[9px] bg-white/5 px-2 py-0.5 rounded-full">Read Only</span></label>
                                 <input type="text" th:value="${user != null ? user.email : ''}"
-                                       class="input-glass rounded-2xl" style="color:rgba(255,255,255,0.35);cursor:not-allowed;" readonly/>
+                                       class="input-glass bg-white/5 rounded-2xl" style="color:rgba(255,255,255,0.35);cursor:not-allowed;" readonly/>
                             </div>
                             <div>
                                 <label class="field-label">Role <span class="ml-1 text-[9px] bg-white/5 px-2 py-0.5 rounded-full">Read Only</span></label>
                                 <input type="text" th:value="${user != null ? user.role : ''}"
-                                       class="input-glass rounded-2xl" style="color:rgba(255,255,255,0.35);cursor:not-allowed;" readonly/>
+                                       class="input-glass bg-white/5 rounded-2xl" style="color:rgba(255,255,255,0.35);cursor:not-allowed;" readonly/>
                             </div>
                             <button type="submit"
                                     class="bg-primary text-white font-black px-8 py-3 rounded-2xl hover:bg-primary/80 transition-all text-sm shadow-[0_0_16px_rgba(31,104,249,0.3)]">Save Changes</button>

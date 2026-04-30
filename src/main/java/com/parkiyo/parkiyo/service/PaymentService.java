@@ -108,6 +108,15 @@ public class PaymentService {
         return paymentRepository.findAll();
     }
 
+    public List<Payment> getAllPaymentHistory() {
+        return paymentRepository.findAll().stream()
+                .sorted(Comparator.comparing(
+                        Payment::getCreatedAt,
+                        Comparator.nullsLast(Comparator.reverseOrder())
+                ))
+                .toList();
+    }
+
     public BigDecimal getTotalRevenue() {
         Double total = paymentRepository.sumTotalRevenue();
         return total != null ? BigDecimal.valueOf(total) : BigDecimal.ZERO;
