@@ -21,56 +21,78 @@ public class WalletService {
     private final WalletRepository walletRepository;
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public BigDecimal getBalance(String email) {
-        return getOrCreateWallet(email).getBalance();
+        Wallet wallet = getOrCreateWallet(email);
+        return wallet.getBalance();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Map<String, Object> getWalletOverview(String email) {
         Wallet wallet = getOrCreateWallet(email);
+        // Force initialize transactions safely inside transaction
+        List<WalletTransaction> transactions = wallet.getTransactions();
+        if (transactions != null) {
+            transactions.size(); // force load lazy collection
+        }
+
         return Map.of(
                 "balance", wallet.getBalance(),
                 "wallet", wallet
         );
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<WalletTransaction> getTransactionHistory(String email) {
         Wallet wallet = getOrCreateWallet(email);
         List<WalletTransaction> transactions = wallet.getTransactions();
-        transactions.size(); // force-loads the lazy collection
-        return transactions;
 
+        // Safe way to force initialization inside @Transactional
+        if (transactions != null) {
+            transactions.size();
+        }
 
+        return new ArrayList<>(transactions); // return copy to avoid lazy issues later
     }
 
     @Transactional
     public void topUp(String email, BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Top-up amount must be positive");
+        }
+
         Wallet wallet = getOrCreateWallet(email);
 
         BigDecimal newBalance = wallet.getBalance().add(amount);
         wallet.setBalance(newBalance);
-
-        if (wallet.getTransactions() == null) {
-            wallet.setTransactions(new java.util.ArrayList<>());
-        }
 
         WalletTransaction transaction = WalletTransaction.builder()
                 .wallet(wallet)
                 .type("CREDIT")
                 .amount(amount)
                 .balanceAfter(newBalance)
-                .description("Top-up")
+                .description("Wallet Top-up")
                 .build();
+
+        if (wallet.getTransactions() == null) {
+            wallet.setTransactions(new ArrayList<>());
+        }
         wallet.getTransactions().add(transaction);
+
         walletRepository.save(wallet);
     }
 
+    // You can add more methods later: deduct, payment for parking, etc.
+
     private Wallet getOrCreateWallet(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be null or empty");
+        }
+
         return walletRepository.findByUserEmail(email)
                 .orElseGet(() -> {
                     User user = userRepository.findByEmail(email)
-                            .orElseThrow(() -> new RuntimeException("User not found: " + email));
+                            .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
 
                     Wallet wallet = Wallet.builder()
                             .user(user)
