@@ -117,7 +117,7 @@ public class PaymentService {
     }
 
     public BigDecimal getTotalRevenue() {
-        Double total = paymentRepository.sumTotalRevenue();   // Using default method
+        Double total = paymentRepository.sumTotalRevenue();
         return total != null ? BigDecimal.valueOf(total) : BigDecimal.ZERO;
     }
 
@@ -125,6 +125,7 @@ public class PaymentService {
 
     @Transactional
     public void initiatePayment(Long paymentId, String email) {
+        // Pessimistic lock on Payment
         Payment payment = entityManager.find(Payment.class, paymentId, LockModeType.PESSIMISTIC_WRITE);
         if (payment == null) {
             throw new ResourceNotFoundException("Payment not found with id: " + paymentId);
@@ -138,6 +139,7 @@ public class PaymentService {
             throw new PaymentException("Only PENDING payments can be initiated. Current status: " + payment.getStatus());
         }
 
+        // Pessimistic lock on Wallet
         Wallet wallet = walletRepository.findByUserEmail(email)
                 .map(w -> entityManager.find(Wallet.class, w.getId(), LockModeType.PESSIMISTIC_WRITE))
                 .orElseThrow(() -> new ResourceNotFoundException("Wallet not found for user: " + email));
@@ -149,9 +151,11 @@ public class PaymentService {
             );
         }
 
+        // Deduct balance
         BigDecimal newBalance = wallet.getBalance().subtract(payment.getAmount());
         wallet.setBalance(newBalance);
 
+        // Create wallet transaction
         WalletTransaction walletTransaction = WalletTransaction.builder()
                 .wallet(wallet)
                 .type("DEBIT")
@@ -166,16 +170,19 @@ public class PaymentService {
         }
         wallet.getTransactions().add(walletTransaction);
 
+        // Update payment
         payment.setStatus(PaymentStatus.SUCCESS);
         payment.setPaymentMethod("Parkiyo Wallet");
         payment.setPaidAt(LocalDateTime.now());
 
+        // Build receipt snapshot
         Receipt receipt = buildReceiptSnapshot(payment);
         payment.setReceipt(receipt);
 
         walletRepository.save(wallet);
         paymentRepository.save(payment);
 
+        // Notifications & Audit Log
         notificationService.createNotification(
                 payment.getUser(),
                 NotificationType.PAYMENT,
