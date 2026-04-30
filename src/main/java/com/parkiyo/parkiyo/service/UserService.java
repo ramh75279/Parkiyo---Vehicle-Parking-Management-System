@@ -12,6 +12,7 @@ import com.parkiyo.parkiyo.exception.InvalidFileException;
 import com.parkiyo.parkiyo.exception.ResourceAlreadyExistsException;
 import com.parkiyo.parkiyo.exception.ResourceNotFoundException;
 import com.parkiyo.parkiyo.model.User;
+import com.parkiyo.parkiyo.repository.AuditLogRepository;
 import com.parkiyo.parkiyo.repository.NotificationRepository;
 import com.parkiyo.parkiyo.repository.ParkingRecordRepository;
 import com.parkiyo.parkiyo.repository.PaymentRepository;
@@ -42,6 +43,7 @@ public class UserService {
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
     private final NotificationRepository notificationRepository;
+    private final AuditLogRepository auditLogRepository;
     private final ParkingRecordRepository parkingRecordRepository;
     private final VehicleRepository vehicleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -186,6 +188,7 @@ public class UserService {
         vehicleRepository.clearUserByEmail(user.getEmail());
         notificationRepository.deleteByUserEmail(user.getEmail());
         reservationRepository.deleteByUserEmail(user.getEmail());
+        auditLogRepository.clearPerformedBy(user.getId());
 
         deleteOldProfilePicture(user.getProfilePicturePath());
         userRepository.delete(user);
