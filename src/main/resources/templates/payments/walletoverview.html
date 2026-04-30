@@ -129,15 +129,15 @@
                             <span class="text-[10px] font-black uppercase tracking-widest text-white/50 bg-white/10 px-3 py-1.5 rounded-lg">Active</span>
                         </div>
                         <p class="text-white/60 text-xs font-black uppercase tracking-widest mb-2">Available Balance</p>
-                        <p class="text-6xl font-black text-white mb-6" th:text="'$' + ${wallet.balance}">$48.50</p>
+                        <p class="text-6xl font-black text-white mb-6" th:text="'$' + (${wallet.balance} ?: 0)">$48.50</p>
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-white/50 text-[10px] font-black uppercase tracking-widest">Wallet ID</p>
-                                <p class="text-white/80 font-mono text-sm font-bold mt-0.5" th:text="'PKW-' + ${wallet.wallet.id} + '-KP'">PKW-00441-KP</p>
+                                <p class="text-white/80 font-mono text-sm font-bold mt-0.5" th:text="${wallet.wallet != null ? 'PKW-' + wallet.wallet.id + '-KP' : 'PKW-N/A'}">PKW-00441-KP</p>
                             </div>
                             <div class="text-right">
                                 <p class="text-white/50 text-[10px] font-black uppercase tracking-widest">Owner</p>
-                                <p class="text-white font-black text-sm mt-0.5" th:text="${wallet.wallet.user.firstName + ' ' + wallet.wallet.user.lastName}">Kamal Perera</p>
+                                <p class="text-white font-black text-sm mt-0.5" th:text="${wallet.wallet != null and wallet.wallet.user != null ? wallet.wallet.user.firstName + ' ' + wallet.wallet.user.lastName : 'User'}">Kamal Perera</p>
                             </div>
                         </div>
                     </div>
@@ -195,7 +195,7 @@
                             </div>
                             <div class="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/15 flex items-center justify-between mb-5">
                                 <p class="text-sm font-black text-white">New Balance After Top-Up</p>
-                                <p class="text-xl font-black text-emerald-400" id="newBalance" th:data-balance="${wallet.balance}">$98.50</p>
+                                <p class="text-xl font-black text-emerald-400" id="newBalance" th:data-balance="${wallet.balance ?: 0}">$98.50</p>
                             </div>
                             <button type="submit" class="w-full flex items-center justify-center gap-2 bg-emerald-500 text-white font-black py-4 rounded-2xl hover:bg-emerald-600 transition-all text-sm shadow-[0_0_20px_rgba(16,185,129,0.3)]">
                                 <span class="material-symbols-outlined text-lg">add_circle</span>
@@ -226,7 +226,7 @@
                                     <p class="text-sm font-black text-white" th:text="${txn.description}">Top-Up</p>
                                     <p class="text-[10px] text-slate-500 font-bold" th:text="${#temporals.format(txn.createdAt, 'dd MMM yyyy')}">08 Mar</p>
                                 </div>
-                                <span th:classappend="${txn.type == 'CREDIT'} ? 'text-emerald-400' : 'text-rose-400'" class="font-black" th:text="(${txn.type == 'CREDIT'} ? '+' : '-') + '$' + ${txn.amount}">+$50.00</span>
+                                <span th:classappend="${txn.type == 'CREDIT' ? 'text-emerald-400' : 'text-rose-400'}" class="font-black" th:text="${(txn.type == 'CREDIT' ? '+' : '-') + '$' + txn.amount}">+$50.00</span>
                             </div>
                             <div th:if="${#lists.isEmpty(transactions)}" class="py-6 text-center">
                                 <p class="text-sm text-slate-500 font-bold">No recent transactions.</p>
@@ -245,7 +245,7 @@
 
 <script th:inline="javascript">
     let selectedAmt = 50;
-    const currentBalance = parseFloat(/*[[${wallet.balance}]]*/ 0);
+    const currentBalance = parseFloat(/*[[${wallet.balance ?: 0}]]*/ 0);
 
     // Initialize display with default topup of 50
     document.getElementById('newBalance').textContent = '$' + (currentBalance + selectedAmt).toFixed(2);

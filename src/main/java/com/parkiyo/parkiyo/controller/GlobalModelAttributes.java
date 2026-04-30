@@ -1,6 +1,5 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.parkiyo.model.User;
 import com.parkiyo.parkiyo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -15,7 +14,7 @@ public class GlobalModelAttributes {
     private final UserService userService;
 
     @ModelAttribute("currentUser")
-    public User currentUser(Authentication authentication) {
+    public Object currentUser(Authentication authentication) {
         if (authentication == null
                 || !authentication.isAuthenticated()
                 || "anonymousUser".equalsIgnoreCase(authentication.getName())) {
