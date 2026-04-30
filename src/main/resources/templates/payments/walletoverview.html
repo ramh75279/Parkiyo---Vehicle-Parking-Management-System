@@ -226,7 +226,7 @@
                                     <p class="text-sm font-black text-white" th:text="${txn.description}">Top-Up</p>
                                     <p class="text-[10px] text-slate-500 font-bold" th:text="${#temporals.format(txn.createdAt, 'dd MMM yyyy')}">08 Mar</p>
                                 </div>
-                                <span th:classappend="${txn.type == 'CREDIT'} ? 'text-emerald-400' : 'text-rose-400'" class="font-black" th:text="(${txn.type == 'CREDIT'} ? '+' : '-') + '$' + ${txn.amount}">+$50.00</span>
+                                <span th:classappend="${txn.type == 'CREDIT' ? 'text-emerald-400' : 'text-rose-400'}" class="font-black" th:text="${(txn.type == 'CREDIT' ? '+' : '-') + '$' + txn.amount}">+$50.00</span>
                             </div>
                             <div th:if="${#lists.isEmpty(transactions)}" class="py-6 text-center">
                                 <p class="text-sm text-slate-500 font-bold">No recent transactions.</p>
