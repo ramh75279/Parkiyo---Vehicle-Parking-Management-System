@@ -1,6 +1,7 @@
 package com.parkiyo.parkiyo.controller;
 
 import com.parkiyo.parkiyo.dto.WalletTopUpRequest;
+import com.parkiyo.parkiyo.service.UserService;
 import com.parkiyo.parkiyo.service.WalletService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class WalletController {
 
     private final WalletService walletService;
+    private final UserService userService;
 
     // GET /wallet
     @Transactional
@@ -25,6 +27,7 @@ public class WalletController {
     public String walletOverview(Authentication auth, Model model) {
         model.addAttribute("wallet", walletService.getWalletOverview(auth.getName()));
         model.addAttribute("transactions", walletService.getTransactionHistory(auth.getName()));
+        model.addAttribute("currentUser", userService.getUserByEmail(auth.getName()));
         return "payments/walletoverview";
     }
 
