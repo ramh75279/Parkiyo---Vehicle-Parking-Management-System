@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     List<Reservation> findByUserEmail(String email);
+    long countByUserEmail(String email);
+    void deleteByUserEmail(String email);
 
     List<Reservation> findByUserEmailAndStatus(String email, ReservationStatus status);
 

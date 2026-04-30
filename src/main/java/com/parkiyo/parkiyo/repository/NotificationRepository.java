@@ -14,4 +14,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     List<Notification> findByUserEmailAndReadFalse(String email);
 
     long countByUserEmailAndReadFalse(String email);
+
+    void deleteByUserEmail(String email);
 }

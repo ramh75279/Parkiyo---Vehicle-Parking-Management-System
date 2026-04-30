@@ -2,6 +2,7 @@ package com.parkiyo.parkiyo.repository;
 
 import com.parkiyo.parkiyo.model.ParkingRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -54,4 +55,8 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
     List<ParkingRecord> findPendingPaymentsByUser(@Param("email") String email);
 
     List<ParkingRecord> findTop10ByOrderByEntryTimeDesc();
+
+    @Modifying
+    @Query("UPDATE ParkingRecord pr SET pr.user = null WHERE pr.user.email = :email")
+    int clearUserByEmail(@Param("email") String email);
 }
