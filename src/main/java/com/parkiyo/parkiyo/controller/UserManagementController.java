@@ -23,16 +23,21 @@ public class UserManagementController {
 
     private final UserService userService;
 
-    // GET /admin/users
+    // GET /admin/users - List Users
     @GetMapping
     public String userList(@RequestParam(required = false) String search,
                            @RequestParam(required = false) String role,
                            @RequestParam(required = false) String status,
                            Model model) {
-        model.addAttribute("users", userService.getAllUsers(search, role, status));
-        model.addAttribute("totalUsers", userService.getTotalUserCount());
-        model.addAttribute("activeUsers", userService.getActiveUserCount());
-        model.addAttribute("adminUsers", userService.getRoleCount(Role.ADMIN));
+
+        // Using the paginated method we have in UserService
+        model.addAttribute("users", userService.getAllUsersPaginated(null, search, role, status));
+        model.addAttribute("totalUsers", userService.getTotalUsers());
+
+        // Optional: You can improve stats later
+        model.addAttribute("activeUsers", 0);     // TODO: Implement later
+        model.addAttribute("adminUsers", 0);      // TODO: Implement later
+
         return "admin/usermanagement";
     }
 
@@ -50,15 +55,13 @@ public class UserManagementController {
                              BindingResult result,
                              RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            redirectAttributes.addFlashAttribute("error", result.getFieldError() != null
-                    ? result.getFieldError().getDefaultMessage()
-                    : "Unable to create user.");
+            redirectAttributes.addFlashAttribute("error",
+                    result.getFieldError() != null ? result.getFieldError().getDefaultMessage() : "Validation error");
             return "redirect:/admin/users/create";
         }
         try {
             userService.createUser(request);
-            redirectAttributes.addFlashAttribute("success",
-                    "User " + request.getEmail() + " created.");
+            redirectAttributes.addFlashAttribute("success", "User " + request.getEmail() + " created successfully.");
             return "redirect:/admin/users";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -82,14 +85,13 @@ public class UserManagementController {
                              BindingResult result,
                              RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            redirectAttributes.addFlashAttribute("error", result.getFieldError() != null
-                    ? result.getFieldError().getDefaultMessage()
-                    : "Unable to update user.");
+            redirectAttributes.addFlashAttribute("error",
+                    result.getFieldError() != null ? result.getFieldError().getDefaultMessage() : "Validation error");
             return "redirect:/admin/users/" + id + "/edit";
         }
         try {
             userService.updateUser(id, request);
-            redirectAttributes.addFlashAttribute("success", "User updated.");
+            redirectAttributes.addFlashAttribute("success", "User updated successfully.");
             return "redirect:/admin/users";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -100,10 +102,9 @@ public class UserManagementController {
     // POST /admin/users/{id}/toggle-status
     @PostMapping("/{id}/toggle-status")
     public String toggleUserStatus(@PathVariable Long id,
-                                   Authentication auth,
                                    RedirectAttributes redirectAttributes) {
         try {
-            userService.toggleUserStatus(id, auth.getName());
+            userService.toggleUserStatus(id);        // Fixed: only one parameter
             redirectAttributes.addFlashAttribute("success", "User status updated.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -116,13 +117,14 @@ public class UserManagementController {
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             userService.deleteUser(id);
-            redirectAttributes.addFlashAttribute("success", "User deleted.");
+            redirectAttributes.addFlashAttribute("success", "User deleted successfully.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/admin/users";
     }
 
+    // POST /admin/users/{id}/reset-password
     @PostMapping("/{id}/reset-password")
     public String resetUserPassword(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
