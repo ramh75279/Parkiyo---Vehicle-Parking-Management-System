@@ -298,7 +298,7 @@
                     <h3 class="text-base font-black text-white mb-2">Step 1 — Enter Plate Number</h3>
                     <p class="text-[11px] text-slate-500 font-bold mb-6">Look up the vehicle that is departing the
                         facility.</p>
-                    <select id="plateSelect" th:field="*{parkingRecordId}" class="pt-3 rounded-3xl plate-input mb-4" onchange="lookupPlate()">
+                    <select id="plateSelect" th:field="*{parkingRecordId}" class="pt-5 text-base rounded-3xl plate-input mb-4" onchange="lookupPlate()">
                         <option value="">-- SELECT ACTIVE VEHICLE --</option>
                         <option th:each="record : ${activeRecords}" th:value="${record.id}" th:text="${record.vehicle.licensePlate}"></option>
                     </select>
