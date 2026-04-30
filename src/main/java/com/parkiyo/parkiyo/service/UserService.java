@@ -3,6 +3,7 @@ package com.parkiyo.parkiyo.service;
 import com.parkiyo.parkiyo.dto.*;
 import com.parkiyo.parkiyo.exception.*;
 import com.parkiyo.parkiyo.model.User;
+import com.parkiyo.parkiyo.enums.Role;
 import com.parkiyo.parkiyo.enums.UserRole;
 import com.parkiyo.parkiyo.enums.UserStatus;
 import com.parkiyo.parkiyo.repository.UserRepository;
@@ -71,9 +72,7 @@ public class UserService {
         if (file != null && !file.isEmpty()) {
             validateImageFile(file);
             String filename = saveProfilePicture(file);
-
             deleteOldProfilePicture(user.getProfilePicturePath());
-
             user.setProfilePicturePath("/uploads/profiles/" + filename);
         }
 
@@ -139,10 +138,6 @@ public class UserService {
 
     // ================== ADMIN METHODS ==================
 
-    public Page<User> getAllUsersPaginated(Pageable pageable, String search, String role, String status) {
-        return userRepository.findAll(pageable);   // TODO: Improve with search/filter later
-    }
-
     @Transactional
     public User createUser(CreateUserRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -155,7 +150,14 @@ public class UserService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setPhone(request.getPhone());
-        user.setRole(UserRole.valueOf(request.getRole().toString().toUpperCase()));
+
+        // Fixed: Use correct Role enum
+        if (request.getRole() != null) {
+            user.setRole(Role.valueOf(request.getRole().toString().toUpperCase()));
+        } else {
+            user.setRole(Role.USER);
+        }
+
         user.setStatus(UserStatus.ACTIVE);
 
         return userRepository.save(user);
@@ -173,11 +175,10 @@ public class UserService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setPhone(request.getPhone());
+
+        // Fixed: Use correct Role enum
         if (request.getRole() != null) {
-            user.setRole(UserRole.valueOf(request.getRole().toUpperCase()));
-        }
-        if (request.getStatus() != null) {
-            user.setStatus(UserStatus.valueOf(request.getStatus().toUpperCase()));
+            user.setRole(Role.valueOf(request.getRole().toString().toUpperCase()));
         }
 
         return userRepository.save(user);
@@ -202,6 +203,10 @@ public class UserService {
         User user = getUserById(id);
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    public Page<User> getAllUsersPaginated(Pageable pageable, String search, String role, String status) {
+        return userRepository.findAll(pageable);
     }
 
     public long getTotalUsers() {
