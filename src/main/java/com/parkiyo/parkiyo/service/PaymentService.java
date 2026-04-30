@@ -108,12 +108,11 @@ public class PaymentService {
         return paymentRepository.findAll();
     }
 
+    // Kept for backward compatibility with controller
     public List<Payment> getAllPaymentHistory() {
         return paymentRepository.findAll().stream()
-                .sorted(Comparator.comparing(
-                        Payment::getCreatedAt,
-                        Comparator.nullsLast(Comparator.reverseOrder())
-                ))
+                .sorted(Comparator.comparing(Payment::getCreatedAt,
+                        Comparator.nullsLast(Comparator.reverseOrder())))
                 .toList();
     }
 
@@ -171,20 +170,19 @@ public class PaymentService {
         }
         wallet.getTransactions().add(walletTransaction);
 
-        // Update payment status
+        // Update payment
         payment.setStatus(PaymentStatus.SUCCESS);
         payment.setPaymentMethod("Parkiyo Wallet");
         payment.setPaidAt(LocalDateTime.now());
 
-        // Build and attach receipt
+        // Build receipt snapshot
         Receipt receipt = buildReceiptSnapshot(payment);
         payment.setReceipt(receipt);
 
-        // Save
         walletRepository.save(wallet);
         paymentRepository.save(payment);
 
-        // Notifications & Audit
+        // Notifications & Audit Log
         notificationService.createNotification(
                 payment.getUser(),
                 NotificationType.PAYMENT,
@@ -260,7 +258,6 @@ public class PaymentService {
     }
 
     private Receipt buildReceiptSnapshot(Payment payment) {
-        // Your original method - kept almost as-is with minor safety improvements
         ParkingRecord parkingRecord = payment.getParkingRecord();
         Reservation reservation = payment.getReservation();
 
