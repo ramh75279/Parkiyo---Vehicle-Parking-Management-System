@@ -228,7 +228,7 @@
                 <span class="material-symbols-outlined shrink-0">payments</span>
                 <span class="nav-label text-sm">Payments</span>
             </a>
-            <a th:href="@{/receipts}"
+            <a th:href="@{/receipt}"
                class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                 <span class="material-symbols-outlined shrink-0">receipt_long</span>
                 <span class="nav-label text-sm">Receipts</span>
@@ -269,7 +269,7 @@
                 <div>
                     <h2 class="text-xl font-black text-white">Receipt</h2>
                     <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1"
-                       th:text="${receipt.transactionId}">TXN-88291047</p>
+                       th:text="${receipt != null ? receipt.transactionId : 'No receipt available'}">TXN-88291047</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -281,11 +281,11 @@
                         class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
                     <span class="material-symbols-outlined text-lg">print</span> Print
                 </button>
-                <a th:href="@{/receipts/{id}/pdf(id=${receipt.payment.id})}"
+                <a th:href="${receipt != null && receipt.payment != null ? '/receipts/' + receipt.payment.id + '/pdf' : '/receipt'}"
                         class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
                     <span class="material-symbols-outlined text-lg">download</span> PDF
                 </a>
-                <a th:href="@{/receipts/{id}/email(id=${receipt.payment.id})}"
+                <a th:href="${receipt != null && receipt.payment != null ? '/receipts/' + receipt.payment.id + '/email' : '/receipt'}"
                         class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
                     <span class="material-symbols-outlined text-lg">email</span> Email
                 </a>
@@ -316,7 +316,7 @@
                             </div>
                             <div class="text-right">
                                 <p class="text-[9px] text-blue-200/50 font-black uppercase tracking-widest">Receipt</p>
-                                <p class="text-white font-black font-mono text-sm" th:text="${receipt.transactionId}">TXN-88291047</p>
+                                <p class="text-white font-black font-mono text-sm" th:text="${receipt != null && receipt.transactionId != null ? receipt.transactionId : 'TXN-00000000'}">TXN-88291047</p>
                             </div>
                         </div>
                         <div
@@ -324,7 +324,7 @@
                             <div>
                                 <p class="text-[9px] text-blue-200/50 font-black uppercase tracking-widest mb-0.5">
                                     Payment Date</p>
-                                <p class="text-white font-black text-sm" th:text="${receipt.paymentDate}">10 Mar 2026 · 02:13 PM</p>
+                                <p class="text-white font-black text-sm" th:text="${receipt.paymentDate != null ? #temporals.format(receipt.paymentDate, 'dd MMM yyyy · hh:mm a') : '-'}">10 Mar 2026 · 02:13 PM</p>
                             </div>
                             <div
                                     class="flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 px-3 py-1.5 rounded-lg">
@@ -344,8 +344,8 @@
                                 <span class="material-symbols-outlined text-primary text-lg">person</span>
                             </div>
                             <div>
-                                <p class="text-sm font-black text-slate-800" th:text="${receipt.customerName}">Nimal Silva</p>
-                                <p class="text-[10px] text-slate-400 font-bold" th:text="${receipt.customerEmail}">nimal.silva@email.com</p>
+                                <p class="text-sm font-black text-slate-800" th:text="${receipt.customerName != null ? receipt.customerName : 'User'}">Nimal Silva</p>
+                                <p class="text-[10px] text-slate-400 font-bold" th:text="${receipt.customerEmail != null ? receipt.customerEmail : '-'}">nimal.silva@email.com</p>
                             </div>
                         </div>
 
@@ -353,15 +353,15 @@
                         <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Parking Details</p>
                         <div class="mb-4">
                             <div class="receipt-row"><span class="lbl">Vehicle</span><span
-                                    class="val font-black tracking-widest" th:text="${receipt.plate}">XYZ-8899</span></div>
-                            <div class="receipt-row"><span class="lbl">Make / Model</span><span class="val" th:text="${receipt.vehicleModel}">Nissan Axio</span></div>
+                                    class="val font-black tracking-widest" th:text="${receipt.plate != null ? receipt.plate : '-'}">XYZ-8899</span></div>
+                            <div class="receipt-row"><span class="lbl">Make / Model</span><span class="val" th:text="${receipt.vehicleModel != null ? receipt.vehicleModel : '-'}">Nissan Axio</span></div>
                             <div class="receipt-row"><span class="lbl">Slot</span><span
-                                    class="val text-blue-600 font-black" th:text="${receipt.slotCode + ' · ' + receipt.zone}">C-03 · Zone C</span></div>
-                            <div class="receipt-row"><span class="lbl">Type</span><span class="val" th:text="${receipt.sessionType}">Advance Reservation</span></div>
-                            <div class="receipt-row"><span class="lbl">Date</span><span class="val" th:text="${receipt.date}">11 Mar 2026</span></div>
-                            <div class="receipt-row"><span class="lbl">Arrival</span><span class="val" th:text="${receipt.arrival}">09:00 AM</span></div>
-                            <div class="receipt-row"><span class="lbl">Departure</span><span class="val" th:text="${receipt.departure}">12:00 PM</span></div>
-                            <div class="receipt-row"><span class="lbl">Duration</span><span class="val" th:text="${receipt.duration}">3 hours</span></div>
+                                    class="val text-blue-600 font-black" th:text="${(receipt.slotCode != null ? receipt.slotCode : '-') + (receipt.zone != null ? ' · ' + receipt.zone : '')}">C-03 · Zone C</span></div>
+                            <div class="receipt-row"><span class="lbl">Type</span><span class="val" th:text="${receipt.sessionType != null ? receipt.sessionType : '-'}">Advance Reservation</span></div>
+                            <div class="receipt-row"><span class="lbl">Date</span><span class="val" th:text="${receipt.date != null ? #temporals.format(receipt.date, 'dd MMM yyyy') : '-'}">11 Mar 2026</span></div>
+                            <div class="receipt-row"><span class="lbl">Arrival</span><span class="val" th:text="${receipt.arrival != null ? #temporals.format(receipt.arrival, 'hh:mm a') : '-'}">09:00 AM</span></div>
+                            <div class="receipt-row"><span class="lbl">Departure</span><span class="val" th:text="${receipt.departure != null ? #temporals.format(receipt.departure, 'hh:mm a') : '-'}">12:00 PM</span></div>
+                            <div class="receipt-row"><span class="lbl">Duration</span><span class="val" th:text="${receipt.duration != null ? receipt.duration : '-'}">3 hours</span></div>
                         </div>
 
                         <!-- Tear -->
@@ -369,11 +369,11 @@
 
                         <!-- Billing -->
                         <div class="mt-4 mb-2">
-                            <div class="receipt-row"><span class="lbl" th:text="'Subtotal (' + ${receipt.billingBreakdown} + ')'">Subtotal (3h × $5.50)</span><span
-                                    class="val" th:text="'$' + ${receipt.subtotal}">$16.50</span></div>
+                            <div class="receipt-row"><span class="lbl" th:text="${'Subtotal (' + (receipt.billingBreakdown != null ? receipt.billingBreakdown : '-') + ')'}">Subtotal (3h × $5.50)</span><span
+                                    class="val" th:text="${'$' + #numbers.formatDecimal(receipt.subtotal != null ? receipt.subtotal : 0, 1, 2)}">$16.50</span></div>
                             <div class="receipt-row"><span class="lbl">Discount</span><span
                                     class="val text-emerald-600" th:text="${receipt.discount != null ? receipt.discount : '—'}">—</span></div>
-                            <div class="receipt-row"><span class="lbl">Tax (0%)</span><span class="val" th:text="'$' + ${receipt.tax}">$0.00</span></div>
+                            <div class="receipt-row"><span class="lbl">Tax (0%)</span><span class="val" th:text="${'$' + #numbers.formatDecimal(receipt.tax != null ? receipt.tax : 0, 1, 2)}">$0.00</span></div>
                         </div>
 
                         <!-- Total box -->
@@ -381,13 +381,13 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Paid</p>
-                                    <p class="text-3xl font-black text-slate-900 mt-0.5" th:text="'$' + ${receipt.total}">$16.50</p>
+                                    <p class="text-3xl font-black text-slate-900 mt-0.5" th:text="${'$' + #numbers.formatDecimal(receipt.total != null ? receipt.total : 0, 1, 2)}">$16.50</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Method</p>
                                     <div class="flex items-center gap-1.5 mt-0.5">
                                         <span class="material-symbols-outlined text-emerald-600 text-sm">account_balance_wallet</span>
-                                        <p class="text-sm font-black text-slate-700" th:text="${receipt.paymentMethod}">Parkiyo Wallet</p>
+                                        <p class="text-sm font-black text-slate-700" th:text="${receipt.paymentMethod != null ? receipt.paymentMethod : 'Parkiyo Wallet'}">Parkiyo Wallet</p>
                                     </div>
                                 </div>
                             </div>
@@ -432,14 +432,14 @@
                             class="flex-1 flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-sm">
                         <span class="material-symbols-outlined text-base">print</span> Print
                     </button>
-                    <button
+                    <a th:href="${receipt != null && receipt.payment != null ? '/receipts/' + receipt.payment.id + '/pdf' : '/receipt'}"
                             class="flex-1 flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black py-3.5 rounded-2xl hover:bg-white/10 transition-all text-sm">
                         <span class="material-symbols-outlined text-base">download</span> Download PDF
-                    </button>
-                    <button
+                    </a>
+                    <a th:href="${receipt != null && receipt.payment != null ? '/receipts/' + receipt.payment.id + '/email' : '/receipt'}"
                             class="flex-1 flex items-center justify-center gap-2 bg-primary/10 border border-primary/20 text-primary font-black py-3.5 rounded-2xl hover:bg-primary/20 transition-all text-sm">
                         <span class="material-symbols-outlined text-base">email</span> Send Email
-                    </button>
+                    </a>
                 </div>
 
             </div>

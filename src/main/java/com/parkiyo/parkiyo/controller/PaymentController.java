@@ -3,6 +3,7 @@ package com.parkiyo.parkiyo.controller;
 import com.parkiyo.parkiyo.exception.InsufficientBalanceException;
 import com.parkiyo.parkiyo.exception.PaymentException;
 import com.parkiyo.parkiyo.exception.ResourceNotFoundException;
+import com.parkiyo.parkiyo.model.Receipt;
 import com.parkiyo.parkiyo.service.PaymentService;
 import com.parkiyo.parkiyo.service.WalletService;
 import lombok.RequiredArgsConstructor;
@@ -92,8 +93,9 @@ public class PaymentController {
             model.addAttribute("receipt", paymentService.getLatestReceipt(auth.getName()));
             return "payments/receipt";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/payments/history";
+            model.addAttribute("receipt", new Receipt());
+            model.addAttribute("error", "No receipt found yet. Complete a payment first.");
+            return "payments/receipt";
         }
     }
 
@@ -107,8 +109,9 @@ public class PaymentController {
             model.addAttribute("receipt", paymentService.getReceipt(paymentId, auth.getName()));
             return "payments/receipt";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/payments/history";
+            model.addAttribute("receipt", new Receipt());
+            model.addAttribute("error", "No receipt found yet. Complete a payment first.");
+            return "payments/receipt";
         }
     }
 
