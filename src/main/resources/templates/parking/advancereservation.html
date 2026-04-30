@@ -354,214 +354,60 @@
             </div>
 
             <!-- Reservation cards -->
-            <div class="space-y-4">
+            <div class="space-y-4" id="reservationList">
+                <div th:if="${#lists.isEmpty(reservations)}" class="text-slate-400">No reservations found.</div>
 
-                <!-- Today - active -->
-                <div class="res-card border-l-4 border-emerald-500">
+                <div th:each="res : ${reservations}"
+                     class="res-card reservation-card"
+                     th:attr="data-status=${res.status.name()},data-date=${#temporals.format(res.startTime, 'yyyy-MM-dd')},data-start=${#temporals.format(res.startTime, 'HH:mm')},data-end=${#temporals.format(res.endTime, 'HH:mm')}">
                     <div class="flex flex-wrap items-start justify-between gap-4">
                         <div class="flex items-center gap-4">
-                            <div
-                                    class="h-11 w-11 rounded-xl bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center shrink-0">
-                                <span class="material-symbols-outlined text-emerald-400">event_available</span>
+                            <div class="h-11 w-11 rounded-xl flex items-center justify-center shrink-0"
+                                 th:classappend="${res.status.name() == 'COMPLETED' ? ' bg-amber-500/10 border border-amber-500/15' : (res.status.name() == 'CANCELLED' ? ' bg-slate-700/30 border border-slate-700/30' : (res.status.name() == 'CONFIRMED' ? ' bg-emerald-500/10 border border-emerald-500/15' : ' bg-primary/10 border border-primary/15'))}">
+                                <span class="material-symbols-outlined text-emerald-400"
+                                      th:classappend="${res.status.name() == 'COMPLETED' ? ' text-amber-400' : (res.status.name() == 'CANCELLED' ? ' text-slate-500' : (res.status.name() == 'CONFIRMED' ? ' text-emerald-400' : ' text-primary'))}"
+                                      th:text="${res.status.name() == 'COMPLETED' ? 'check_circle' : (res.status.name() == 'CANCELLED' ? 'cancel' : (res.status.name() == 'CONFIRMED' ? 'event_available' : 'schedule'))}"></span>
                             </div>
                             <div>
                                 <div class="flex items-center gap-2 mb-1">
-                                    <p class="text-base font-black text-white tracking-widest">ABC-1234</p>
-                                    <span class="res-pill res-pill-active">Active</span>
+                                    <p class="text-base font-black text-white tracking-widest" th:text="${res.vehicle.licensePlate}"></p>
+                                    <span class="res-pill"
+                                          th:classappend="${res.status.name() == 'CONFIRMED' ? ' res-pill-active' : (res.status.name() == 'CANCELLED' ? ' res-pill-cancelled' : (res.status.name() == 'COMPLETED' ? ' res-pill-completed' : ' res-pill-upcoming'))}"
+                                          th:text="${res.status.name()}"></span>
+                                    <span th:if="${#temporals.format(res.startTime, 'yyyy-MM-dd') == #temporals.format(T(java.time.LocalDate).now(), 'yyyy-MM-dd')}"
+                                          class="text-[9px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg">Today</span>
                                 </div>
-                                <p class="text-xs text-slate-400 font-bold">Kamal Perera · Toyota Prius</p>
+                                <p class="text-xs text-slate-400 font-bold"
+                                   th:text="${res.user.fullName + ' · ' + res.vehicle.make + (res.vehicle.model != null ? ' ' + res.vehicle.model : '')}"></p>
                             </div>
                         </div>
                         <div class="flex items-center gap-6 flex-wrap">
                             <div class="text-center">
                                 <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Slot</p>
-                                <p class="text-sm font-black text-primary mt-0.5">A-12</p>
+                                <p class="text-sm font-black text-primary mt-0.5" th:text="${res.slot.slotNumber}"></p>
                             </div>
                             <div class="text-center">
                                 <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Arrival</p>
-                                <p class="text-sm font-black text-white mt-0.5">10:30 AM</p>
+                                <p class="text-sm font-black text-white mt-0.5" th:text="${#temporals.format(res.startTime, 'hh:mm a')}"></p>
                             </div>
                             <div class="text-center">
                                 <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Until</p>
-                                <p class="text-sm font-black text-white mt-0.5">02:30 PM</p>
+                                <p class="text-sm font-black text-white mt-0.5" th:text="${#temporals.format(res.endTime, 'hh:mm a')}"></p>
                             </div>
                             <div class="text-center">
                                 <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Fee</p>
-                                <p class="text-sm font-black text-emerald-400 mt-0.5">$22.00</p>
+                                <p class="text-sm font-black text-emerald-400 mt-0.5" th:text="${res.payment != null ? '$' + res.payment.amount : '$0.00'}"></p>
                             </div>
                             <div class="flex gap-2">
-                                <button
-                                        class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all"><span
-                                        class="material-symbols-outlined text-sm text-slate-400">edit</span></button>
-                                <a th:href="@{/parking/record-details}"
-                                   class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all"><span
-                                        class="material-symbols-outlined text-sm text-slate-400">open_in_new</span></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Today - upcoming -->
-                <div class="res-card border-l-4 border-primary">
-                    <div class="flex flex-wrap items-start justify-between gap-4">
-                        <div class="flex items-center gap-4">
-                            <div
-                                    class="h-11 w-11 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center shrink-0">
-                                <span class="material-symbols-outlined text-primary">schedule</span>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <p class="text-base font-black text-white tracking-widest">GHI-7721</p>
-                                    <span class="res-pill res-pill-upcoming">Upcoming</span>
-                                    <span
-                                            class="text-[9px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg">Today</span>
-                                </div>
-                                <p class="text-xs text-slate-400 font-bold">Chamari W. · Suzuki Alto</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-6 flex-wrap">
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Slot</p>
-                                <p class="text-sm font-black text-primary mt-0.5">B-05</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Arrival</p>
-                                <p class="text-sm font-black text-white mt-0.5">02:00 PM</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Until</p>
-                                <p class="text-sm font-black text-white mt-0.5">05:00 PM</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Fee</p>
-                                <p class="text-sm font-black text-emerald-400 mt-0.5">$16.50</p>
-                            </div>
-                            <div class="flex gap-2">
-                                <button
-                                        class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all"><span
-                                        class="material-symbols-outlined text-sm text-slate-400">edit</span></button>
-                                <button
-                                        class="h-9 w-9 rounded-xl bg-rose-500/10 border border-rose-500/15 flex items-center justify-center hover:bg-rose-500/20 transition-all"><span
-                                        class="material-symbols-outlined text-sm text-rose-400">cancel</span></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tomorrow -->
-                <div class="res-card border-l-4 border-primary/40">
-                    <div class="flex flex-wrap items-start justify-between gap-4">
-                        <div class="flex items-center gap-4">
-                            <div
-                                    class="h-11 w-11 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center shrink-0">
-                                <span class="material-symbols-outlined text-primary">schedule</span>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <p class="text-base font-black text-white tracking-widest">XYZ-8899</p>
-                                    <span class="res-pill res-pill-upcoming">Upcoming</span>
-                                </div>
-                                <p class="text-xs text-slate-400 font-bold">Nimal Silva · Nissan Axio</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-6 flex-wrap">
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Slot</p>
-                                <p class="text-sm font-black text-primary mt-0.5">C-03</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Date</p>
-                                <p class="text-sm font-black text-white mt-0.5">11 Mar</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Time</p>
-                                <p class="text-sm font-black text-white mt-0.5">09:00–12:00</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Fee</p>
-                                <p class="text-sm font-black text-emerald-400 mt-0.5">$16.50</p>
-                            </div>
-                            <div class="flex gap-2">
-                                <button
-                                        class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all"><span
-                                        class="material-symbols-outlined text-sm text-slate-400">edit</span></button>
-                                <button
-                                        class="h-9 w-9 rounded-xl bg-rose-500/10 border border-rose-500/15 flex items-center justify-center hover:bg-rose-500/20 transition-all"><span
-                                        class="material-symbols-outlined text-sm text-rose-400">cancel</span></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Completed -->
-                <div class="res-card opacity-60">
-                    <div class="flex flex-wrap items-start justify-between gap-4">
-                        <div class="flex items-center gap-4">
-                            <div
-                                    class="h-11 w-11 rounded-xl bg-amber-500/10 border border-amber-500/15 flex items-center justify-center shrink-0">
-                                <span class="material-symbols-outlined text-amber-400">check_circle</span>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <p class="text-base font-black text-white tracking-widest">MNO-3310</p>
-                                    <span class="res-pill res-pill-completed">Completed</span>
-                                </div>
-                                <p class="text-xs text-slate-400 font-bold">Dilshan K. · Hyundai i10</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-6 flex-wrap">
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Slot</p>
-                                <p class="text-sm font-black text-slate-400 mt-0.5">A-07</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Date</p>
-                                <p class="text-sm font-black text-slate-400 mt-0.5">08 Mar</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Time</p>
-                                <p class="text-sm font-black text-slate-400 mt-0.5">14:00–16:30</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Paid</p>
-                                <p class="text-sm font-black text-emerald-400 mt-0.5">$13.75</p>
-                            </div>
-                            <a th:href="@{/receipts}"
-                               class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all"><span
-                                    class="material-symbols-outlined text-sm text-slate-400">receipt_long</span></a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Cancelled -->
-                <div class="res-card opacity-50">
-                    <div class="flex flex-wrap items-start justify-between gap-4">
-                        <div class="flex items-center gap-4">
-                            <div
-                                    class="h-11 w-11 rounded-xl bg-slate-700/30 border border-slate-700/30 flex items-center justify-center shrink-0">
-                                <span class="material-symbols-outlined text-slate-500">cancel</span>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <p class="text-base font-black text-slate-400 tracking-widest line-through">
-                                        TRK-5502</p>
-                                    <span class="res-pill res-pill-cancelled">Cancelled</span>
-                                </div>
-                                <p class="text-xs text-slate-500 font-bold">Roshan Mendis · Cancelled 07 Mar</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-6 flex-wrap">
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-600">Slot</p>
-                                <p class="text-sm font-black text-slate-500 mt-0.5">C-08</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-600">Date</p>
-                                <p class="text-sm font-black text-slate-500 mt-0.5">09 Mar</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-600">Refund</p>
-                                <p class="text-sm font-black text-slate-400 mt-0.5">$0.00</p>
+                                <a th:if="${res.parkingRecord != null}"
+                                   th:href="@{/parking/record-details}"
+                                   class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all"><span class="material-symbols-outlined text-sm text-slate-400">open_in_new</span></a>
+                                <form th:if="${res.status.name() != 'CANCELLED' and res.status.name() != 'COMPLETED'}"
+                                      th:action="@{'/reservations/' + ${res.id} + '/cancel'}"
+                                      method="post">
+                                    <button type="submit"
+                                            class="h-9 w-9 rounded-xl bg-rose-500/10 border border-rose-500/15 flex items-center justify-center hover:bg-rose-500/20 transition-all"><span class="material-symbols-outlined text-sm text-rose-400">cancel</span></button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -578,6 +424,28 @@
     function setTab(el) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
+        filterReservations(el.textContent.trim());
+    }
+
+    function filterReservations(tabName) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        document.querySelectorAll('.reservation-card').forEach(card => {
+            const status = (card.dataset.status || '').toUpperCase();
+            const date = card.dataset.date ? new Date(card.dataset.date + 'T00:00:00') : null;
+            const isToday = date && date.getTime() === today.getTime();
+            const isUpcoming = date && date.getTime() > today.getTime() && status !== 'CANCELLED' && status !== 'COMPLETED';
+            const isCompleted = status === 'COMPLETED';
+            const isCancelled = status === 'CANCELLED';
+
+            let visible = true;
+            if (tabName === 'Upcoming') visible = isUpcoming;
+            if (tabName === 'Today') visible = isToday && status !== 'CANCELLED';
+            if (tabName === 'Completed') visible = isCompleted;
+            if (tabName === 'Cancelled') visible = isCancelled;
+
+            card.style.display = visible ? '' : 'none';
+        });
     }
 </script>
 </body>
