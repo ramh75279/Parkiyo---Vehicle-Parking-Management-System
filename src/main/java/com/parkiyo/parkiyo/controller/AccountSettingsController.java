@@ -25,6 +25,7 @@ public class AccountSettingsController {
 
     // GET /account/settings  (admin)
     @GetMapping("/account/settings")
+    @PreAuthorize("hasRole('ADMIN')")
     public String adminSettings(Authentication auth, Model model) {
         model.addAttribute("user", userService.getUserByEmail(auth.getName()));
         return "account/accountsetting";
@@ -32,6 +33,7 @@ public class AccountSettingsController {
 
     // POST /account/settings/profile  (admin)
     @PostMapping("/account/settings/profile")
+    @PreAuthorize("hasRole('ADMIN')")
     public String updateAdminProfile(@Valid @ModelAttribute ProfileUpdateRequest request,
                                      Authentication auth,
                                      RedirectAttributes redirectAttributes) {
@@ -45,6 +47,7 @@ public class AccountSettingsController {
     }
 
     @PostMapping("/account/settings/photo")
+    @PreAuthorize("hasRole('ADMIN')")
     public String uploadPhotoOnly(@RequestParam("photo") MultipartFile photo,
                                   Authentication auth,
                                   RedirectAttributes redirectAttributes) {
@@ -61,6 +64,7 @@ public class AccountSettingsController {
 
     // POST /account/settings/password  (admin)
     @PostMapping("/account/settings/password")
+    @PreAuthorize("hasRole('ADMIN')")
     public String changeAdminPassword(@Valid @ModelAttribute PasswordChangeRequest request,
                                       Authentication auth,
                                       RedirectAttributes redirectAttributes) {
@@ -75,6 +79,7 @@ public class AccountSettingsController {
 
     // POST /account/settings/notifications  (admin)
     @PostMapping("/account/settings/notifications")
+    @PreAuthorize("hasRole('ADMIN')")
     public String updateAdminNotificationPrefs(
             @ModelAttribute NotificationPreferenceRequest request,
             Authentication auth,

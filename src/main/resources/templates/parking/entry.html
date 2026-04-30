@@ -246,7 +246,7 @@
                 <span class="material-symbols-outlined shrink-0">notifications</span>
                 <span class="nav-label text-sm">Notifications</span>
             </a>
-            <a th:href="@{/account/settings}"
+            <a th:href="@{/settings/profile}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">settings</span>
                 <span class="nav-label text-sm">Account Settings</span>
@@ -314,7 +314,8 @@
                 <!-- Form Wrapper -->
                 <form id="entryForm" th:action="@{/entry}" th:object="${entryRequest}" method="post">
                 <input type="hidden" id="hiddenPlate" th:field="*{licensePlate}" />
-                <input type="hidden" id="hiddenSlotId" th:field="*{slotId}" />
+                <input type="hidden" id="hiddenSlotId" th:field="*{preferredSlotId}" />
+                <input type="hidden" id="hiddenVehicleType" th:field="*{vehicleType}" value="CAR" />
 
                 <!-- Step 1: Plate lookup -->
                 <div class="glass-card rounded-[2.5rem] p-8" id="step1">
@@ -477,6 +478,7 @@
             return;
         }
         document.getElementById('hiddenPlate').value = plate;
+        document.getElementById('hiddenVehicleType').value = 'CAR';
         document.getElementById('entryForm').submit();
     }
 
