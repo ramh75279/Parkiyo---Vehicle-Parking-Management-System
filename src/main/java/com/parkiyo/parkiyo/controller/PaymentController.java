@@ -1,5 +1,8 @@
 package com.parkiyo.parkiyo.controller;
 
+import com.parkiyo.parkiyo.exception.InsufficientBalanceException;
+import com.parkiyo.parkiyo.exception.PaymentException;
+import com.parkiyo.parkiyo.exception.ResourceNotFoundException;
 import com.parkiyo.parkiyo.service.PaymentService;
 import com.parkiyo.parkiyo.service.WalletService;
 import lombok.RequiredArgsConstructor;
@@ -19,18 +22,21 @@ public class PaymentController {
 
     // ─── USER ────────────────────────────────────────────────────────────────
 
-    // GET /payments/pending/{id}
     @GetMapping("/payments/pending/{id}")
     @PreAuthorize("isAuthenticated()")
     public String pendingPayment(@PathVariable Long id,
                                  Authentication auth,
                                  Model model) {
-        model.addAttribute("pendingPayment", paymentService.getPendingPayment(id, auth.getName()));
-        model.addAttribute("walletBalance", walletService.getBalance(auth.getName()));
-        return "payments/pendingpayment";
+        try {
+            model.addAttribute("pendingPayment", paymentService.getPaymentById(id, auth.getName()));
+            model.addAttribute("walletBalance", walletService.getBalance(auth.getName()));
+            return "payments/pendingpayment";
+        } catch (ResourceNotFoundException | PaymentException e) {
+            // You can add error handling here if needed
+            return "redirect:/payments/history";
+        }
     }
 
-    // POST /payments/processing
     @PostMapping("/payments/processing")
     @PreAuthorize("isAuthenticated()")
     public String processPayment(@RequestParam Long paymentId,
@@ -38,34 +44,44 @@ public class PaymentController {
                                  RedirectAttributes redirectAttributes) {
         try {
             paymentService.initiatePayment(paymentId, auth.getName());
+            redirectAttributes.addFlashAttribute("success", "Payment completed successfully!");
             return "redirect:/payments/processing/" + paymentId;
-        } catch (Exception e) {
+        } catch (InsufficientBalanceException e) {
+            redirectAttributes.addFlashAttribute("error", "Insufficient wallet balance. Please top up your wallet.");
+            return "redirect:/payments/pending/" + paymentId;
+        } catch (PaymentException | ResourceNotFoundException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/payments/pending/" + paymentId;
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "An unexpected error occurred. Please try again.");
             return "redirect:/payments/pending/" + paymentId;
         }
     }
 
-    // GET /payments/processing/{id}
     @GetMapping("/payments/processing/{id}")
     @PreAuthorize("isAuthenticated()")
     public String paymentProcessingPage(@PathVariable Long id,
                                         Authentication auth,
                                         Model model) {
-        model.addAttribute("payment", paymentService.getPaymentById(id, auth.getName()));
-        return "payments/paymentprocessing";
+        try {
+            model.addAttribute("payment", paymentService.getPaymentById(id, auth.getName()));
+            return "payments/paymentprocessing";
+        } catch (Exception e) {
+            return "redirect:/payments/history";
+        }
     }
 
-    // GET /payment/success
     @GetMapping("/payment/success")
     @PreAuthorize("isAuthenticated()")
-    public String paymentSuccess(@RequestParam(required = false) Long paymentId,
-                                 Authentication auth,
-                                 Model model) {
-        model.addAttribute("payment", paymentService.getLatestSuccessfulPayment(auth.getName()));
-        return "payments/paymentsuccess";
+    public String paymentSuccess(Authentication auth, Model model) {
+        try {
+            model.addAttribute("payment", paymentService.getLatestReceipt(auth.getName())); // Using receipt as success view
+            return "payments/paymentsuccess";
+        } catch (Exception e) {
+            return "redirect:/payments/history";
+        }
     }
 
-    // GET /payments/history  (user)
     @GetMapping("/payments/history")
     @PreAuthorize("isAuthenticated()")
     public String userPaymentHistory(Authentication auth, Model model) {
@@ -74,22 +90,18 @@ public class PaymentController {
         return "payments/paymenthistory-user";
     }
 
-    // GET /receipts  (list)
     @GetMapping("/receipts")
     @PreAuthorize("isAuthenticated()")
-    public String receipts(Authentication auth,
-                           Model model,
-                           RedirectAttributes redirectAttributes) {
+    public String receipts(Authentication auth, Model model, RedirectAttributes redirectAttributes) {
         try {
             model.addAttribute("receipt", paymentService.getLatestReceipt(auth.getName()));
+            return "payments/receipt";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/payments/history";
         }
-        return "payments/receipt";
     }
 
-    // GET /receipt  (single receipt)
     @GetMapping("/receipt")
     @PreAuthorize("isAuthenticated()")
     public String receipt(@RequestParam(required = false) Long paymentId,
@@ -98,11 +110,11 @@ public class PaymentController {
                           RedirectAttributes redirectAttributes) {
         try {
             model.addAttribute("receipt", paymentService.getReceipt(paymentId, auth.getName()));
+            return "payments/receipt";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/payments/history";
         }
-        return "payments/receipt";
     }
 
     @GetMapping("/user/receipt")
@@ -114,7 +126,7 @@ public class PaymentController {
         return receipt(paymentId, auth, model, redirectAttributes);
     }
 
-    // GET /receipts/{id}/pdf
+    // Dummy PDF and Email endpoints (for now)
     @GetMapping("/receipts/{id}/pdf")
     @PreAuthorize("isAuthenticated()")
     public String downloadReceiptPdf(@PathVariable Long id, RedirectAttributes redirectAttributes) {
@@ -122,7 +134,6 @@ public class PaymentController {
         return "redirect:/receipt?paymentId=" + id;
     }
 
-    // GET /receipts/{id}/email
     @GetMapping("/receipts/{id}/email")
     @PreAuthorize("isAuthenticated()")
     public String emailReceipt(@PathVariable Long id, RedirectAttributes redirectAttributes) {
@@ -132,7 +143,6 @@ public class PaymentController {
 
     // ─── ADMIN ───────────────────────────────────────────────────────────────
 
-    // GET /admin/payments  (admin - all payments)
     @GetMapping("/admin/payments")
     @PreAuthorize("hasRole('ADMIN')")
     public String adminPayments(@RequestParam(required = false) String status,
@@ -144,42 +154,38 @@ public class PaymentController {
         return "payments/paymenthistory";
     }
 
-    // GET /admin/payments/history
     @GetMapping("/admin/payments/history")
     @PreAuthorize("hasRole('ADMIN')")
     public String adminPaymentHistory(Model model) {
-        model.addAttribute("payments", paymentService.getAllPaymentHistory());
+        model.addAttribute("payments", paymentService.getAllPaymentHistory()); // Keep if you still have this method
         return "payments/paymenthistory";
     }
 
-    // GET /admin/receipts/{id}
     @GetMapping("/admin/receipts/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public String adminReceipt(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
             model.addAttribute("receipt", paymentService.getAdminReceipt(id));
+            return "payments/receipt-admin";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/admin/payments/history";
+            return "redirect:/admin/payments";
         }
-        return "payments/receipt-admin";
     }
 
-    // POST /admin/payments/{id}/refund
     @PostMapping("/admin/payments/{id}/refund")
     @PreAuthorize("hasRole('ADMIN')")
-    public String refundPayment(@PathVariable Long id,
-                                RedirectAttributes redirectAttributes) {
+    public String refundPayment(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             paymentService.refundPayment(id);
-            redirectAttributes.addFlashAttribute("success", "Payment refunded.");
+            redirectAttributes.addFlashAttribute("success", "Payment refunded successfully.");
+            return "redirect:/admin/payments";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/admin/payments";
         }
-        return "redirect:/admin/payments";
     }
 
-    // GET /admin/receipts/{id}/pdf
     @GetMapping("/admin/receipts/{id}/pdf")
     @PreAuthorize("hasRole('ADMIN')")
     public String adminDownloadReceiptPdf(@PathVariable Long id, RedirectAttributes redirectAttributes) {
@@ -187,7 +193,6 @@ public class PaymentController {
         return "redirect:/admin/receipts/" + id;
     }
 
-    // GET /admin/receipts/{id}/email
     @GetMapping("/admin/receipts/{id}/email")
     @PreAuthorize("hasRole('ADMIN')")
     public String adminEmailReceipt(@PathVariable Long id, RedirectAttributes redirectAttributes) {
