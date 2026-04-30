@@ -15,6 +15,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Optional<Payment> findByTransactionCode(String transactionCode);
 
     List<Payment> findByUserEmail(String email);
+    long countByUserEmail(String email);
 
     List<Payment> findByStatus(PaymentStatus status);
 

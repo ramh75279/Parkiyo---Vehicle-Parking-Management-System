@@ -17,6 +17,7 @@
         .sidebar-container:hover { width: 280px; background: rgba(2,6,23,0.95); }
         .nav-label { opacity: 0; transition: opacity 0.3s ease; margin-left: 1rem; }
         .sidebar-container:hover .nav-label { opacity: 1; }
+        .brand-logo { height: 48px; width: 48px; border-radius: 16px; background: linear-gradient(145deg, #1f68f9 0%, #2563eb 100%); color: #ffffff; font-size: 1.75rem; font-weight: 900; line-height: 1; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 18px rgba(31, 104, 249, 0.35); }
         .input-glass { background: rgba(255,255,255,0.04) !important; border: 1px solid rgba(255,255,255,0.09); color: white !important; border-radius: 14px; padding: 12px 16px; font-size: 0.875rem; font-weight: 600; font-family: 'Public Sans', sans-serif; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; outline: none; width: 100%; }
         .input-glass:hover { border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.055) !important; }
         .input-glass:focus { background: rgba(31,104,249,0.07) !important; border-color: rgba(31,104,249,0.55) !important; box-shadow: 0 0 0 3px rgba(31,104,249,0.12); }
@@ -34,23 +35,21 @@
 
     <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
         <div class="p-6 mb-4 flex items-center">
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
-                <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
-            </div>
+            <div class="brand-logo shrink-0">P</div>
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
             <a th:href="@{/admin/dashboard}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">dashboard</span><span class="nav-label text-sm">Dashboard</span></a>
             <a th:href="@{/admin/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle Entry</span></a>
             <a th:href="@{/admin/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span></a>
-            <a th:href="@{/admin/slots}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">grid_view</span><span class="nav-label text-sm">Parking Slots</span></a>
+            <a th:href="@{/admin/slots/overview}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">grid_view</span><span class="nav-label text-sm">Parking Slots</span></a>
             <a th:href="@{/admin/vehicles}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">directions_car</span><span class="nav-label text-sm">Vehicles</span></a>
             <a th:href="@{/admin/users}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span class="material-symbols-outlined shrink-0">group</span><span class="nav-label text-sm">Users</span></a>
             <a th:href="@{/admin/payments}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">payments</span><span class="nav-label text-sm">Payments</span></a>
             <a th:href="@{/admin/reports}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">bar_chart</span><span class="nav-label text-sm">Reports</span></a>
             <a th:href="@{/admin/notifications}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">notifications</span><span class="nav-label text-sm">Notifications</span></a>
             <a th:href="@{/admin/system-status}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">monitor_heart</span><span class="nav-label text-sm">System Status</span></a>
-            <a th:href="@{/settings}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">settings</span><span class="nav-label text-sm">Settings</span></a>
+            <a th:href="@{/admin/settings}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">settings</span><span class="nav-label text-sm">Settings</span></a>
         </nav>
         <div class="p-4 border-t border-white/5">
             <a th:href="@{/logout}" class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">

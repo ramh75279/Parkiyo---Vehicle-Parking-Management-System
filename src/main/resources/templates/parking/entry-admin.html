@@ -319,7 +319,8 @@
                 <!-- Form Wrapper -->
                 <form id="entryForm" th:action="@{/admin/entry}" th:object="${entryRequest}" method="post">
                 <input type="hidden" id="hiddenPlate" th:field="*{licensePlate}" />
-                <input type="hidden" id="hiddenSlotId" th:field="*{slotId}" />
+                <input type="hidden" id="hiddenSlotId" th:field="*{preferredSlotId}" />
+                <input type="hidden" id="hiddenVehicleType" th:field="*{vehicleType}" value="CAR" />
 
                 <!-- Step 1: Plate lookup -->
                 <div class="glass-card rounded-[2.5rem] p-8" id="step1">
@@ -481,6 +482,7 @@
             return;
         }
         document.getElementById('hiddenPlate').value = plate;
+        document.getElementById('hiddenVehicleType').value = 'CAR';
         document.getElementById('entryForm').submit();
     }
 

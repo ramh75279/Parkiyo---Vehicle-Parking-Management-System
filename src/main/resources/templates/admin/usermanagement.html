@@ -6,13 +6,57 @@
     <title>Parkiyo | User Management</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
     <style>
         body { font-family: 'Public Sans', sans-serif; background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%); }
         .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.09); }
+        .sidebar-container { width: 80px; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); background: rgba(2,6,23,0.6); overflow: hidden; white-space: nowrap; }
+        .sidebar-container:hover { width: 280px; background: rgba(2,6,23,0.95); }
+        .nav-label { opacity: 0; transition: opacity 0.3s ease; margin-left: 1rem; }
+        .sidebar-container:hover .nav-label { opacity: 1; }
+        .brand-logo {
+            height: 48px;
+            width: 48px;
+            border-radius: 16px;
+            background: linear-gradient(145deg, #1f68f9 0%, #2563eb 100%);
+            color: #ffffff;
+            font-size: 1.75rem;
+            font-weight: 900;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 18px rgba(31, 104, 249, 0.35);
+        }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen">
-<main class="max-w-7xl mx-auto px-5 md:px-8 py-8 space-y-6">
+<body class="text-slate-100 min-h-screen flex">
+<aside class="sidebar-container border-r border-white/5 flex flex-col shrink-0 z-50">
+    <div class="p-6 mb-4 flex items-center">
+        <div class="brand-logo shrink-0">P</div>
+        <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+    </div>
+    <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+        <a th:href="@{/admin/dashboard}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">dashboard</span><span class="nav-label text-sm">Dashboard</span></a>
+        <a th:href="@{/admin/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle Entry</span></a>
+        <a th:href="@{/admin/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span></a>
+        <a th:href="@{/admin/slots/overview}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">grid_view</span><span class="nav-label text-sm">Parking Slots</span></a>
+        <a th:href="@{/admin/vehicles}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">directions_car</span><span class="nav-label text-sm">Vehicles</span></a>
+        <a th:href="@{/admin/users}" class="flex items-center px-4 py-4 rounded-xl text-blue-400 bg-blue-500/10 border-r-4 border-blue-500 font-bold"><span class="material-symbols-outlined shrink-0">group</span><span class="nav-label text-sm">Users</span></a>
+        <a th:href="@{/admin/payments}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">payments</span><span class="nav-label text-sm">Payments</span></a>
+        <a th:href="@{/admin/reports}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">bar_chart</span><span class="nav-label text-sm">Reports</span></a>
+        <a th:href="@{/admin/notifications}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">notifications</span><span class="nav-label text-sm">Notifications</span></a>
+        <a th:href="@{/admin/system-status}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">monitor_heart</span><span class="nav-label text-sm">System Status</span></a>
+        <a th:href="@{/admin/settings}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">settings</span><span class="nav-label text-sm">Settings</span></a>
+    </nav>
+    <div class="p-4 border-t border-white/5">
+        <a th:href="@{/logout}" class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+            <span class="material-symbols-outlined shrink-0">power_settings_new</span>
+            <span class="nav-label">Logout</span>
+        </a>
+    </div>
+</aside>
+<main class="flex-1 max-w-7xl mx-auto px-5 md:px-8 py-8 space-y-6">
     <header class="flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl font-black">User Management</h1>

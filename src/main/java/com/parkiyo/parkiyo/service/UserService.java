@@ -12,7 +12,12 @@ import com.parkiyo.parkiyo.exception.InvalidFileException;
 import com.parkiyo.parkiyo.exception.ResourceAlreadyExistsException;
 import com.parkiyo.parkiyo.exception.ResourceNotFoundException;
 import com.parkiyo.parkiyo.model.User;
+import com.parkiyo.parkiyo.repository.NotificationRepository;
+import com.parkiyo.parkiyo.repository.ParkingRecordRepository;
+import com.parkiyo.parkiyo.repository.PaymentRepository;
+import com.parkiyo.parkiyo.repository.ReservationRepository;
 import com.parkiyo.parkiyo.repository.UserRepository;
+import com.parkiyo.parkiyo.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +39,11 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PaymentRepository paymentRepository;
+    private final ReservationRepository reservationRepository;
+    private final NotificationRepository notificationRepository;
+    private final ParkingRecordRepository parkingRecordRepository;
+    private final VehicleRepository vehicleRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetDeliveryService passwordResetDeliveryService;
 
@@ -160,8 +170,23 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(Long id) {
+    public void deleteUser(Long id, String actorEmail) {
         User user = getUserById(id);
+
+        if (actorEmail != null && actorEmail.equalsIgnoreCase(user.getEmail())) {
+            throw new BadRequestException("You cannot delete your own account.");
+        }
+
+        long paymentCount = paymentRepository.countByUserEmail(user.getEmail());
+        if (paymentCount > 0) {
+            throw new BadRequestException("Cannot delete user with payment history.");
+        }
+
+        parkingRecordRepository.clearUserByEmail(user.getEmail());
+        vehicleRepository.clearUserByEmail(user.getEmail());
+        notificationRepository.deleteByUserEmail(user.getEmail());
+        reservationRepository.deleteByUserEmail(user.getEmail());
+
         deleteOldProfilePicture(user.getProfilePicturePath());
         userRepository.delete(user);
     }

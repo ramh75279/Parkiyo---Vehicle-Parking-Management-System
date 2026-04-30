@@ -113,9 +113,11 @@ public class UserManagementController {
 
     // POST /admin/users/{id}/delete
     @PostMapping("/{id}/delete")
-    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteUser(@PathVariable Long id,
+                             Authentication auth,
+                             RedirectAttributes redirectAttributes) {
         try {
-            userService.deleteUser(id);
+            userService.deleteUser(id, auth != null ? auth.getName() : null);
             redirectAttributes.addFlashAttribute("success", "User deleted.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
