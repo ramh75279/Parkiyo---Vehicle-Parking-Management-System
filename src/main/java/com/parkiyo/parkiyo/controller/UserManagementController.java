@@ -7,6 +7,8 @@ import com.parkiyo.parkiyo.enums.UserStatus;
 import com.parkiyo.parkiyo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -23,20 +25,24 @@ public class UserManagementController {
 
     private final UserService userService;
 
-    // GET /admin/users - List Users
+    // GET /admin/users - List Users (FIXED)
     @GetMapping
     public String userList(@RequestParam(required = false) String search,
                            @RequestParam(required = false) String role,
                            @RequestParam(required = false) String status,
                            Model model) {
 
-        // Using the paginated method we have in UserService
-        model.addAttribute("users", userService.getAllUsersPaginated(null, search, role, status));
+        // Fixed: Create proper Pageable instead of passing null
+        Pageable pageable = PageRequest.of(0, 50); // Page 0, 50 users per page
+
+        var usersPage = userService.getAllUsersPaginated(pageable, search, role, status);
+
+        model.addAttribute("users", usersPage.getContent());
         model.addAttribute("totalUsers", userService.getTotalUsers());
 
-        // Optional: You can improve stats later
-        model.addAttribute("activeUsers", 0);     // TODO: Implement later
-        model.addAttribute("adminUsers", 0);      // TODO: Implement later
+        // TODO: You can implement real stats later
+        model.addAttribute("activeUsers", 0);
+        model.addAttribute("adminUsers", 0);
 
         return "admin/usermanagement";
     }
@@ -101,10 +107,9 @@ public class UserManagementController {
 
     // POST /admin/users/{id}/toggle-status
     @PostMapping("/{id}/toggle-status")
-    public String toggleUserStatus(@PathVariable Long id,
-                                   RedirectAttributes redirectAttributes) {
+    public String toggleUserStatus(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            userService.toggleUserStatus(id);        // Fixed: only one parameter
+            userService.toggleUserStatus(id);
             redirectAttributes.addFlashAttribute("success", "User status updated.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
