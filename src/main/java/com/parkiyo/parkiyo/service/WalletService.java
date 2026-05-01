@@ -27,32 +27,44 @@ public class WalletService {
         return wallet.getBalance();
     }
 
+    /**
+     * Improved getWalletOverview to prevent LazyInitializationException
+     */
     @Transactional(readOnly = true)
     public Map<String, Object> getWalletOverview(String email) {
         Wallet wallet = getOrCreateWallet(email);
-        // Force initialize transactions safely inside transaction
+
+        // Force initialize the User (lazy proxy) inside transaction
+        User user = wallet.getUser();
+        if (user != null) {
+            user.getFirstName();   // trigger initialization
+            user.getLastName();    // trigger initialization
+        }
+
+        // Force initialize transactions
         List<WalletTransaction> transactions = wallet.getTransactions();
         if (transactions != null) {
-            transactions.size(); // force load lazy collection
+            transactions.size();
         }
 
         return Map.of(
+                "wallet", wallet,
+                "user", user,                    // Pass user separately - safer for Thymeleaf
                 "balance", wallet.getBalance(),
-                "wallet", wallet
+                "transactions", transactions != null ? new ArrayList<>(transactions) : new ArrayList<>()
         );
     }
 
     @Transactional(readOnly = true)
     public List<WalletTransaction> getTransactionHistory(String email) {
         Wallet wallet = getOrCreateWallet(email);
-        List<WalletTransaction> transactions = wallet.getTransactions();
 
-        // Safe way to force initialization inside @Transactional
+        List<WalletTransaction> transactions = wallet.getTransactions();
         if (transactions != null) {
-            transactions.size();
+            transactions.size(); // force load
         }
 
-        return new ArrayList<>(transactions); // return copy to avoid lazy issues later
+        return transactions != null ? new ArrayList<>(transactions) : new ArrayList<>();
     }
 
     @Transactional
@@ -81,8 +93,6 @@ public class WalletService {
 
         walletRepository.save(wallet);
     }
-
-    // You can add more methods later: deduct, payment for parking, etc.
 
     private Wallet getOrCreateWallet(String email) {
         if (email == null || email.trim().isEmpty()) {

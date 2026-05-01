@@ -2,7 +2,6 @@ package com.parkiyo.parkiyo.controller;
 
 import com.parkiyo.parkiyo.dto.WalletTopUpRequest;
 import com.parkiyo.parkiyo.service.WalletService;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,16 +18,20 @@ public class WalletController {
 
     private final WalletService walletService;
 
-    // GET /wallet
-    @Transactional
     @GetMapping("/wallet")
     public String walletOverview(Authentication auth, Model model) {
-        model.addAttribute("wallet", walletService.getWalletOverview(auth.getName()));
-        model.addAttribute("transactions", walletService.getTransactionHistory(auth.getName()));
+        String email = auth.getName();
+
+        var overview = walletService.getWalletOverview(email);
+
+        model.addAttribute("wallet", overview.get("wallet"));
+        model.addAttribute("user", overview.get("user"));
+        model.addAttribute("balance", overview.get("balance"));
+        model.addAttribute("transactions", walletService.getTransactionHistory(email));
+
         return "payments/walletoverview";
     }
 
-    // POST /wallet/topup
     @PostMapping("/wallet/topup")
     public String topUp(@Valid @ModelAttribute WalletTopUpRequest request,
                         Authentication auth,
