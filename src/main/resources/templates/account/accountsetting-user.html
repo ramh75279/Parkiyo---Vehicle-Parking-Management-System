@@ -153,30 +153,33 @@
                                     <label class="field-label">First Name</label>
                                     <input type="text" name="firstName"
                                            th:value="${user != null ? user.firstName : ''}"
-                                           class="input-glass rounded-2xl" placeholder="First name"/>
+                                           class="input-glass rounded-2xl"
+                                           style="background:rgba(8,47,73,0.95);" placeholder="First name"/>
                                 </div>
                                 <div>
                                     <label class="field-label">Last Name</label>
                                     <input type="text" name="lastName"
                                            th:value="${user != null ? user.lastName : ''}"
-                                           class="input-glass rounded-2xl" placeholder="Last name"/>
+                                           class="input-glass rounded-2xl"
+                                           style="background:rgba(8,47,73,0.95);" placeholder="Last name"/>
                                 </div>
                             </div>
                             <div>
                                 <label class="field-label">Phone Number</label>
                                 <input type="tel" name="phone"
                                        th:value="${user != null ? user.phone : ''}"
-                                       class="input-glass rounded-2xl" placeholder="+94 77 123 4567"/>
+                                       class="input-glass rounded-2xl"
+                                       style="background:rgba(8,47,73,0.95);" placeholder="+94 77 123 4567"/>
                             </div>
                             <div>
                                 <label class="field-label">Email Address <span class="ml-1 text-[9px] bg-white/5 px-2 py-0.5 rounded-full">Read Only</span></label>
                                 <input type="text" th:value="${user != null ? user.email : ''}"
-                                       class="input-glass rounded-2xl" style="color:rgba(255,255,255,0.35);cursor:not-allowed;" readonly/>
+                                       class="input-glass rounded-2xl" style="background:rgba(8,47,73,0.95);color:rgba(255,255,255,0.35);cursor:not-allowed;" readonly/>
                             </div>
                             <div>
                                 <label class="field-label">Role <span class="ml-1 text-[9px] bg-white/5 px-2 py-0.5 rounded-full">Read Only</span></label>
                                 <input type="text" th:value="${user != null ? user.role : ''}"
-                                       class="input-glass rounded-2xl" style="color:rgba(255,255,255,0.35);cursor:not-allowed;" readonly/>
+                                       class="input-glass rounded-2xl" style="background:rgba(8,47,73,0.95);color:rgba(255,255,255,0.35);cursor:not-allowed;" readonly/>
                             </div>
                             <button type="submit"
                                     class="bg-primary text-white font-black px-8 py-3 rounded-2xl hover:bg-primary/80 transition-all text-sm shadow-[0_0_16px_rgba(31,104,249,0.3)]">Save Changes</button>
@@ -195,15 +198,15 @@
                             <div id="pwMsg" class="hidden mb-5"></div>
                             <div>
                                 <label class="field-label">Current Password</label>
-                                <input type="password" name="currentPassword" placeholder="••••••••" class="input-glass rounded-2xl"/>
+                                <input type="password" name="currentPassword" placeholder="••••••••" class="input-glass rounded-2xl" style="background:rgba(8,47,73,0.95);"/>
                             </div>
                             <div>
                                 <label class="field-label">New Password</label>
-                                <input type="password" name="newPassword" id="newPw" placeholder="Min. 8 characters" class="input-glass rounded-2xl"/>
+                                <input type="password" name="newPassword" id="newPw" placeholder="Min. 8 characters" class="input-glass rounded-2xl" style="background:rgba(8,47,73,0.95);"/>
                             </div>
                             <div>
                                 <label class="field-label">Confirm New Password</label>
-                                <input type="password" name="confirmPassword" id="confirmPw" placeholder="Repeat new password" class="input-glass rounded-2xl"/>
+                                <input type="password" name="confirmPassword" id="confirmPw" placeholder="Repeat new password" class="input-glass rounded-2xl" style="background:rgba(8,47,73,0.95);"/>
                             </div>
                             <div class="p-4 rounded-2xl bg-white/[0.02] border border-white/5 text-xs text-slate-500 font-bold space-y-1">
                                 <p>· At least 8 characters</p>
