@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 
 @Controller
 @PreAuthorize("isAuthenticated()")
@@ -28,13 +29,17 @@ public class ReservationController {
     private final VehicleService vehicleService;
 
     /**
-     * Main Advance Reservations Page
+     * Main Advance Reservations Page - Lists all user reservations
      */
     @GetMapping("/reservations")
     public String reservations(Authentication auth, Model model) {
         String email = auth.getName();
+        System.out.println(">>> Logged in as: " + email); // DEBUG LINE
 
-        model.addAttribute("reservations", reservationService.getUserReservations(email));
+        List<Reservation> reservations = reservationService.getUserReservations(email);
+
+        model.addAttribute("reservations", reservations != null ? reservations : Collections.emptyList());
+
         model.addAttribute("upcomingCount", reservationService.countUpcomingReservations(email));
         model.addAttribute("todayCount", reservationService.countTodayReservations(email));
         model.addAttribute("cancelledCount", reservationService.countCancelledReservations(email));
@@ -44,19 +49,19 @@ public class ReservationController {
     }
 
     /**
-     * Active Reservation View
+     * Active / Current Reservation View
      */
     @GetMapping("/reservation")
     public String activeReservation(Authentication auth, Model model) {
         String email = auth.getName();
+
         model.addAttribute("reservation", reservationService.getActiveReservation(email));
-        // Safety for template
         model.addAttribute("reservations", Collections.emptyList());
 
         return "parking/advancereservation";
     }
 
-    // ====================== SLOT SELECTION ======================
+    // ====================== SLOT SELECTION FOR NEW RESERVATION ======================
     @GetMapping("/reservations/slot-selection")
     public String slotSelection(@RequestParam(required = false) LocalDate date,
                                 @RequestParam(required = false) String zone,
@@ -70,7 +75,7 @@ public class ReservationController {
         return "slots/slotselection";
     }
 
-    // ====================== CREATE ======================
+    // ====================== CREATE RESERVATION ======================
     @PostMapping("/reservations/create")
     public String createReservation(@Valid @ModelAttribute ReservationRequest request,
                                     Authentication auth,
@@ -86,7 +91,7 @@ public class ReservationController {
         }
     }
 
-    // ====================== EDIT ======================
+    // ====================== EDIT RESERVATION ======================
     @GetMapping("/reservations/{id}/edit")
     public String editReservationForm(@PathVariable Long id,
                                       Authentication auth,
@@ -96,7 +101,7 @@ public class ReservationController {
             Reservation reservation = reservationService.getReservationByIdForUser(id, auth.getName());
 
             if (reservation.getStatus() != ReservationStatus.CONFIRMED) {
-                redirectAttributes.addFlashAttribute("error", "Only upcoming reservations can be edited.");
+                redirectAttributes.addFlashAttribute("error", "Only upcoming (CONFIRMED) reservations can be edited.");
                 return "redirect:/reservations";
             }
 
@@ -127,7 +132,7 @@ public class ReservationController {
         return "redirect:/reservations";
     }
 
-    // ====================== CANCEL ======================
+    // ====================== CANCEL RESERVATION ======================
     @PostMapping("/reservations/{id}/cancel")
     public String cancelReservation(@PathVariable Long id,
                                     Authentication auth,

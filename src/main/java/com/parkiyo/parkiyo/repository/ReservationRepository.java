@@ -27,16 +27,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     boolean existsByReservationCode(String reservationCode);
 
-    // ====================== COUNT METHODS FOR STATS ======================
-
-    /**
-     * Count reservations by user and status
-     */
     long countByUserEmailAndStatus(String email, ReservationStatus status);
 
-    /**
-     * Count CONFIRMED reservations for today
-     */
     @Query("SELECT COUNT(r) FROM Reservation r " +
             "WHERE r.user.email = :email " +
             "AND r.status = :status " +
@@ -46,8 +38,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("status") ReservationStatus status,
             @Param("today") LocalDate today);
 
-    /**
-     * Optional: Count all reservations for a user (for future use)
-     */
     long countByUserEmail(String email);
 }
