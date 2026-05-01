@@ -19,9 +19,8 @@ public class ExitController {
     private final ExitService exitService;
     private final ParkingService parkingService;
 
-    // ─── USER ────────────────────────────────────────────────────────────────
+    // ─── USER EXIT ────────────────────────────────────────────────────────────────
 
-    // GET /exit
     @GetMapping("/exit")
     @PreAuthorize("isAuthenticated()")
     public String userExitPage(Authentication auth, Model model) {
@@ -30,25 +29,26 @@ public class ExitController {
         return "parking/exitvehicle";
     }
 
-    // POST /exit
     @PostMapping("/exit")
     @PreAuthorize("isAuthenticated()")
     public String processUserExit(@Valid @ModelAttribute ExitRequest request,
                                   Authentication auth,
                                   RedirectAttributes redirectAttributes) {
         try {
-            Long recordId = exitService.processExit(request, auth.getName());
-            redirectAttributes.addFlashAttribute("success", "Exit recorded. Proceed to payment.");
-            return "redirect:/payments/pending/" + recordId;
+            Long paymentId = exitService.processExit(request, auth.getName());
+
+            redirectAttributes.addFlashAttribute("success",
+                    "Vehicle " + request.getLicensePlate() + " exited successfully. Please proceed to payment.");
+
+            return "redirect:/payments/pending/" + paymentId;
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Exit failed: " + e.getMessage());
             return "redirect:/exit";
         }
     }
 
-    // ─── ADMIN ───────────────────────────────────────────────────────────────
+    // ─── ADMIN EXIT ───────────────────────────────────────────────────────────────
 
-    // GET /admin/exit
     @GetMapping("/admin/exit")
     @PreAuthorize("hasRole('ADMIN')")
     public String adminExitPage(Model model) {
@@ -58,18 +58,20 @@ public class ExitController {
         return "parking/exitvehicle-admin";
     }
 
-    // POST /admin/exit
     @PostMapping("/admin/exit")
     @PreAuthorize("hasRole('ADMIN')")
     public String processAdminExit(@Valid @ModelAttribute ExitRequest request,
                                    Authentication auth,
                                    RedirectAttributes redirectAttributes) {
         try {
-            exitService.processExit(request, auth.getName());
-            redirectAttributes.addFlashAttribute("success", "Exit processed successfully.");
+            Long paymentId = exitService.processExit(request, auth.getName());
+
+            redirectAttributes.addFlashAttribute("success",
+                    "Vehicle " + request.getLicensePlate() + " exit processed successfully.");
+
             return "redirect:/admin/exit";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Exit failed: " + e.getMessage());
             return "redirect:/admin/exit";
         }
     }
