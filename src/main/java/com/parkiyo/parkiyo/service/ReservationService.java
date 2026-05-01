@@ -25,7 +25,7 @@ public class ReservationService {
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
-        private final NotificationService notificationService;
+    private final NotificationService notificationService;
 
     public List<Reservation> getUserReservations(String email) {
         return reservationRepository.findByUserEmail(email);
@@ -35,6 +35,19 @@ public class ReservationService {
         return reservationRepository
                 .findTopByUserEmailAndStatusOrderByCreatedAtDesc(email, ReservationStatus.CONFIRMED)
                 .orElse(null);
+    }
+
+    /**
+     * Fetches a single reservation by ID, verifying it belongs to the given user.
+     * Throws RuntimeException if not found or not owned by user.
+     */
+    public Reservation getReservationByIdForUser(Long id, String email) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reservation not found."));
+        if (!reservation.getUser().getEmail().equals(email)) {
+            throw new RuntimeException("Not authorised to access this reservation.");
+        }
+        return reservation;
     }
 
     @Transactional
@@ -91,6 +104,69 @@ public class ReservationService {
         );
 
         return payment.getId();
+    }
+
+    /**
+     * Updates an existing CONFIRMED reservation's time window and/or vehicle.
+     * If the slot changes, the old slot is freed and the new one is reserved.
+     * The linked pending payment amount is recalculated to match the new duration.
+     */
+    @Transactional
+    public void updateReservation(Long id, ReservationRequest request, String email) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reservation not found."));
+
+        if (!reservation.getUser().getEmail().equals(email)) {
+            throw new RuntimeException("Not authorised to edit this reservation.");
+        }
+        if (reservation.getStatus() != ReservationStatus.CONFIRMED) {
+            throw new RuntimeException("Only upcoming reservations can be edited.");
+        }
+
+        ParkingSlot oldSlot = reservation.getSlot();
+        ParkingSlot newSlot = slotRepository.findById(request.getSlotId())
+                .orElseThrow(() -> new RuntimeException("Slot not found."));
+
+        // If the slot changed, validate availability and swap reservation
+        if (!oldSlot.getId().equals(newSlot.getId())) {
+            if (newSlot.getStatus() != SlotStatus.AVAILABLE) {
+                throw new RuntimeException("Slot " + newSlot.getSlotNumber() + " is not available.");
+            }
+            oldSlot.setStatus(SlotStatus.AVAILABLE);
+            slotRepository.save(oldSlot);
+
+            newSlot.setStatus(SlotStatus.RESERVED);
+            slotRepository.save(newSlot);
+
+            reservation.setSlot(newSlot);
+        }
+
+        Vehicle vehicle = vehicleRepository.findById(request.getVehicleId())
+                .orElseThrow(() -> new RuntimeException("Vehicle not found."));
+
+        reservation.setVehicle(vehicle);
+        reservation.setStartTime(request.getStartTime());
+        reservation.setEndTime(request.getEndTime());
+        reservationRepository.save(reservation);
+
+        // Recalculate and update the pending payment amount
+        long hours = (long) Math.ceil(
+                Duration.between(request.getStartTime(), request.getEndTime()).toMinutes() / 60.0);
+        BigDecimal newAmount = newSlot.getHourlyRate().multiply(BigDecimal.valueOf(hours));
+
+        Payment payment = reservation.getPayment();
+        if (payment != null && payment.getStatus() == PaymentStatus.PENDING) {
+            payment.setAmount(newAmount);
+            paymentRepository.save(payment);
+        }
+
+        notificationService.createNotification(
+                reservation.getUser(),
+                NotificationType.RESERVATION,
+                "Reservation Updated",
+                "Reservation " + reservation.getReservationCode() + " has been updated.",
+                "/reservations"
+        );
     }
 
     @Transactional

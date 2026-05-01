@@ -1,6 +1,8 @@
 package com.parkiyo.parkiyo.controller;
 
 import com.parkiyo.parkiyo.dto.ReservationRequest;
+import com.parkiyo.parkiyo.enums.ReservationStatus;
+import com.parkiyo.parkiyo.model.Reservation;
 import com.parkiyo.parkiyo.service.ReservationService;
 import com.parkiyo.parkiyo.service.SlotService;
 import com.parkiyo.parkiyo.service.VehicleService;
@@ -64,6 +66,48 @@ public class ReservationController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/reservations/slot-selection";
         }
+    }
+
+    // GET /reservations/{id}/edit  — show edit form
+    @GetMapping("/reservations/{id}/edit")
+    public String editReservationForm(@PathVariable Long id,
+                                      Authentication auth,
+                                      Model model,
+                                      RedirectAttributes redirectAttributes) {
+        try {
+            Reservation reservation = reservationService.getReservationByIdForUser(id, auth.getName());
+
+            // Only CONFIRMED (upcoming) reservations can be edited
+            if (reservation.getStatus() != ReservationStatus.CONFIRMED) {
+                redirectAttributes.addFlashAttribute("error", "Only upcoming reservations can be edited.");
+                return "redirect:/reservations";
+            }
+
+            model.addAttribute("reservation", reservation);
+            model.addAttribute("userVehicles", vehicleService.getVehiclesByUser(auth.getName()));
+            model.addAttribute("availableSlots", slotService.getAvailableSlots(
+                    reservation.getStartTime().toLocalDate(), null));
+            model.addAttribute("zones", slotService.getAllZones());
+            return "parking/editreservation";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/reservations";
+        }
+    }
+
+    // POST /reservations/{id}/edit  — save changes
+    @PostMapping("/reservations/{id}/edit")
+    public String updateReservation(@PathVariable Long id,
+                                    @Valid @ModelAttribute ReservationRequest request,
+                                    Authentication auth,
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            reservationService.updateReservation(id, request, auth.getName());
+            redirectAttributes.addFlashAttribute("success", "Reservation updated successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/reservations";
     }
 
     // POST /reservations/{id}/cancel
