@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,43 +29,37 @@ public class WalletService {
     }
 
     /**
-     * Improved getWalletOverview to prevent LazyInitializationException
+     * Deduct balance from wallet - Used by PaymentService
      */
-    @Transactional(readOnly = true)
-    public Map<String, Object> getWalletOverview(String email) {
+    @Transactional
+    public void deductBalance(String email, BigDecimal amount, String description) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Deduction amount must be positive");
+        }
+
         Wallet wallet = getOrCreateWallet(email);
 
-        // Force initialize the User (lazy proxy) inside transaction
-        User user = wallet.getUser();
-        if (user != null) {
-            user.getFirstName();   // trigger initialization
-            user.getLastName();    // trigger initialization
+        if (wallet.getBalance().compareTo(amount) < 0) {
+            throw new RuntimeException("Insufficient wallet balance.");
         }
 
-        // Force initialize transactions
-        List<WalletTransaction> transactions = wallet.getTransactions();
-        if (transactions != null) {
-            transactions.size();
+        BigDecimal newBalance = wallet.getBalance().subtract(amount);
+        wallet.setBalance(newBalance);
+
+        WalletTransaction transaction = WalletTransaction.builder()
+                .wallet(wallet)
+                .type("DEBIT")
+                .amount(amount)
+                .balanceAfter(newBalance)
+                .description(description)
+                .build();
+
+        if (wallet.getTransactions() == null) {
+            wallet.setTransactions(new ArrayList<>());
         }
+        wallet.getTransactions().add(transaction);
 
-        return Map.of(
-                "wallet", wallet,
-                "user", user,                    // Pass user separately - safer for Thymeleaf
-                "balance", wallet.getBalance(),
-                "transactions", transactions != null ? new ArrayList<>(transactions) : new ArrayList<>()
-        );
-    }
-
-    @Transactional(readOnly = true)
-    public List<WalletTransaction> getTransactionHistory(String email) {
-        Wallet wallet = getOrCreateWallet(email);
-
-        List<WalletTransaction> transactions = wallet.getTransactions();
-        if (transactions != null) {
-            transactions.size(); // force load
-        }
-
-        return transactions != null ? new ArrayList<>(transactions) : new ArrayList<>();
+        walletRepository.save(wallet);
     }
 
     @Transactional
@@ -92,6 +87,43 @@ public class WalletService {
         wallet.getTransactions().add(transaction);
 
         walletRepository.save(wallet);
+    }
+
+    @Transactional(readOnly = true)
+    public List<WalletTransaction> getTransactionHistory(String email) {
+        Wallet wallet = getOrCreateWallet(email);
+        List<WalletTransaction> transactions = wallet.getTransactions();
+        if (transactions != null) {
+            transactions.size(); // force load
+        }
+        return transactions != null ? new ArrayList<>(transactions) : new ArrayList<>();
+    }
+
+    /**
+     * FIXED: Restored getWalletOverview as Map to match existing calls
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Object> getWalletOverview(String email) {
+        Wallet wallet = getOrCreateWallet(email);
+
+        User user = wallet.getUser();
+        if (user != null) {
+            user.getFirstName();   // force initialization
+            user.getLastName();
+        }
+
+        List<WalletTransaction> transactions = wallet.getTransactions();
+        if (transactions != null) {
+            transactions.size(); // force load
+        }
+
+        Map<String, Object> overview = new HashMap<>();
+        overview.put("wallet", wallet);
+        overview.put("user", user);
+        overview.put("balance", wallet.getBalance());
+        overview.put("transactions", transactions != null ? new ArrayList<>(transactions) : new ArrayList<>());
+
+        return overview;
     }
 
     private Wallet getOrCreateWallet(String email) {

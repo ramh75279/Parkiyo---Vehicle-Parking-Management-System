@@ -11,7 +11,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payments")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Payment {
 
     @Id
@@ -48,6 +52,10 @@ public class Payment {
     private LocalDateTime paidAt;
     private LocalDateTime refundedAt;
     private String refundReason;
+
+    // NEW FIELD: Who processed the cash payment (operator)
+    @Column(name = "paid_by", length = 150)
+    private String paidBy;
 
     @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Receipt receipt;

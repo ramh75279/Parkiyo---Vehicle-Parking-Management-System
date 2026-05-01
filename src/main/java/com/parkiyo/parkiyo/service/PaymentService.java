@@ -2,11 +2,10 @@ package com.parkiyo.parkiyo.service;
 
 import com.parkiyo.parkiyo.enums.PaymentStatus;
 import com.parkiyo.parkiyo.enums.NotificationType;
-import com.parkiyo.parkiyo.model.ParkingRecord;
 import com.parkiyo.parkiyo.model.Payment;
 import com.parkiyo.parkiyo.model.Receipt;
 import com.parkiyo.parkiyo.repository.PaymentRepository;
-import com.parkiyo.parkiyo.repository.WalletRepository;
+import com.parkiyo.parkiyo.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,6 @@ import java.util.List;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final WalletRepository walletRepository;
     private final WalletService walletService;
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
@@ -30,7 +28,7 @@ public class PaymentService {
     public Payment getPendingPayment(Long id, String email) {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Payment not found."));
-        // Basic ownership check
+
         if (!payment.getUser().getEmail().equalsIgnoreCase(email)) {
             throw new RuntimeException("You are not authorized to view this payment.");
         }
@@ -38,11 +36,42 @@ public class PaymentService {
     }
 
     public Payment getPaymentById(Long id, String email) {
-        return getPendingPayment(id, email); // reuse with check
+        return getPendingPayment(id, email);
+    }
+
+    public Receipt getReceipt(Long paymentId, String email) {
+        Payment payment = getPendingPayment(paymentId, email);
+        return payment.getReceipt();
+    }
+
+    /**
+     * ✅ NEW METHOD - For Admin (no user ownership check)
+     */
+    public Receipt getAdminReceipt(Long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new RuntimeException("Payment not found."));
+        return payment.getReceipt();
     }
 
     public List<Payment> getUserPaymentHistory(String email) {
         return paymentRepository.findByUserEmail(email);
+    }
+
+    public List<Payment> getAllPaymentHistory() {
+        return paymentRepository.findAll();
+    }
+
+    public Payment getLatestSuccessfulPayment(String email) {
+        return paymentRepository.findTopByUserEmailAndStatusOrderByPaidAtDesc(email, PaymentStatus.SUCCESS)
+                .orElse(null);
+    }
+
+    public Receipt getLatestReceipt(String email) {
+        Payment latestPayment = getLatestSuccessfulPayment(email);
+        if (latestPayment != null && latestPayment.getReceipt() != null) {
+            return latestPayment.getReceipt();
+        }
+        return null;
     }
 
     public BigDecimal getUserTotalSpent(String email) {
@@ -53,6 +82,11 @@ public class PaymentService {
     }
 
     // ==================== PAYMENT PROCESSING ====================
+
+    @Transactional
+    public void initiatePayment(Long paymentId, String userEmail) {
+        initiateWalletPayment(paymentId, userEmail);
+    }
 
     @Transactional
     public void completeCashPayment(Long paymentId, String operatorEmail) {
@@ -68,7 +102,6 @@ public class PaymentService {
         payment.setPaidAt(LocalDateTime.now());
         payment.setPaidBy(operatorEmail);
 
-        // Update related parking record status if exists
         if (payment.getParkingRecord() != null) {
             payment.getParkingRecord().setPaid(true);
         }
@@ -106,8 +139,8 @@ public class PaymentService {
             throw new RuntimeException("Insufficient wallet balance.");
         }
 
-        // Deduct from wallet
-        walletService.deductBalance(userEmail, payment.getAmount(), "Payment for " + payment.getTransactionCode());
+        walletService.deductBalance(userEmail, payment.getAmount(),
+                "Payment for " + payment.getTransactionCode());
 
         payment.setStatus(PaymentStatus.SUCCESS);
         payment.setPaymentMethod("Parkiyo Wallet");
@@ -126,7 +159,6 @@ public class PaymentService {
     }
 
     private void createReceipt(Payment payment) {
-        // Simplified receipt creation
         Receipt receipt = Receipt.builder()
                 .payment(payment)
                 .receiptNumber("RCP-" + payment.getTransactionCode())
@@ -143,7 +175,7 @@ public class PaymentService {
         payment.setReceipt(receipt);
     }
 
-    // ==================== ADMIN & OTHER ====================
+    // ==================== ADMIN METHODS ====================
 
     public List<Payment> getAllPayments(String status, String dateFrom, String dateTo) {
         if (status != null && !status.isBlank()) {
@@ -159,7 +191,6 @@ public class PaymentService {
 
     @Transactional
     public void refundPayment(Long id) {
-        // ... (keep your existing refund logic or simplify later)
-        // For now, you can keep your original refundPayment method
+        throw new UnsupportedOperationException("Refund functionality not implemented yet.");
     }
 }
