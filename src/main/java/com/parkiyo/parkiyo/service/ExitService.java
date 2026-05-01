@@ -4,9 +4,9 @@ import com.parkiyo.parkiyo.dto.ExitRequest;
 import com.parkiyo.parkiyo.enums.NotificationType;
 import com.parkiyo.parkiyo.enums.PaymentStatus;
 import com.parkiyo.parkiyo.enums.SlotStatus;
-import com.parkiyo.parkiyo.model.Payment;
 import com.parkiyo.parkiyo.model.ParkingRecord;
 import com.parkiyo.parkiyo.model.ParkingSlot;
+import com.parkiyo.parkiyo.model.Payment;
 import com.parkiyo.parkiyo.repository.ParkingRecordRepository;
 import com.parkiyo.parkiyo.repository.ParkingSlotRepository;
 import com.parkiyo.parkiyo.repository.PaymentRepository;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Comparator;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,25 +31,30 @@ public class ExitService {
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
 
+    private static final ZoneId COLOMBO_ZONE = ZoneId.of("Asia/Colombo");
+
     @Transactional
     public Long processExit(ExitRequest request, String operatorEmail) {
-        ParkingRecord record = parkingRecordRepository.findById(request.getParkingRecordId())
-                .orElseThrow(() -> new RuntimeException("Parking record not found."));
+        String normalizedPlate = normalizeLicensePlate(request.getLicensePlate());
+
+        // Find active parking record using license plate (Best for real gate system)
+        ParkingRecord record = parkingRecordRepository
+                .findByVehicleLicensePlateAndActiveTrue(normalizedPlate)
+                .orElseThrow(() -> new RuntimeException("No active parking record found for vehicle: " + normalizedPlate));
 
         if (!record.isActive()) {
-            throw new RuntimeException("This vehicle has already exited.");
+            throw new RuntimeException("Vehicle " + normalizedPlate + " has already exited.");
         }
 
-        LocalDateTime exitTime = LocalDateTime.now();
-        long minutes = Duration.between(record.getEntryTime(), exitTime).toMinutes();
+        LocalDateTime exitTime = LocalDateTime.now(COLOMBO_ZONE);
+        Duration duration = Duration.between(record.getEntryTime(), exitTime);
+        long minutes = duration.toMinutes();
         if (minutes < 1) minutes = 1;
 
-        // Calculate fee based on slot hourly rate
-        ParkingSlot slot = record.getSlot();
-        BigDecimal hours = BigDecimal.valueOf(Math.ceil(minutes / 60.0));
-        BigDecimal amount = slot.getHourlyRate().multiply(hours);
+        // Improved Fee Calculation
+        BigDecimal amount = calculateParkingFee(minutes, record.getSlot());
 
-        // Update record
+        // Update Parking Record
         record.setExitTime(exitTime);
         record.setDurationMinutes((int) minutes);
         record.setAmountCharged(amount);
@@ -57,50 +62,70 @@ public class ExitService {
         record.setActive(false);
         parkingRecordRepository.save(record);
 
-        // Free up the slot
+        // Free the slot
+        ParkingSlot slot = record.getSlot();
         slot.setStatus(SlotStatus.AVAILABLE);
         slotRepository.save(slot);
 
-        // Create a pending payment
+        // Create Payment Record
         Payment payment = Payment.builder()
                 .transactionCode("TXN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
                 .user(record.getUser())
                 .parkingRecord(record)
                 .amount(amount)
-                .paymentMethod("Pending")
+                .paymentMethod("CASH")           // Default, can be changed later
                 .status(PaymentStatus.PENDING)
                 .build();
+
         paymentRepository.save(payment);
 
-            notificationService.createNotification(
+        // Notifications & Audit Log
+        notificationService.createNotification(
                 record.getUser(),
                 NotificationType.EXIT,
                 "Vehicle Exit Processed",
-                "Vehicle " + record.getVehicle().getLicensePlate() + " exited. Pending payment " + payment.getTransactionCode() + " created.",
+                "Vehicle " + normalizedPlate + " exited. Amount due: Rs. " + amount,
                 "/payments/pending/" + payment.getId()
-            );
+        );
 
         auditLogService.logAction(
-            "EXIT",
-            operatorEmail,
-            "ParkingRecord",
-            record.getId(),
-            "Vehicle " + record.getVehicle().getLicensePlate() + " exited from slot " + slot.getSlotNumber(),
-            null,
-            null,
-            null
+                "EXIT",
+                operatorEmail,
+                "ParkingRecord",
+                record.getId(),
+                "Vehicle " + normalizedPlate + " exited from slot " + slot.getSlotNumber() + ". Fee: Rs." + amount,
+                null, null, null
         );
 
         return payment.getId();
     }
 
+    private String normalizeLicensePlate(String plate) {
+        if (plate == null) return "";
+        return plate.toUpperCase().replaceAll("\\s+", "").replace("-", "");
+    }
+
+    /**
+     * Improved Fee Calculation Logic
+     */
+    private BigDecimal calculateParkingFee(long minutes, ParkingSlot slot) {
+        BigDecimal hourlyRate = slot.getHourlyRate() != null ? slot.getHourlyRate() : BigDecimal.valueOf(200);
+
+        // Grace period: First 15 minutes free
+        if (minutes <= 15) {
+            return BigDecimal.ZERO;
+        }
+
+        long billableHours = (long) Math.ceil((minutes - 15) / 60.0);
+        if (billableHours < 1) billableHours = 1;
+
+        return hourlyRate.multiply(BigDecimal.valueOf(billableHours));
+    }
+
     public List<ParkingRecord> getRecentExits(int limit) {
-        return parkingRecordRepository.findAll().stream()
+        return parkingRecordRepository.findTop20ByOrderByEntryTimeDesc()
+                .stream()
                 .filter(r -> !r.isActive())
-            .sorted(Comparator.comparing(
-                ParkingRecord::getExitTime,
-                Comparator.nullsLast(Comparator.reverseOrder())
-            ))
                 .limit(limit)
                 .toList();
     }
