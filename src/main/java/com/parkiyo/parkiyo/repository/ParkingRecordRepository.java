@@ -17,7 +17,6 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
     @Query("SELECT COUNT(pr) FROM ParkingRecord pr WHERE pr.exitTime IS NULL")
     long countActiveRecords();
 
-    // TEMPORARY SAFE VERSION - returns 0 until we fix the entity
     @Query("SELECT COALESCE(SUM(0), 0)")
     BigDecimal calculateTodayRevenue();
 
@@ -27,15 +26,17 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
     @Query("SELECT pr FROM ParkingRecord pr ORDER BY pr.createdAt DESC LIMIT 20")
     List<ParkingRecord> findTop20ByOrderByCreatedAtDesc();
 
+    // ✅ NEW METHOD ADDED
+    @Query("SELECT pr FROM ParkingRecord pr ORDER BY pr.entryTime DESC LIMIT 20")
+    List<ParkingRecord> findTop20ByOrderByEntryTimeDesc();
+
     @Query("SELECT pr FROM ParkingRecord pr WHERE pr.payment IS NOT NULL " +
             "ORDER BY pr.exitTime DESC LIMIT :limit")
     List<ParkingRecord> findRecentPaid(@Param("limit") int limit);
 
-    // History
+    // History & User related
     List<ParkingRecord> findByVehicleId(Long vehicleId);
     List<ParkingRecord> findBySlotId(Long slotId);
-
-    // User
     List<ParkingRecord> findByUserEmail(String email);
     List<ParkingRecord> findByUserEmailAndActiveTrue(String email);
     List<ParkingRecord> findByActiveTrue();
@@ -54,4 +55,14 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
     List<ParkingRecord> findPendingPaymentsByUser(@Param("email") String email);
 
     List<ParkingRecord> findTop10ByOrderByEntryTimeDesc();
+
+    // ==================== KEY METHODS FOR ENTRY & EXIT ====================
+
+    @Query("SELECT pr FROM ParkingRecord pr " +
+            "WHERE pr.vehicle.licensePlate = :licensePlate AND pr.active = true")
+    Optional<ParkingRecord> findByVehicleLicensePlateAndActiveTrue(@Param("licensePlate") String licensePlate);
+
+    @Query("SELECT COUNT(pr) > 0 FROM ParkingRecord pr " +
+            "WHERE pr.vehicle.licensePlate = :licensePlate AND pr.active = true")
+    boolean existsByVehicleLicensePlateAndActiveTrue(@Param("licensePlate") String licensePlate);
 }

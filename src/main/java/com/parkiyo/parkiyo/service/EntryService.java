@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,71 +32,79 @@ public class EntryService {
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
 
+    private static final ZoneId COLOMBO_ZONE = ZoneId.of("Asia/Colombo");
+
     @Transactional
     public void processEntry(EntryRequest request, String operatorEmail) {
-        VehicleCategory category = (request.getCategory() != null && !request.getCategory().isBlank())
-            ? VehicleCategory.valueOf(request.getCategory().trim().toUpperCase())
-            : VehicleCategory.CAR;
+        String normalizedPlate = normalizeLicensePlate(request.getLicensePlate());
 
-        // Get or create vehicle
-        Vehicle vehicle = vehicleRepository.findByLicensePlate(
-                        request.getLicensePlate().toUpperCase())
+        // 1. Check for duplicate active entry
+        Optional<ParkingRecord> existing = parkingRecordRepository.findByVehicleLicensePlateAndActiveTrue(normalizedPlate);
+        if (existing.isPresent()) {
+            throw new RuntimeException("Vehicle " + normalizedPlate + " is already parked.");
+        }
+
+        // 2. Get or Create Vehicle
+        Vehicle vehicle = vehicleRepository.findByLicensePlate(normalizedPlate)
                 .orElseGet(() -> {
+                    VehicleCategory category = convertToVehicleCategory(request.getVehicleType());
                     Vehicle v = Vehicle.builder()
-                            .licensePlate(request.getLicensePlate().toUpperCase())
-                    .category(category)
+                            .licensePlate(normalizedPlate)
+                            .category(category)
                             .active(true)
                             .build();
                     return vehicleRepository.save(v);
                 });
 
-        // Get slot and check availability
-        ParkingSlot slot = slotRepository.findById(request.getSlotId())
-                .orElseThrow(() -> new RuntimeException("Slot not found."));
-        if (slot.getStatus() != SlotStatus.AVAILABLE) {
-            throw new RuntimeException("Slot " + slot.getSlotNumber() + " is not available.");
-        }
+        // 3. Auto-assign available slot based on vehicle type (Recommended)
+        ParkingSlot slot = slotRepository.findFirstAvailableSlotByCategory(vehicle.getCategory())
+                .orElseThrow(() -> new RuntimeException("No available slot for vehicle type: " + request.getVehicleType()));
 
-        // Get user (may be null for walk-in vehicles)
+        // 4. Get User (operator or owner)
         User user = userRepository.findByEmail(operatorEmail).orElse(null);
 
-        // Create parking record
+        // 5. Create Parking Record
+        LocalDateTime entryTime = LocalDateTime.now(COLOMBO_ZONE);
+
         ParkingRecord record = ParkingRecord.builder()
                 .vehicle(vehicle)
                 .slot(slot)
                 .user(user)
-                .entryTime(LocalDateTime.now())
+                .entryTime(entryTime)
                 .entryOperator(operatorEmail)
                 .active(true)
                 .build();
+
         parkingRecordRepository.save(record);
 
-        // Mark slot as occupied
+        // 6. Mark slot occupied
         slot.setStatus(SlotStatus.OCCUPIED);
         slotRepository.save(slot);
 
-        notificationService.createNotification(
-            user,
-            NotificationType.ENTRY,
-            "Vehicle Entry Recorded",
-            "Vehicle " + vehicle.getLicensePlate() + " entered slot " + slot.getSlotNumber() + ".",
-            "/parking"
-        );
+        // Notifications & Audit
+        notificationService.createNotification(user, NotificationType.ENTRY,
+                "Vehicle Entry",
+                "Vehicle " + normalizedPlate + " entered slot " + slot.getSlotNumber(), "/parking");
 
-        auditLogService.logAction(
-            "ENTRY",
-            operatorEmail,
-            "ParkingRecord",
-            record.getId(),
-            "Vehicle " + vehicle.getLicensePlate() + " entered slot " + slot.getSlotNumber(),
-            null,
-            null,
-            null
-        );
+        auditLogService.logAction("ENTRY", operatorEmail, "ParkingRecord", record.getId(),
+                "Vehicle " + normalizedPlate + " entered slot " + slot.getSlotNumber(), null, null, null);
+    }
+
+    private String normalizeLicensePlate(String plate) {
+        if (plate == null) return "";
+        return plate.toUpperCase().replaceAll("\\s+", "").replace("-", "");
+    }
+
+    private VehicleCategory convertToVehicleCategory(String type) {
+        try {
+            return VehicleCategory.valueOf(type.trim().toUpperCase());
+        } catch (Exception e) {
+            return VehicleCategory.CAR;
+        }
     }
 
     public List<ParkingRecord> getRecentEntries(int limit) {
-        return parkingRecordRepository.findTop20ByOrderByCreatedAtDesc()
+        return parkingRecordRepository.findTop20ByOrderByEntryTimeDesc()
                 .stream().limit(limit).toList();
     }
 }
