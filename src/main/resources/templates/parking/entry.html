@@ -291,7 +291,7 @@
                     <div class="glass-card p-5 rounded-2xl flex items-center gap-3">
                         <span class="h-2.5 w-2.5 rounded-full bg-emerald-400 shrink-0"></span>
                         <div>
-                            <p class="text-xl font-black text-emerald-400" th:text="${availableSlots != null ? availableSlots : '42'}">42</p>
+                            <p class="text-xl font-black text-emerald-400" th:text="${availableSlots != null ? availableSlots.size() : '42'}">42</p>
                             <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Available Now</p>
                         </div>
                     </div>
