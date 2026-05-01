@@ -1,6 +1,7 @@
 package com.parkiyo.parkiyo.controller;
 
 import com.parkiyo.parkiyo.dto.VehicleRequest;
+import com.parkiyo.parkiyo.model.ParkingRecord;
 import com.parkiyo.parkiyo.model.Vehicle;
 import com.parkiyo.parkiyo.service.VehicleService;
 import jakarta.servlet.http.HttpSession;
@@ -16,11 +17,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/admin/vehicles")
@@ -79,8 +85,60 @@ public class VehicleController {
     // GET /admin/vehicles/{id}
     @GetMapping("/{id}")
     public String vehicleDetails(@PathVariable Long id, Model model) {
-        model.addAttribute("vehicle", vehicleService.getVehicleById(id));
-        model.addAttribute("parkingHistory", vehicleService.getVehicleParkingHistory(id));
+        Vehicle vehicle = vehicleService.getVehicleById(id);
+        List<ParkingRecord> parkingHistory = vehicleService.getVehicleParkingHistory(id);
+
+        Optional<ParkingRecord> activeOpt = parkingHistory.stream()
+                .filter(r -> r.getExitTime() == null)
+                .findFirst();
+
+        BigDecimal totalPaid = parkingHistory.stream()
+                .map(ParkingRecord::getAmountCharged)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        int visitCount = parkingHistory.size();
+        int avgMinutes = (int) Math.round(parkingHistory.stream()
+                .map(ParkingRecord::getDurationMinutes)
+                .filter(Objects::nonNull)
+                .mapToInt(Integer::intValue)
+                .average()
+                .orElse(0));
+
+        long unpaidApprox = parkingHistory.stream()
+                .filter(r -> r.getExitTime() == null && r.getPayment() == null)
+                .count();
+
+        Long activeSessionMinutes = activeOpt
+                .map(a -> ChronoUnit.MINUTES.between(a.getEntryTime(), LocalDateTime.now()))
+                .orElse(null);
+
+        String activeSlotLabel = activeOpt
+                .map(ParkingRecord::getSlot)
+                .map(slot -> {
+                    String num = slot.getSlotNumber() != null ? slot.getSlotNumber() : "";
+                    String zone = slot.getZone();
+                    if (zone != null && !zone.isBlank()) {
+                        return "Slot " + num + " · " + zone;
+                    }
+                    return "Slot " + num;
+                })
+                .orElse("");
+
+        model.addAttribute("vehicle", vehicle);
+        model.addAttribute("parkingHistory", parkingHistory);
+        model.addAttribute("activeParkingRecord", activeOpt.orElse(null));
+        model.addAttribute("makeModel", buildMakeModel(vehicle.getMake(), vehicle.getModel()));
+        model.addAttribute("categoryLabel", vehicle.getCategory() != null
+                ? formatCategory(vehicle.getCategory().name())
+                : "-");
+        model.addAttribute("ownerDisplayName", resolveOwnerDisplayName(vehicle));
+        model.addAttribute("visitCount", visitCount);
+        model.addAttribute("totalPaidAmount", totalPaid);
+        model.addAttribute("avgDurationLabel", formatDurationMinutes(avgMinutes));
+        model.addAttribute("unpaidApproxCount", unpaidApprox);
+        model.addAttribute("activeSessionMinutes", activeSessionMinutes);
+        model.addAttribute("activeSlotLabel", activeSlotLabel);
         return "vehicles/vehicle-details-page";
     }
 
@@ -282,5 +340,31 @@ public class VehicleController {
             case "purple" -> "#a855f7";
             default -> "#94a3b8";
         };
+    }
+
+    private static String formatDurationMinutes(int totalMinutes) {
+        if (totalMinutes <= 0) {
+            return "—";
+        }
+        int hours = totalMinutes / 60;
+        int mins = totalMinutes % 60;
+        if (hours > 0 && mins > 0) {
+            return hours + "h " + mins + "m";
+        }
+        if (hours > 0) {
+            return hours + "h";
+        }
+        return mins + "m";
+    }
+
+    private String resolveOwnerDisplayName(Vehicle vehicle) {
+        try {
+            if (vehicle.getUser() == null) {
+                return "Guest";
+            }
+            return vehicle.getUser().getFullName();
+        } catch (Exception ignored) {
+            return "Guest";
+        }
     }
 }

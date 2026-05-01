@@ -32,8 +32,9 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
             "ORDER BY pr.exitTime DESC LIMIT :limit")
     List<ParkingRecord> findRecentPaid(@Param("limit") int limit);
 
-    // History
-    List<ParkingRecord> findByVehicleId(Long vehicleId);
+    // History (explicit query — "findByVehicleId" is not a valid derived path for nested vehicle.id)
+    @Query("SELECT pr FROM ParkingRecord pr WHERE pr.vehicle.id = :vehicleId ORDER BY pr.entryTime DESC")
+    List<ParkingRecord> findByVehicleId(@Param("vehicleId") Long vehicleId);
     List<ParkingRecord> findBySlotId(Long slotId);
 
     // User

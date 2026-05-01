@@ -210,7 +210,8 @@
                         </thead>
                         <tbody class="text-sm font-bold text-slate-300 divide-y divide-white/5">
                         <tr class="veh-row" th:each="v : ${vehicles}"
-                            th:onclick="|window.location.href='[[@{/admin/vehicles/{id}(id=${v.id})}]]'|">
+                            th:attr="data-view-url=@{/admin/vehicles/{id}(id=${v.id})}"
+                            onclick="window.location.href=this.dataset.viewUrl">
                             <td class="px-8 py-5">
                                         <span th:text="${v.plate}"
                                               th:classappend="${v.status == 'Blocked'} ? 'text-rose-400 bg-rose-500/10 border border-rose-500/20' : 'text-white bg-white/5'"
@@ -232,11 +233,13 @@
                                               th:text="${v.status}">Parked</span>
                             </td>
                             <td class="px-8 py-5">
-                                <div class="flex items-center gap-2" onclick="event.stopPropagation()">
+                                <div class="flex items-center gap-2" onclick="event.stopPropagation();">
                                     <a th:href="@{/admin/vehicles/{id}(id=${v.id})}"
+                                       onclick="event.stopPropagation();"
                                        class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 hover:border-primary/30 transition-all"
                                        title="View"><span class="material-symbols-outlined text-sm text-slate-400">visibility</span></a>
                                     <a th:href="@{/admin/vehicles/{id}/edit(id=${v.id})}"
+                                       onclick="event.stopPropagation();"
                                        class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-amber-500/20 hover:border-amber-500/30 transition-all"
                                        title="Edit"><span class="material-symbols-outlined text-sm text-slate-400">edit</span></a>
                                 </div>
