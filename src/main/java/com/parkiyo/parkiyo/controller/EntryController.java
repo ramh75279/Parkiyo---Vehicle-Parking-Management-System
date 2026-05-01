@@ -56,6 +56,7 @@ public class EntryController {
     @PreAuthorize("hasRole('ADMIN')")
     public String adminEntryPage(Model model) {
         model.addAttribute("availableSlots", slotService.getAvailableSlots());
+        model.addAttribute("slotOverview", slotService.getSlotOverview());
         model.addAttribute("recentEntries", entryService.getRecentEntries(20));
         model.addAttribute("entryRequest", new EntryRequest());
         return "parking/entry-admin";
