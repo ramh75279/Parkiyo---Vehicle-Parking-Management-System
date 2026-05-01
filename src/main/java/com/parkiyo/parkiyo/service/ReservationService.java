@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,33 +29,90 @@ public class ReservationService {
     private final PaymentRepository paymentRepository;
     private final NotificationService notificationService;
 
+    /**
+     * Get all reservations for a user - NEVER returns null
+     */
+    @Transactional(readOnly = true)
     public List<Reservation> getUserReservations(String email) {
-        return reservationRepository.findByUserEmail(email);
+        if (email == null || email.isBlank()) {
+            return Collections.emptyList();
+        }
+        List<Reservation> reservations = reservationRepository.findByUserEmail(email);
+        return reservations != null ? reservations : Collections.emptyList();
     }
 
+    /**
+     * Get active (CONFIRMED) reservation for user
+     */
+    @Transactional(readOnly = true)
     public Reservation getActiveReservation(String email) {
+        if (email == null || email.isBlank()) {
+            return null;
+        }
         return reservationRepository
                 .findTopByUserEmailAndStatusOrderByCreatedAtDesc(email, ReservationStatus.CONFIRMED)
                 .orElse(null);
     }
 
     /**
-     * Fetches a single reservation by ID, verifying it belongs to the given user.
-     * Throws RuntimeException if not found or not owned by user.
+     * Fetches a single reservation by ID with ownership verification
      */
     public Reservation getReservationByIdForUser(Long id, String email) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found."));
+
         if (!reservation.getUser().getEmail().equals(email)) {
             throw new RuntimeException("Not authorised to access this reservation.");
         }
         return reservation;
     }
 
+    // ====================== COUNT METHODS FOR DASHBOARD/STATS ======================
+
+    /**
+     * Count upcoming (CONFIRMED) reservations
+     */
+    @Transactional(readOnly = true)
+    public long countUpcomingReservations(String email) {
+        if (email == null || email.isBlank()) return 0;
+        return reservationRepository.countByUserEmailAndStatus(email, ReservationStatus.CONFIRMED);
+    }
+
+    /**
+     * Count reservations scheduled for today
+     */
+    @Transactional(readOnly = true)
+    public long countTodayReservations(String email) {
+        if (email == null || email.isBlank()) return 0;
+        LocalDate today = LocalDate.now();
+        return reservationRepository.countByUserEmailAndStatusAndStartTimeToday(email, ReservationStatus.CONFIRMED, today);
+    }
+
+    /**
+     * Count cancelled reservations
+     */
+    @Transactional(readOnly = true)
+    public long countCancelledReservations(String email) {
+        if (email == null || email.isBlank()) return 0;
+        return reservationRepository.countByUserEmailAndStatus(email, ReservationStatus.CANCELLED);
+    }
+
+    /**
+     * Count completed reservations
+     */
+    @Transactional(readOnly = true)
+    public long countCompletedReservations(String email) {
+        if (email == null || email.isBlank()) return 0;
+        return reservationRepository.countByUserEmailAndStatus(email, ReservationStatus.COMPLETED);
+    }
+
+    // ====================== CORE BUSINESS METHODS ======================
+
     @Transactional
     public Long createReservation(ReservationRequest request, String email) {
         ParkingSlot slot = slotRepository.findById(request.getSlotId())
                 .orElseThrow(() -> new RuntimeException("Slot not found."));
+
         if (slot.getStatus() != SlotStatus.AVAILABLE) {
             throw new RuntimeException("Slot " + slot.getSlotNumber() + " is not available.");
         }
@@ -78,13 +137,14 @@ public class ReservationService {
                 .endTime(request.getEndTime())
                 .status(ReservationStatus.CONFIRMED)
                 .build();
+
         reservationRepository.save(reservation);
 
         // Reserve the slot
         slot.setStatus(SlotStatus.RESERVED);
         slotRepository.save(slot);
 
-        // Create a pending payment
+        // Create pending payment
         Payment payment = Payment.builder()
                 .transactionCode("TXN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
                 .user(user)
@@ -93,6 +153,7 @@ public class ReservationService {
                 .paymentMethod("Pending")
                 .status(PaymentStatus.PENDING)
                 .build();
+
         paymentRepository.save(payment);
 
         notificationService.createNotification(
@@ -106,11 +167,6 @@ public class ReservationService {
         return payment.getId();
     }
 
-    /**
-     * Updates an existing CONFIRMED reservation's time window and/or vehicle.
-     * If the slot changes, the old slot is freed and the new one is reserved.
-     * The linked pending payment amount is recalculated to match the new duration.
-     */
     @Transactional
     public void updateReservation(Long id, ReservationRequest request, String email) {
         Reservation reservation = reservationRepository.findById(id)
@@ -127,7 +183,7 @@ public class ReservationService {
         ParkingSlot newSlot = slotRepository.findById(request.getSlotId())
                 .orElseThrow(() -> new RuntimeException("Slot not found."));
 
-        // If the slot changed, validate availability and swap reservation
+        // Handle slot change
         if (!oldSlot.getId().equals(newSlot.getId())) {
             if (newSlot.getStatus() != SlotStatus.AVAILABLE) {
                 throw new RuntimeException("Slot " + newSlot.getSlotNumber() + " is not available.");
@@ -149,7 +205,7 @@ public class ReservationService {
         reservation.setEndTime(request.getEndTime());
         reservationRepository.save(reservation);
 
-        // Recalculate and update the pending payment amount
+        // Recalculate payment amount
         long hours = (long) Math.ceil(
                 Duration.between(request.getStartTime(), request.getEndTime()).toMinutes() / 60.0);
         BigDecimal newAmount = newSlot.getHourlyRate().multiply(BigDecimal.valueOf(hours));
@@ -173,9 +229,11 @@ public class ReservationService {
     public void cancelReservation(Long id, String email) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found."));
+
         if (!reservation.getUser().getEmail().equals(email)) {
             throw new RuntimeException("Not authorised to cancel this reservation.");
         }
+
         reservation.setStatus(ReservationStatus.CANCELLED);
         reservationRepository.save(reservation);
 

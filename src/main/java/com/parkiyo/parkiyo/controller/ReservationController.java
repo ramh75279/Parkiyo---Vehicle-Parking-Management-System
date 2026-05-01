@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.util.Collections;
 
 @Controller
 @PreAuthorize("isAuthenticated()")
@@ -26,21 +27,36 @@ public class ReservationController {
     private final SlotService slotService;
     private final VehicleService vehicleService;
 
-    // GET /reservations
+    /**
+     * Main Advance Reservations Page
+     */
     @GetMapping("/reservations")
     public String reservations(Authentication auth, Model model) {
-        model.addAttribute("reservations", reservationService.getUserReservations(auth.getName()));
+        String email = auth.getName();
+
+        model.addAttribute("reservations", reservationService.getUserReservations(email));
+        model.addAttribute("upcomingCount", reservationService.countUpcomingReservations(email));
+        model.addAttribute("todayCount", reservationService.countTodayReservations(email));
+        model.addAttribute("cancelledCount", reservationService.countCancelledReservations(email));
+        model.addAttribute("completedCount", reservationService.countCompletedReservations(email));
+
         return "parking/advancereservation";
     }
 
-    // GET /reservation  (single active reservation view)
+    /**
+     * Active Reservation View
+     */
     @GetMapping("/reservation")
     public String activeReservation(Authentication auth, Model model) {
-        model.addAttribute("reservation", reservationService.getActiveReservation(auth.getName()));
+        String email = auth.getName();
+        model.addAttribute("reservation", reservationService.getActiveReservation(email));
+        // Safety for template
+        model.addAttribute("reservations", Collections.emptyList());
+
         return "parking/advancereservation";
     }
 
-    // GET /reservations/slot-selection
+    // ====================== SLOT SELECTION ======================
     @GetMapping("/reservations/slot-selection")
     public String slotSelection(@RequestParam(required = false) LocalDate date,
                                 @RequestParam(required = false) String zone,
@@ -49,26 +65,28 @@ public class ReservationController {
         model.addAttribute("availableSlots", slotService.getAvailableSlots(date, zone));
         model.addAttribute("userVehicles", vehicleService.getVehiclesByUser(auth.getName()));
         model.addAttribute("zones", slotService.getAllZones());
-        model.addAttribute("selectedDate", date);
+        model.addAttribute("selectedDate", date != null ? date : LocalDate.now());
+
         return "slots/slotselection";
     }
 
-    // POST /reservations/create
+    // ====================== CREATE ======================
     @PostMapping("/reservations/create")
     public String createReservation(@Valid @ModelAttribute ReservationRequest request,
                                     Authentication auth,
                                     RedirectAttributes redirectAttributes) {
         try {
-            Long reservationId = reservationService.createReservation(request, auth.getName());
-            redirectAttributes.addFlashAttribute("success", "Slot reserved! Proceed to payment.");
-            return "redirect:/payments/pending/" + reservationId;
+            Long paymentId = reservationService.createReservation(request, auth.getName());
+            redirectAttributes.addFlashAttribute("success",
+                    "Reservation created successfully! Please proceed to payment.");
+            return "redirect:/payments/pending/" + paymentId;
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/reservations/slot-selection";
         }
     }
 
-    // GET /reservations/{id}/edit  — show edit form
+    // ====================== EDIT ======================
     @GetMapping("/reservations/{id}/edit")
     public String editReservationForm(@PathVariable Long id,
                                       Authentication auth,
@@ -77,7 +95,6 @@ public class ReservationController {
         try {
             Reservation reservation = reservationService.getReservationByIdForUser(id, auth.getName());
 
-            // Only CONFIRMED (upcoming) reservations can be edited
             if (reservation.getStatus() != ReservationStatus.CONFIRMED) {
                 redirectAttributes.addFlashAttribute("error", "Only upcoming reservations can be edited.");
                 return "redirect:/reservations";
@@ -88,6 +105,7 @@ public class ReservationController {
             model.addAttribute("availableSlots", slotService.getAvailableSlots(
                     reservation.getStartTime().toLocalDate(), null));
             model.addAttribute("zones", slotService.getAllZones());
+
             return "parking/editreservation";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -95,7 +113,6 @@ public class ReservationController {
         }
     }
 
-    // POST /reservations/{id}/edit  — save changes
     @PostMapping("/reservations/{id}/edit")
     public String updateReservation(@PathVariable Long id,
                                     @Valid @ModelAttribute ReservationRequest request,
@@ -110,14 +127,14 @@ public class ReservationController {
         return "redirect:/reservations";
     }
 
-    // POST /reservations/{id}/cancel
+    // ====================== CANCEL ======================
     @PostMapping("/reservations/{id}/cancel")
     public String cancelReservation(@PathVariable Long id,
                                     Authentication auth,
                                     RedirectAttributes redirectAttributes) {
         try {
             reservationService.cancelReservation(id, auth.getName());
-            redirectAttributes.addFlashAttribute("success", "Reservation cancelled.");
+            redirectAttributes.addFlashAttribute("success", "Reservation cancelled successfully.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
