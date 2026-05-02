@@ -278,13 +278,12 @@
     </div>
 </div>
 
-<form id="deleteUserForm" method="post" class="hidden" action="#">
+<form id="deleteUserForm" method="post" class="hidden" action="#"
+      th:attr="data-users-base=@{/admin/users/}">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 </form>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    const deleteBase = /*[[@{/admin/users/}]]*/ '';
+<script>
     let pendingDeleteId = null;
 
     function filterTable() {
@@ -314,10 +313,10 @@
     function submitDelete() {
         if (!pendingDeleteId) return;
         const f = document.getElementById('deleteUserForm');
-        f.action = deleteBase + pendingDeleteId + '/delete';
+        const base = f.getAttribute('data-users-base') || '/admin/users/';
+        f.action = base + pendingDeleteId + '/delete';
         f.submit();
     }
-    /*]]>*/
 </script>
 </body>
 </html>
