@@ -56,7 +56,7 @@ public class EntryService {
                     return vehicleRepository.save(v);
                 });
 
-        // 3. Auto-assign available slot (prefer category-tagged slots, then any available)
+        // 3. Auto-assign available slot
         ParkingSlot slot = slotRepository
                 .findFirstByStatusAndVehicleCategoryOrderBySlotNumberAsc(SlotStatus.AVAILABLE, vehicle.getCategory())
                 .or(() -> slotRepository.findFirstByStatusOrderBySlotNumberAsc(SlotStatus.AVAILABLE))
@@ -88,8 +88,16 @@ public class EntryService {
                 "Vehicle Entry",
                 "Vehicle " + normalizedPlate + " entered slot " + slot.getSlotNumber(), "/parking");
 
-        auditLogService.logAction("ENTRY", operatorEmail, "ParkingRecord", record.getId(),
-                "Vehicle " + normalizedPlate + " entered slot " + slot.getSlotNumber(), null, null, null);
+        auditLogService.logAction(
+                "ENTRY",
+                operatorEmail,
+                "ParkingRecord",
+                record.getId(),
+                "Vehicle " + normalizedPlate + " entered slot " + slot.getSlotNumber(),
+                null,
+                null,
+                null
+        );
     }
 
     private String normalizeLicensePlate(String plate) {

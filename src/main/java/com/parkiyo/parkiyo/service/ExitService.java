@@ -37,21 +37,14 @@ public class ExitService {
     public Long processExit(ExitRequest request, String operatorEmail) {
         String normalizedPlate = normalizeLicensePlate(request.getLicensePlate());
 
-        // Find active parking record using license plate (Best for real gate system)
         ParkingRecord record = parkingRecordRepository
                 .findByVehicleLicensePlateAndActiveTrue(normalizedPlate)
                 .orElseThrow(() -> new RuntimeException("No active parking record found for vehicle: " + normalizedPlate));
 
-        if (!record.isActive()) {
-            throw new RuntimeException("Vehicle " + normalizedPlate + " has already exited.");
-        }
-
         LocalDateTime exitTime = LocalDateTime.now(COLOMBO_ZONE);
         Duration duration = Duration.between(record.getEntryTime(), exitTime);
-        long minutes = duration.toMinutes();
-        if (minutes < 1) minutes = 1;
+        long minutes = Math.max(duration.toMinutes(), 1);
 
-        // Improved Fee Calculation
         BigDecimal amount = calculateParkingFee(minutes, record.getSlot());
 
         // Update Parking Record
@@ -67,19 +60,19 @@ public class ExitService {
         slot.setStatus(SlotStatus.AVAILABLE);
         slotRepository.save(slot);
 
-        // Create Payment Record
+        // Create Payment
         Payment payment = Payment.builder()
                 .transactionCode("TXN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
                 .user(record.getUser())
                 .parkingRecord(record)
                 .amount(amount)
-                .paymentMethod("CASH")           // Default, can be changed later
+                .paymentMethod("CASH")
                 .status(PaymentStatus.PENDING)
                 .build();
 
         paymentRepository.save(payment);
 
-        // Notifications & Audit Log
+        // Notifications & Audit
         notificationService.createNotification(
                 record.getUser(),
                 NotificationType.EXIT,
@@ -105,21 +98,13 @@ public class ExitService {
         return plate.toUpperCase().replaceAll("\\s+", "").replace("-", "");
     }
 
-    /**
-     * Improved Fee Calculation Logic
-     */
     private BigDecimal calculateParkingFee(long minutes, ParkingSlot slot) {
         BigDecimal hourlyRate = slot.getHourlyRate() != null ? slot.getHourlyRate() : BigDecimal.valueOf(200);
 
-        // Grace period: First 15 minutes free
-        if (minutes <= 15) {
-            return BigDecimal.ZERO;
-        }
+        if (minutes <= 15) return BigDecimal.ZERO;
 
         long billableHours = (long) Math.ceil((minutes - 15) / 60.0);
-        if (billableHours < 1) billableHours = 1;
-
-        return hourlyRate.multiply(BigDecimal.valueOf(billableHours));
+        return hourlyRate.multiply(BigDecimal.valueOf(Math.max(billableHours, 1)));
     }
 
     public List<ParkingRecord> getRecentExits(int limit) {

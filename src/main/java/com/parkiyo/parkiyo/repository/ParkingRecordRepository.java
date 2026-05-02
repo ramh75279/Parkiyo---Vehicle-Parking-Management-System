@@ -18,31 +18,32 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
     @Query("SELECT COUNT(pr) FROM ParkingRecord pr WHERE pr.exitTime IS NULL")
     long countActiveRecords();
 
-    @Query("SELECT COALESCE(SUM(0), 0)")
+    @Query("SELECT COALESCE(SUM(pr.amount), 0) FROM ParkingRecord pr " +
+            "WHERE pr.exitTime IS NOT NULL AND DATE(pr.exitTime) = CURRENT_DATE")
     BigDecimal calculateTodayRevenue();
 
-    @Query("SELECT pr FROM ParkingRecord pr ORDER BY pr.entryTime DESC LIMIT :limit")
-    List<ParkingRecord> findTopRecentEntries(@Param("limit") int limit);
+    @Query("SELECT pr FROM ParkingRecord pr ORDER BY pr.entryTime DESC")
+    List<ParkingRecord> findTopRecentEntries(@Param("limit") int limit);  // Use Pageable in service for better LIMIT
 
-    @Query("SELECT pr FROM ParkingRecord pr ORDER BY pr.createdAt DESC LIMIT 20")
+    @Query("SELECT pr FROM ParkingRecord pr ORDER BY pr.createdAt DESC")
     List<ParkingRecord> findTop20ByOrderByCreatedAtDesc();
 
-    // ✅ NEW METHOD ADDED
-    @Query("SELECT pr FROM ParkingRecord pr ORDER BY pr.entryTime DESC LIMIT 20")
+    @Query("SELECT pr FROM ParkingRecord pr ORDER BY pr.entryTime DESC")
     List<ParkingRecord> findTop20ByOrderByEntryTimeDesc();
 
     @Query("SELECT pr FROM ParkingRecord pr WHERE pr.payment IS NOT NULL " +
-            "ORDER BY pr.exitTime DESC LIMIT :limit")
+            "ORDER BY pr.exitTime DESC")
     List<ParkingRecord> findRecentPaid(@Param("limit") int limit);
 
     // History & User related
     List<ParkingRecord> findByVehicleId(Long vehicleId);
 
-    @Query("SELECT DISTINCT pr FROM ParkingRecord pr "
-            + "LEFT JOIN FETCH pr.parkingSlot "
-            + "WHERE pr.vehicle.id = :vehicleId "
-            + "ORDER BY pr.entryTime DESC")
+    @Query("SELECT DISTINCT pr FROM ParkingRecord pr " +
+            "LEFT JOIN FETCH pr.parkingSlot " +
+            "WHERE pr.vehicle.id = :vehicleId " +
+            "ORDER BY pr.entryTime DESC")
     List<ParkingRecord> findParkingHistoryForVehicle(@Param("vehicleId") Long vehicleId);
+
     List<ParkingRecord> findByParkingSlot_Id(Long slotId);
     List<ParkingRecord> findByUserEmail(String email);
     List<ParkingRecord> findByUserEmailAndActiveTrue(String email);
@@ -51,7 +52,7 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
     Optional<ParkingRecord> findByIdAndUserEmail(Long id, String email);
 
     @Query("SELECT pr FROM ParkingRecord pr WHERE pr.user.email = :email " +
-            "ORDER BY pr.entryTime DESC LIMIT :limit")
+            "ORDER BY pr.entryTime DESC")
     List<ParkingRecord> findByUserEmailRecent(@Param("email") String email, @Param("limit") int limit);
 
     @Query("SELECT pr FROM ParkingRecord pr WHERE pr.user.email = :email AND pr.exitTime IS NULL")
@@ -74,6 +75,7 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
     boolean existsByVehicleLicensePlateAndActiveTrue(@Param("licensePlate") String licensePlate);
 
     @Modifying(clearAutomatically = true)
-    @Query("DELETE FROM ParkingRecord pr WHERE (pr.user IS NOT NULL AND pr.user.id = :userId) OR (pr.vehicle.user IS NOT NULL AND pr.vehicle.user.id = :userId)")
+    @Query("DELETE FROM ParkingRecord pr WHERE (pr.user IS NOT NULL AND pr.user.id = :userId) " +
+            "OR (pr.vehicle.user IS NOT NULL AND pr.vehicle.user.id = :userId)")
     void deleteAllLinkedToUser(@Param("userId") Long userId);
 }
