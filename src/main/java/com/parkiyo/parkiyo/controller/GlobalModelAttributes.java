@@ -4,11 +4,10 @@ import com.parkiyo.parkiyo.model.User;
 import com.parkiyo.parkiyo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-@ControllerAdvice(annotations = Controller.class)
+@ControllerAdvice
 @RequiredArgsConstructor
 public class GlobalModelAttributes {
 
@@ -16,14 +15,18 @@ public class GlobalModelAttributes {
 
     @ModelAttribute("currentUser")
     public User currentUser(Authentication authentication) {
+
         if (authentication == null
                 || !authentication.isAuthenticated()
-                || "anonymousUser".equalsIgnoreCase(authentication.getName())) {
+                || "anonymousUser".equals(authentication.getName())) {
             return null;
         }
+
         try {
             return userService.getUserByEmail(authentication.getName());
-        } catch (RuntimeException ex) {
+        } catch (Exception e) {
+            System.err.println("Failed to load currentUser: " + authentication.getName());
+            e.printStackTrace();
             return null;
         }
     }
