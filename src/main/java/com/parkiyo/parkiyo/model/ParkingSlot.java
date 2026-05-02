@@ -1,6 +1,7 @@
 package com.parkiyo.parkiyo.model;
 
 import com.parkiyo.parkiyo.enums.SlotStatus;
+import com.parkiyo.parkiyo.enums.VehicleCategory;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -33,7 +34,11 @@ public class ParkingSlot {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal hourlyRate = BigDecimal.ZERO;
 
-    @OneToMany(mappedBy = "slot", fetch = FetchType.LAZY)
+    /** When set, entry flow prefers this slot for matching vehicle type; when null, slot matches any type (with fallback in {@code EntryService}). */
+    @Enumerated(EnumType.STRING)
+    private VehicleCategory vehicleCategory;
+
+    @OneToMany(mappedBy = "parkingSlot", fetch = FetchType.LAZY)
     private List<ParkingRecord> parkingRecords;
 
     @OneToMany(mappedBy = "slot", fetch = FetchType.LAZY)

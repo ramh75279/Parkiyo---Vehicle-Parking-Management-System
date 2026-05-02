@@ -93,7 +93,7 @@ public class SlotService {
     }
 
     public List<ParkingRecord> getSlotUsageHistory(Long slotId) {
-        return parkingRecordRepository.findBySlotId(slotId);
+        return parkingRecordRepository.findByParkingSlot_Id(slotId);
     }
 
     @Transactional

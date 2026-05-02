@@ -5,7 +5,6 @@ import com.parkiyo.parkiyo.enums.VehicleCategory;
 import com.parkiyo.parkiyo.model.ParkingSlot;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,11 +28,8 @@ public interface ParkingSlotRepository extends JpaRepository<ParkingSlot, Long> 
 
     // ==================== IMPORTANT FOR ENTRY ====================
 
-    /** Find first available slot for a specific vehicle category */
-    @Query("SELECT s FROM ParkingSlot s WHERE s.status = 'AVAILABLE' " +
-            "AND s.vehicleCategory = :category " +
-            "ORDER BY s.slotNumber ASC LIMIT 1")
-    Optional<ParkingSlot> findFirstAvailableSlotByCategory(@Param("category") VehicleCategory category);
+    /** Prefer slots tagged for this vehicle category; see EntryService for fallback when none match. */
+    Optional<ParkingSlot> findFirstByStatusAndVehicleCategoryOrderBySlotNumberAsc(SlotStatus status, VehicleCategory category);
 
     /** Simple fallback - any available slot */
     Optional<ParkingSlot> findFirstByStatusOrderBySlotNumberAsc(SlotStatus status);

@@ -56,8 +56,10 @@ public class EntryService {
                     return vehicleRepository.save(v);
                 });
 
-        // 3. Auto-assign available slot based on vehicle type (Recommended)
-        ParkingSlot slot = slotRepository.findFirstAvailableSlotByCategory(vehicle.getCategory())
+        // 3. Auto-assign available slot (prefer category-tagged slots, then any available)
+        ParkingSlot slot = slotRepository
+                .findFirstByStatusAndVehicleCategoryOrderBySlotNumberAsc(SlotStatus.AVAILABLE, vehicle.getCategory())
+                .or(() -> slotRepository.findFirstByStatusOrderBySlotNumberAsc(SlotStatus.AVAILABLE))
                 .orElseThrow(() -> new RuntimeException("No available slot for vehicle type: " + request.getVehicleType()));
 
         // 4. Get User (operator or owner)
