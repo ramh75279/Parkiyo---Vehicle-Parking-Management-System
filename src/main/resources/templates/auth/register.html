@@ -72,7 +72,7 @@
 </head>
 <body class="bg-background-dark text-slate-100 font-display antialiased min-h-screen flex flex-col bg-subtle-radial">
 
-<div th:replace="~{common/fragments :: authNavbar('home', '/login', 'Sign In')}"></div>
+<div th:replace="~{common/fragments :: authNavbar('home', '/sign-in', 'Sign In')}"></div>
 
 <main class="flex-grow flex items-center justify-center py-16 px-6">
     <div class="w-full max-w-xl">
@@ -171,7 +171,7 @@
                 </form>
 
                 <div class="mt-8 pt-8 border-t border-white/5 text-center">
-                    <p class="text-slate-500 text-sm font-medium">Already have an account? <a th:href="@{/login}" class="text-primary font-black hover:brightness-125 transition-all">Sign in</a></p>
+                    <p class="text-slate-500 text-sm font-medium">Already have an account? <a th:href="@{/sign-in}" class="text-primary font-black hover:brightness-125 transition-all">Sign in</a></p>
                 </div>
             </div>
         </div>

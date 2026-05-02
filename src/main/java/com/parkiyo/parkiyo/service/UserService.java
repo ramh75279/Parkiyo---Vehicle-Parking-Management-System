@@ -225,7 +225,7 @@ public class UserService {
             receiptRepository.findByPaymentId(p.getId()).ifPresent(receiptRepository::delete);
         }
 
-        walletRepository.findByUserId(userId).ifPresent(w ->
+        walletRepository.findByUser_Id(userId).ifPresent(w ->
                 walletTransactionRepository.deleteByWallet_Id(w.getId()));
 
         paymentRepository.deleteAll(payments);
@@ -234,13 +234,13 @@ public class UserService {
 
         parkingRecordRepository.deleteAllLinkedToUser(userId);
 
-        vehicleRepository.deleteAll(vehicleRepository.findByUserId(userId));
+        vehicleRepository.deleteAllForUser(userId);
 
         notificationRepository.deleteByUser_Id(userId);
 
         auditLogRepository.deleteByPerformedBy_Id(userId);
 
-        walletRepository.findByUserId(userId).ifPresent(walletRepository::delete);
+        walletRepository.findByUser_Id(userId).ifPresent(walletRepository::delete);
 
         userRepository.delete(user);
     }

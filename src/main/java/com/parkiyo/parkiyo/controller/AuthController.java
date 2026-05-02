@@ -22,14 +22,18 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // GET /login
-    @GetMapping("/login")
-    public String loginPage(@RequestParam(value = "error", required = false) String error,
-                            @RequestParam(value = "logout", required = false) String logout,
-                            Model model) {
+    @GetMapping("/sign-in")
+    public String signInPage(@RequestParam(value = "error", required = false) String error,
+                             @RequestParam(value = "logout", required = false) String logout,
+                             Model model) {
         if (error != null) model.addAttribute("error", "Invalid email or password.");
         if (logout != null) model.addAttribute("success", "You have been logged out.");
         return "auth/login";
+    }
+
+    @GetMapping("/login")
+    public String loginLegacyRedirect() {
+        return "redirect:/sign-in";
     }
 
     // GET /register
@@ -51,7 +55,7 @@ public class AuthController {
         try {
             authService.register(request);
             redirectAttributes.addFlashAttribute("success", "Account created! Please log in.");
-            return "redirect:/login";
+            return "redirect:/sign-in";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
             return "auth/register";
@@ -93,7 +97,7 @@ public class AuthController {
         try {
             authService.resetPassword(request);
             redirectAttributes.addFlashAttribute("success", "Password reset successfully. Please log in.");
-            return "redirect:/login";
+            return "redirect:/sign-in";
         } catch (Exception e) {
             model.addAttribute("token", request.getToken());
             model.addAttribute("error", e.getMessage());

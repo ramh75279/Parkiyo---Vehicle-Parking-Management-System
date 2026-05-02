@@ -11,5 +11,5 @@ public interface WalletRepository extends JpaRepository<Wallet, Long> {
 
     Optional<Wallet> findByUserEmail(String email);
 
-    Optional<Wallet> findByUserId(Long userId);
+    Optional<Wallet> findByUser_Id(Long userId);
 }

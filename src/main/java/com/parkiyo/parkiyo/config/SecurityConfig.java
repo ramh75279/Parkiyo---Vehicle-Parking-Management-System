@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/", "/home", "/features", "/solutions", "/analytics",
-                                "/faq", "/privacy", "/login", "/register",
+                                "/faq", "/privacy", "/sign-in", "/perform-login", "/login", "/register",
                                 "/forgot-password", "/reset-password", "/access-denied",
                                 "/uploads/**", "/css/**", "/js/**", "/images/**", "/webjars/**"
                         ).permitAll()
@@ -45,8 +45,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
+                        .loginPage("/sign-in")
+                        .loginProcessingUrl("/perform-login")
                         .usernameParameter("email")
                         .passwordParameter("password")
                         .successHandler((request, response, authentication) -> {
@@ -63,12 +63,12 @@ public class SecurityConfig {
                             );
                             response.sendRedirect(request.getContextPath() + "/dashboard");
                         })
-                        .failureUrl("/login?error=true")
+                        .failureUrl("/sign-in?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/perform-logout")
-                        .logoutSuccessUrl("/login?logout=true")
+                        .logoutSuccessUrl("/sign-in?logout=true")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
