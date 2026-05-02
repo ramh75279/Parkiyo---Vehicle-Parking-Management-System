@@ -9,6 +9,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -20,33 +21,17 @@ public class SecurityConfig {
 
     private final AuthService authService;
     private final AuditLogService auditLogService;
-    private final PasswordEncoder passwordEncoder;
 
-    private static final String[] PUBLIC_URLS = {
-            "/",
-            "/home",
-            "/features",
-            "/solutions",
-            "/analytics",
-            "/faq",
-            "/privacy",
-            "/login",
-            "/register",
-            "/forgot-password",
-            "/reset-password",
-            "/access-denied",
-            "/uploads/**",
-            "/css/**",
-            "/js/**",
-            "/images/**",
-            "/webjars/**"
-    };
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(12);   // Strong encoding
+    }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(authService);
-        authProvider.setPasswordEncoder(passwordEncoder);
+        authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 
@@ -56,7 +41,12 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(PUBLIC_URLS).permitAll()
+                        .requestMatchers(
+                                "/", "/home", "/features", "/solutions", "/analytics",
+                                "/faq", "/privacy", "/login", "/register",
+                                "/forgot-password", "/reset-password", "/access-denied",
+                                "/uploads/**", "/css/**", "/js/**", "/images/**", "/webjars/**"
+                        ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -64,11 +54,8 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-
-                        // 🔥 THIS IS THE FIX
                         .usernameParameter("email")
                         .passwordParameter("password")
-
                         .successHandler((request, response, authentication) -> {
                             authService.markSuccessfulLogin(authentication.getName());
                             auditLogService.logAction(
