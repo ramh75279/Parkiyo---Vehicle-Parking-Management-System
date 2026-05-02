@@ -3,282 +3,127 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Parkiyo | Wallet Overview</title>
+
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
-    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#1f68f9", "background-dark": "#020617" }, fontFamily: { display: ["Public Sans", "sans-serif"] } } } }</script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { primary: "#1f68f9", "background-dark": "#020617" },
+                    fontFamily: { display: ["Public Sans", "sans-serif"] }
+                }
+            }
+        }
+    </script>
+
     <style>
         body { font-family: 'Public Sans', sans-serif; background-color: #020617; }
-        .premium-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
         .glass-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .sidebar-container { width: 80px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(2, 6, 23, 0.6); overflow: hidden; white-space: nowrap; }
-        .sidebar-container:hover { width: 280px; background: rgba(2, 6, 23, 0.95); }
-        .nav-label { opacity: 0; transition: opacity 0.3s ease; margin-left: 1rem; }
+        .sidebar-container { width: 80px; transition: 0.4s; overflow: hidden; }
+        .sidebar-container:hover { width: 280px; }
+        .nav-label { opacity: 0; transition: 0.3s; margin-left: 1rem; }
         .sidebar-container:hover .nav-label { opacity: 1; }
-        .input-glass { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); color: white; border-radius: 12px; padding: 11px 16px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; outline: none; width: 100%; }
-        .input-glass:focus { border-color: rgba(31, 104, 249, 0.5); box-shadow: 0 0 0 3px rgba(31, 104, 249, 0.1); }
-        .input-glass::placeholder { color: rgba(255, 255, 255, 0.18); }
-        label.field-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 6px; display: block; }
+        .input-glass { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color:white; border-radius:12px; padding:11px 16px; width:100%; }
         .txn-in { color: #34d399; }
         .txn-out { color: #f87171; }
-        .pill-credit { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
-        .pill-debit { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
-        .type-pill { padding: 3px 11px; border-radius: 9px; font-size: 0.67rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
-        .txn-row { transition: background 0.15s; border-bottom: 1px solid rgba(255,255,255,0.04); }
-        .txn-row:hover { background: rgba(255, 255, 255, 0.02); }
-        .topup-amount { background: rgba(255, 255, 255, 0.04); border: 2px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px; cursor: pointer; transition: all 0.2s; text-align: center; font-weight: 900; font-size: 1rem; color: #94a3b8; }
-        .topup-amount:hover { border-color: rgba(31, 104, 249, 0.4); color: white; }
-        .topup-amount.selected { border-color: #1f68f9; background: rgba(31, 104, 249, 0.1); color: #60a5fa; }
-        .balance-card { background: linear-gradient(135deg, rgba(31, 104, 249, 0.15) 0%, rgba(31, 104, 249, 0.03) 100%); border: 1px solid rgba(31, 104, 249, 0.25); }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
     </style>
 </head>
 
-<body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
-<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
-<div class="flex flex-1 overflow-hidden">
+<body class="text-slate-100 flex">
 
-    <!-- Sidebar -->
-    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
-        <div class="p-6 mb-4 flex items-center">
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
-                <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
-            </div>
-            <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+<!-- MAIN CONTENT -->
+<main class="flex-1 p-8 space-y-8">
+
+    <!-- HEADER -->
+    <div>
+        <h1 class="text-2xl font-black">Wallet Overview</h1>
+        <p class="text-slate-400 text-sm">Your balance and transactions</p>
+    </div>
+
+    <!-- BALANCE -->
+    <div class="glass-card p-6 rounded-xl">
+        <p class="text-slate-400 text-sm">Balance</p>
+        <h2 class="text-4xl font-black">
+            $<span th:text="${#numbers.formatDecimal(balance,1,'COMMA',2,'POINT')}">0.00</span>
+        </h2>
+    </div>
+
+    <!-- QUICK STATS -->
+    <div class="grid grid-cols-3 gap-4">
+
+        <!-- ✅ FIXED: use backend values instead -->
+        <div class="glass-card p-4 text-center">
+            <p class="text-xs text-slate-400">Total In</p>
+            <p class="text-green-400 font-bold">
+                $<span th:text="${totalIn != null ? totalIn : 0}">0.00</span>
+            </p>
         </div>
-        <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a th:href="@{/dashboard/user}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
-                <span class="material-symbols-outlined shrink-0">dashboard</span>
-                <span class="nav-label text-sm">Dashboard</span>
-            </a>
-            <a th:href="@{/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
-                <span class="material-symbols-outlined shrink-0">login</span>
-                <span class="nav-label text-sm">Vehicle Entry</span>
-            </a>
-            <a th:href="@{/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
-                <span class="material-symbols-outlined shrink-0">logout</span>
-                <span class="nav-label text-sm">Vehicle Exit</span>
-            </a>
-            <a th:href="@{/wallet}" class="flex items-center px-4 py-4 text-white bg-primary/10 border border-primary/20 rounded-xl text-sm font-bold transition-all">
-                <span class="material-symbols-outlined shrink-0 text-primary">account_balance_wallet</span>
-                <span class="nav-label text-sm text-primary">Wallet</span>
-            </a>
-            <a th:href="@{/reservations}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
-                <span class="material-symbols-outlined shrink-0">calendar_month</span>
-                <span class="nav-label text-sm">Reservations</span>
-            </a>
-        </nav>
-        <!-- Sidebar user footer -->
-        <div class="p-4 border-t border-white/5">
-            <div class="flex items-center gap-3">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary font-black text-sm"
-                     th:text="${user != null ? user.initials : 'U'}">U</div>
-                <div class="nav-label flex flex-col min-w-0">
-                    <span class="text-sm font-bold text-white truncate" th:text="${user != null ? user.fullName : 'User'}">User</span>
-                    <span class="text-xs text-slate-500 truncate" th:text="${user != null ? user.email : ''}">email</span>
-                </div>
-            </div>
+
+        <div class="glass-card p-4 text-center">
+            <p class="text-xs text-slate-400">Total Out</p>
+            <p class="text-red-400 font-bold">
+                $<span th:text="${totalOut != null ? totalOut : 0}">0.00</span>
+            </p>
         </div>
-    </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto p-8 space-y-8">
+        <div class="glass-card p-4 text-center">
+            <p class="text-xs text-slate-400">Transactions</p>
+            <p class="text-white font-bold" th:text="${transactions != null ? transactions.size() : 0}">0</p>
+        </div>
+    </div>
 
-        <!-- Page Header -->
-        <div class="flex items-start justify-between">
+    <!-- TOPUP -->
+    <div class="glass-card p-6 rounded-xl">
+        <form th:action="@{/wallet/topup}" method="post">
+            <input id="amountInput" name="amount" type="number" class="input-glass" required />
+            <button class="mt-4 bg-primary px-4 py-2 rounded text-white font-bold">Top Up</button>
+        </form>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div class="glass-card rounded-xl overflow-hidden">
+        <div class="p-4 border-b border-white/10">Transactions</div>
+
+        <div th:if="${transactions == null or transactions.isEmpty()}" class="p-6 text-center text-slate-500">
+            No transactions yet
+        </div>
+
+        <div th:each="txn : ${transactions}" class="p-4 flex justify-between border-b border-white/5">
+
             <div>
-                <h1 class="text-2xl font-black text-white tracking-tight">Wallet Overview</h1>
-                <p class="text-slate-400 text-sm mt-1">Your balance and transaction history</p>
+                <p th:text="${txn.description}">Description</p>
+                <p class="text-xs text-slate-500"
+                   th:text="${txn.createdAt != null ? #temporals.format(txn.createdAt,'MMM dd yyyy HH:mm') : '-'}">
+                </p>
             </div>
-            <!-- Success / Error flash messages -->
-            <div th:if="${success}" class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-bold px-4 py-3 rounded-xl">
-                <span class="material-symbols-outlined text-base">check_circle</span>
-                <span th:text="${success}"></span>
+
+            <div>
+                <p th:classappend="${txn.type == 'CREDIT'} ? 'txn-in' : 'txn-out'"
+                   th:text="${(txn.type == 'CREDIT' ? '+' : '-') + txn.amount}">
+                    +0.00
+                </p>
             </div>
-            <div th:if="${error}" class="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-bold px-4 py-3 rounded-xl">
-                <span class="material-symbols-outlined text-base">error</span>
-                <span th:text="${error}"></span>
-            </div>
+
         </div>
+    </div>
 
-        <!-- Top row: User Info Card + Balance Card -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+</main>
 
-            <!-- User Info Card -->
-            <div class="glass-card rounded-2xl p-6 flex flex-col gap-5">
-                <div class="flex items-center gap-4">
-                    <!-- Avatar -->
-                    <div th:if="${user != null and user.profilePicturePath != null}"
-                         class="h-14 w-14 rounded-2xl overflow-hidden shrink-0">
-                        <img th:src="@{${user.profilePicturePath}}" alt="Profile" class="h-full w-full object-cover" />
-                    </div>
-                    <div th:if="${user == null or user.profilePicturePath == null}"
-                         class="h-14 w-14 rounded-2xl bg-primary/20 flex items-center justify-center shrink-0">
-                        <span class="text-primary font-black text-xl" th:text="${user != null ? user.initials : 'U'}">U</span>
-                    </div>
-                    <div>
-                        <p class="text-white font-black text-lg leading-tight" th:text="${user != null ? user.fullName : '-'}">Full Name</p>
-                        <p class="text-slate-400 text-xs mt-0.5" th:text="${user != null ? user.email : '-'}">email@example.com</p>
-                    </div>
-                </div>
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center py-2 border-b border-white/5">
-                        <span class="text-slate-500 text-xs font-bold uppercase tracking-wider">Phone</span>
-                        <span class="text-slate-200 text-sm font-bold" th:text="${user?.phone != null ? user.phone : '—'}">—</span>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-white/5">
-                        <span class="text-slate-500 text-xs font-bold uppercase tracking-wider">Role</span>
-                        <span class="text-slate-200 text-sm font-bold" th:text="${user?.role}">USER</span>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-white/5">
-                        <span class="text-slate-500 text-xs font-bold uppercase tracking-wider">Status</span>
-                        <span class="text-emerald-400 text-xs font-black uppercase bg-emerald-400/10 border border-emerald-400/20 px-2 py-1 rounded-lg"
-                              th:text="${user?.status}">ACTIVE</span>
-                    </div>
-                    <div class="flex justify-between items-center py-2">
-                        <span class="text-slate-500 text-xs font-bold uppercase tracking-wider">Member Since</span>
-                        <span class="text-slate-200 text-sm font-bold"
-                              th:text="${wallet?.createdAt != null ? #temporals.format(wallet.createdAt, 'MMM dd, yyyy') : '—'}">—</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Balance Card -->
-            <div class="balance-card rounded-2xl p-6 flex flex-col justify-between lg:col-span-2">
-                <div>
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="material-symbols-outlined text-primary text-xl">account_balance_wallet</span>
-                        <span class="text-slate-400 text-xs font-black uppercase tracking-widest">Current Balance</span>
-                    </div>
-                    <p class="text-5xl font-black text-white mt-3 tracking-tight">
-                        $<span th:text="${#numbers.formatDecimal(balance, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                    </p>
-                    <p class="text-slate-500 text-xs mt-2">
-                        Wallet ID &nbsp;·&nbsp;
-                        <span th:text="${wallet != null ? 'WLT-' + wallet.id : '—'}">WLT-0</span>
-                    </p>
-                </div>
-
-                <!-- Quick stats row -->
-                <div class="grid grid-cols-3 gap-4 mt-6">
-                    <div class="glass-card rounded-xl p-4 text-center">
-                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Total In</p>
-                        <p class="text-emerald-400 font-black text-lg">
-                            $<span th:text="${#numbers.formatDecimal(
-                                transactions != null ? transactions.?[type == 'CREDIT'].![amount].stream().reduce(0, (a,b) -> a + b.doubleValue()) : 0,
-                                1, 'COMMA', 2, 'POINT')}">0.00</span>
-                        </p>
-                    </div>
-                    <div class="glass-card rounded-xl p-4 text-center">
-                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Total Out</p>
-                        <p class="text-red-400 font-black text-lg">
-                            $<span th:text="${#numbers.formatDecimal(
-                                transactions != null ? transactions.?[type == 'DEBIT'].![amount].stream().reduce(0, (a,b) -> a + b.doubleValue()) : 0,
-                                1, 'COMMA', 2, 'POINT')}">0.00</span>
-                        </p>
-                    </div>
-                    <div class="glass-card rounded-xl p-4 text-center">
-                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Transactions</p>
-                        <p class="text-white font-black text-lg" th:text="${transactions != null ? transactions.size() : 0}">0</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bottom row: Top-Up Form + Transaction History -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-            <!-- Top-Up Form -->
-            <div class="glass-card rounded-2xl p-6 flex flex-col gap-5">
-                <div>
-                    <h2 class="text-white font-black text-base">Top Up Wallet</h2>
-                    <p class="text-slate-500 text-xs mt-1">Add funds to your wallet instantly</p>
-                </div>
-                <!-- Quick amounts -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="topup-amount" onclick="setAmount(10)">$10</div>
-                    <div class="topup-amount" onclick="setAmount(25)">$25</div>
-                    <div class="topup-amount" onclick="setAmount(50)">$50</div>
-                    <div class="topup-amount" onclick="setAmount(100)">$100</div>
-                </div>
-                <form th:action="@{/wallet/topup}" method="post" class="space-y-4">
-                    <div>
-                        <label class="field-label" for="amount">Custom Amount ($)</label>
-                        <input id="amountInput" name="amount" type="number" min="1" step="0.01"
-                               class="input-glass" placeholder="Enter amount..." required />
-                    </div>
-                    <button type="submit"
-                            class="w-full bg-primary hover:bg-blue-500 text-white font-black text-sm py-3 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(31,104,249,0.3)]">
-                        Add Funds
-                    </button>
-                </form>
-            </div>
-
-            <!-- Transaction History -->
-            <div class="glass-card rounded-2xl lg:col-span-2 flex flex-col overflow-hidden">
-                <div class="px-6 py-5 border-b border-white/5 flex items-center justify-between">
-                    <div>
-                        <h2 class="text-white font-black text-base">Transaction History</h2>
-                        <p class="text-slate-500 text-xs mt-0.5">All wallet activity, newest first</p>
-                    </div>
-                    <span class="text-xs font-black bg-white/5 text-slate-400 px-3 py-1.5 rounded-lg"
-                          th:text="${(transactions != null ? transactions.size() : 0) + ' records'}">0 records</span>
-                </div>
-
-                <div class="overflow-y-auto flex-1" style="max-height: 380px;">
-                    <!-- Empty state -->
-                    <div th:if="${transactions == null or transactions.isEmpty()}"
-                         class="flex flex-col items-center justify-center py-16 text-center">
-                        <span class="material-symbols-outlined text-slate-700 text-5xl mb-3">receipt_long</span>
-                        <p class="text-slate-500 font-bold text-sm">No transactions yet</p>
-                        <p class="text-slate-600 text-xs mt-1">Top up your wallet to get started</p>
-                    </div>
-
-                    <!-- Transaction rows -->
-                    <div th:each="txn : ${transactions}" class="txn-row px-6 py-4 flex items-center gap-4">
-                        <!-- Icon -->
-                        <div class="h-9 w-9 shrink-0 rounded-xl flex items-center justify-center"
-                             th:classappend="${txn.type == 'CREDIT'} ? 'bg-emerald-500/10' : 'bg-red-500/10'">
-                            <span class="material-symbols-outlined text-base"
-                                  th:classappend="${txn.type == 'CREDIT'} ? 'text-emerald-400' : 'text-red-400'"
-                                  th:text="${txn.type == 'CREDIT'} ? 'arrow_downward' : 'arrow_upward'">arrow_downward</span>
-                        </div>
-                        <!-- Description + date -->
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-white truncate" th:text="${txn.description ?: 'Transaction'}">Description</p>
-                            <p class="text-xs text-slate-500 mt-0.5"
-                               th:text="${txn.createdAt != null ? #temporals.format(txn.createdAt, 'MMM dd, yyyy · HH:mm') : '—'}">—</p>
-                        </div>
-                        <!-- Type pill -->
-                        <span class="type-pill shrink-0"
-                              th:classappend="${txn.type == 'CREDIT'} ? 'pill-credit' : 'pill-debit'"
-                              th:text="${txn.type == 'CREDIT'} ? 'Top-Up' : 'Payment'">Type</span>
-                        <!-- Amount -->
-                        <div class="text-right shrink-0 min-w-[90px]">
-                            <p class="font-black text-sm"
-                               th:classappend="${txn.type == 'CREDIT'} ? 'txn-in' : 'txn-out'"
-                               th:text="${(txn.type == 'CREDIT' ? '+' : '-') + '$' + #numbers.formatDecimal(txn.amount, 1, 'COMMA', 2, 'POINT')}">$0.00</p>
-                            <p class="text-slate-600 text-xs mt-0.5">
-                                Bal: $<span th:text="${#numbers.formatDecimal(txn.balanceAfter, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-</div>
-
+<!-- FIXED JS -->
 <script>
-    function setAmount(val) {
+    function setAmount(val, el) {
         document.getElementById('amountInput').value = val;
-        document.querySelectorAll('.topup-amount').forEach(el => el.classList.remove('selected'));
-        event.currentTarget.classList.add('selected');
+        document.querySelectorAll('.topup-amount').forEach(e => e.classList.remove('selected'));
+        if (el) el.classList.add('selected');
     }
 </script>
+
 </body>
 </html>
