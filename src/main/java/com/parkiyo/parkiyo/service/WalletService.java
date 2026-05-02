@@ -28,9 +28,6 @@ public class WalletService {
         return wallet.getBalance();
     }
 
-    /**
-     * Deduct balance from wallet - Used by PaymentService
-     */
     @Transactional
     public void deductBalance(String email, BigDecimal amount, String description) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
@@ -93,29 +90,15 @@ public class WalletService {
     public List<WalletTransaction> getTransactionHistory(String email) {
         Wallet wallet = getOrCreateWallet(email);
         List<WalletTransaction> transactions = wallet.getTransactions();
-        if (transactions != null) {
-            transactions.size(); // force load
-        }
         return transactions != null ? new ArrayList<>(transactions) : new ArrayList<>();
     }
 
-    /**
-     * FIXED: Restored getWalletOverview as Map to match existing calls
-     */
     @Transactional(readOnly = true)
     public Map<String, Object> getWalletOverview(String email) {
         Wallet wallet = getOrCreateWallet(email);
 
         User user = wallet.getUser();
-        if (user != null) {
-            user.getFirstName();   // force initialization
-            user.getLastName();
-        }
-
         List<WalletTransaction> transactions = wallet.getTransactions();
-        if (transactions != null) {
-            transactions.size(); // force load
-        }
 
         Map<String, Object> overview = new HashMap<>();
         overview.put("wallet", wallet);

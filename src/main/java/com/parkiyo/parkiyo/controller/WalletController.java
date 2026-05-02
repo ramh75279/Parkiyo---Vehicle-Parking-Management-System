@@ -12,13 +12,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
+@RequestMapping("/wallet")
 @PreAuthorize("isAuthenticated()")
 @RequiredArgsConstructor
 public class WalletController {
 
     private final WalletService walletService;
 
-    @GetMapping("/wallet")
+    @GetMapping
     public String walletOverview(Authentication auth, Model model) {
         String email = auth.getName();
 
@@ -32,7 +33,7 @@ public class WalletController {
         return "payments/walletoverview";
     }
 
-    @PostMapping("/wallet/topup")
+    @PostMapping("/topup")
     public String topUp(@Valid @ModelAttribute WalletTopUpRequest request,
                         Authentication auth,
                         RedirectAttributes redirectAttributes) {
