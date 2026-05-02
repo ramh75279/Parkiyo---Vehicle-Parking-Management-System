@@ -93,11 +93,24 @@ public class WalletService {
         return transactions != null ? new ArrayList<>(transactions) : new ArrayList<>();
     }
 
+    /**
+     * Returns wallet overview data for the controller.
+     *
+     * FIX: Instead of calling wallet.getUser() (which returns a Hibernate lazy proxy
+     * that becomes inaccessible after the session closes), we load the User directly
+     * from UserRepository using the email we already have. This prevents the
+     * LazyInitializationException that occurs when Thymeleaf accesses user.initials
+     * or other properties after the transaction ends.
+     */
     @Transactional(readOnly = true)
     public Map<String, Object> getWalletOverview(String email) {
         Wallet wallet = getOrCreateWallet(email);
 
-        User user = wallet.getUser();
+        // Load User directly — do NOT use wallet.getUser() here because that
+        // relationship is LAZY and the proxy cannot be initialized outside a session.
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+
         List<WalletTransaction> transactions = wallet.getTransactions();
 
         Map<String, Object> overview = new HashMap<>();
