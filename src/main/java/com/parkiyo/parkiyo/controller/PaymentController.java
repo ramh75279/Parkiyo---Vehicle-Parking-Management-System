@@ -1,8 +1,13 @@
 package com.parkiyo.parkiyo.controller;
 
+import com.parkiyo.parkiyo.model.Payment;
 import com.parkiyo.parkiyo.service.PaymentService;
 import com.parkiyo.parkiyo.service.WalletService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -68,8 +73,19 @@ public class PaymentController {
     // GET /payments/history  (user)
     @GetMapping("/payments/history")
     @PreAuthorize("isAuthenticated()")
-    public String userPaymentHistory(Authentication auth, Model model) {
-        model.addAttribute("payments", paymentService.getUserPaymentHistory(auth.getName()));
+    public String userPaymentHistory(
+            @RequestParam(defaultValue = "0") int page,
+            Authentication auth,
+            Model model) {
+        int pageSize = 6;
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Payment> paymentPage = paymentService.getUserPaymentHistoryPaginated(auth.getName(), pageable);
+        
+        model.addAttribute("payments", paymentPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", paymentPage.getTotalPages());
+        model.addAttribute("totalPayments", paymentPage.getTotalElements());
+        model.addAttribute("pageSize", pageSize);
         model.addAttribute("totalSpent", paymentService.getUserTotalSpent(auth.getName()));
         return "payments/paymenthistory-user";
     }
