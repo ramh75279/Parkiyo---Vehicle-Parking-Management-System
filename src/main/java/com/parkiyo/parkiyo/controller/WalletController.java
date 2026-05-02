@@ -19,7 +19,10 @@ public class WalletController {
 
     private final WalletService walletService;
 
-    @GetMapping
+    /**
+     * Wallet Overview Page
+     */
+    @GetMapping("/overview")
     public String walletOverview(Authentication auth, Model model) {
         String email = auth.getName();
 
@@ -33,6 +36,9 @@ public class WalletController {
         return "payments/walletoverview";
     }
 
+    /**
+     * Wallet Top-up
+     */
     @PostMapping("/topup")
     public String topUp(@Valid @ModelAttribute WalletTopUpRequest request,
                         Authentication auth,
@@ -44,6 +50,14 @@ public class WalletController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/wallet";
+        return "redirect:/wallet/overview";   // Updated redirect
+    }
+
+    /**
+     * Redirect root /wallet to /wallet/overview
+     */
+    @GetMapping
+    public String redirectToOverview() {
+        return "redirect:/wallet/overview";
     }
 }
