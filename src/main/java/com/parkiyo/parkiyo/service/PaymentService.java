@@ -5,6 +5,8 @@ import com.parkiyo.parkiyo.enums.NotificationType;
 import com.parkiyo.parkiyo.model.Payment;
 import com.parkiyo.parkiyo.model.Receipt;
 import com.parkiyo.parkiyo.repository.PaymentRepository;
+import com.parkiyo.parkiyo.service.AuditLogService;
+import com.parkiyo.parkiyo.service.NotificationService;
 import com.parkiyo.parkiyo.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +31,8 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Payment not found."));
 
-        if (!payment.getUser().getEmail().equalsIgnoreCase(email)) {
+        if (payment.getUser() == null ||
+                !payment.getUser().getEmail().equalsIgnoreCase(email)) {
             throw new RuntimeException("You are not authorized to view this payment.");
         }
         return payment;
@@ -126,7 +129,8 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Payment not found."));
 
-        if (!payment.getUser().getEmail().equalsIgnoreCase(userEmail)) {
+        if (payment.getUser() == null ||
+                !payment.getUser().getEmail().equalsIgnoreCase(userEmail)) {
             throw new RuntimeException("You are not authorized.");
         }
 
@@ -159,17 +163,22 @@ public class PaymentService {
     }
 
     private void createReceipt(Payment payment) {
+        if (payment.getReceipt() != null) {
+            return; // Receipt already exists
+        }
+
         Receipt receipt = Receipt.builder()
                 .payment(payment)
                 .receiptNumber("RCP-" + payment.getTransactionCode())
                 .transactionId(payment.getTransactionCode())
-                .paymentDate(payment.getPaidAt())
-                .customerName(payment.getUser().getFullName())
-                .customerEmail(payment.getUser().getEmail())
-                .plate(payment.getParkingRecord() != null ?
-                        payment.getParkingRecord().getVehicle().getLicensePlate() : null)
+                .paymentDate(payment.getPaidAt() != null ? payment.getPaidAt() : LocalDateTime.now())
+                .customerName(payment.getUser() != null ? payment.getUser().getFullName() : "N/A")
+                .customerEmail(payment.getUser() != null ? payment.getUser().getEmail() : "N/A")
+                .plate(payment.getParkingRecord() != null &&
+                        payment.getParkingRecord().getVehicle() != null ?
+                        payment.getParkingRecord().getVehicle().getLicensePlate() : "N/A")
                 .amountPaid(payment.getAmount())
-                .paymentMethod(payment.getPaymentMethod())
+                .paymentMethod(payment.getPaymentMethod() != null ? payment.getPaymentMethod() : "Unknown")
                 .build();
 
         payment.setReceipt(receipt);
@@ -179,7 +188,11 @@ public class PaymentService {
 
     public List<Payment> getAllPayments(String status, String dateFrom, String dateTo) {
         if (status != null && !status.isBlank()) {
-            return paymentRepository.findByStatus(PaymentStatus.valueOf(status.toUpperCase()));
+            try {
+                return paymentRepository.findByStatus(PaymentStatus.valueOf(status.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid payment status: " + status);
+            }
         }
         return paymentRepository.findAll();
     }
