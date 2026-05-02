@@ -46,7 +46,9 @@ public class ParkingRecord {
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+    @Column(nullable = false)
     private LocalDateTime entryTime;
+
     private LocalDateTime exitTime;
 
     @Column(name = "duration_minutes")
@@ -58,7 +60,6 @@ public class ParkingRecord {
     @Column(name = "exit_operator", length = 100)
     private String exitOperator;
 
-    // ✅ NEW FIELD - Added for entryOperator
     @Column(name = "entry_operator", length = 100)
     private String entryOperator;
 
@@ -68,7 +69,6 @@ public class ParkingRecord {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    // Relationship with Payment
     @OneToOne(mappedBy = "parkingRecord", fetch = FetchType.LAZY)
     private Payment payment;
 
@@ -82,22 +82,6 @@ public class ParkingRecord {
         return this.active;
     }
 
-    public void setDurationMinutes(int durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
-
-    public void setAmountCharged(BigDecimal amountCharged) {
-        this.amountCharged = amountCharged;
-    }
-
-    public void setExitOperator(String exitOperator) {
-        this.exitOperator = exitOperator;
-    }
-
-    public void setEntryOperator(String entryOperator) {
-        this.entryOperator = entryOperator;
-    }
-
     // ==================== BUILDER CUSTOMIZATION ====================
 
     public static class ParkingRecordBuilder {
@@ -106,7 +90,6 @@ public class ParkingRecord {
             return this;
         }
 
-        // ✅ Added to fix current error: .entryOperator(...)
         public ParkingRecordBuilder entryOperator(String entryOperator) {
             this.entryOperator = entryOperator;
             return this;

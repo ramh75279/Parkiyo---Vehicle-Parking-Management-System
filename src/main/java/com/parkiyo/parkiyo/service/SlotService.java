@@ -29,7 +29,6 @@ public class SlotService {
         return slotRepository.findByStatus(SlotStatus.AVAILABLE);
     }
 
-    // Overloaded — used by ReservationController
     public List<ParkingSlot> getAvailableSlots(LocalDate date, String zone) {
         List<ParkingSlot> slots = slotRepository.findByStatus(SlotStatus.AVAILABLE);
         if (zone != null && !zone.isBlank()) {
@@ -110,10 +109,14 @@ public class SlotService {
         slotRepository.save(slot);
 
         auditLogService.logAction(
-            "SLOT_CREATED",
-            "ParkingSlot",
-            slot.getId(),
-            "Parking slot created: " + slot.getSlotNumber()
+                "SLOT_CREATED",
+                "ADMIN",
+                "ParkingSlot",
+                slot.getId(),
+                "Parking slot created: " + slot.getSlotNumber(),
+                null,
+                null,
+                null
         );
     }
 
@@ -129,13 +132,18 @@ public class SlotService {
     @Transactional
     public void deleteSlot(Long id) {
         ParkingSlot slot = getSlotById(id);
+        String slotNumber = slot.getSlotNumber();
         slotRepository.deleteById(id);
 
         auditLogService.logAction(
                 "SLOT_DELETED",
+                "ADMIN",
                 "ParkingSlot",
                 id,
-                "Parking slot deleted: " + slot.getSlotNumber()
+                "Parking slot deleted: " + slotNumber,
+                null,
+                null,
+                null
         );
     }
 
