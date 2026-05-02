@@ -4,7 +4,6 @@ import com.parkiyo.parkiyo.dto.*;
 import com.parkiyo.parkiyo.exception.*;
 import com.parkiyo.parkiyo.model.User;
 import com.parkiyo.parkiyo.enums.Role;
-import com.parkiyo.parkiyo.enums.UserRole;
 import com.parkiyo.parkiyo.enums.UserStatus;
 import com.parkiyo.parkiyo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,11 +41,13 @@ public class UserService {
 
     // ================== COMMON METHODS ==================
 
+    @Transactional(readOnly = true)
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 
+    @Transactional(readOnly = true)
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
@@ -102,14 +103,15 @@ public class UserService {
     }
 
     private void deleteOldProfilePicture(String oldPath) {
-        if (oldPath != null && !oldPath.isBlank()) {
-            try {
-                String filename = oldPath.substring(oldPath.lastIndexOf('/') + 1);
-                Path oldFile = Paths.get(uploadDir, filename);
-                Files.deleteIfExists(oldFile);
-            } catch (Exception ignored) {
-                // Ignore for now
-            }
+        if (oldPath == null || oldPath.isBlank()) {
+            return;
+        }
+        try {
+            String filename = Paths.get(oldPath).getFileName().toString();
+            Path oldFile = Paths.get(uploadDir, filename);
+            Files.deleteIfExists(oldFile);
+        } catch (Exception e) {
+            System.err.println("Could not delete old profile picture: " + e.getMessage());
         }
     }
 
@@ -150,15 +152,18 @@ public class UserService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setPhone(request.getPhone());
+        user.setStatus(UserStatus.ACTIVE);
 
-        // Fixed: Use correct Role enum
-        if (request.getRole() != null) {
-            user.setRole(Role.valueOf(request.getRole().toString().toUpperCase()));
+        // Safe Role Setting
+        if (request.getRole() != null && !request.getRole().toString().isBlank()) {
+            try {
+                user.setRole(Role.valueOf(request.getRole().toString().trim().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new BadRequestException("Invalid role: " + request.getRole());
+            }
         } else {
             user.setRole(Role.USER);
         }
-
-        user.setStatus(UserStatus.ACTIVE);
 
         return userRepository.save(user);
     }
@@ -176,9 +181,13 @@ public class UserService {
         user.setLastName(request.getLastName());
         user.setPhone(request.getPhone());
 
-        // Fixed: Use correct Role enum
-        if (request.getRole() != null) {
-            user.setRole(Role.valueOf(request.getRole().toString().toUpperCase()));
+        // Safe Role Setting
+        if (request.getRole() != null && !request.getRole().toString().isBlank()) {
+            try {
+                user.setRole(Role.valueOf(request.getRole().toString().trim().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new BadRequestException("Invalid role: " + request.getRole());
+            }
         }
 
         return userRepository.save(user);
@@ -205,10 +214,13 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     public Page<User> getAllUsersPaginated(Pageable pageable, String search, String role, String status) {
+        // TODO: Later improve with actual filtering using custom repository query
         return userRepository.findAll(pageable);
     }
 
+    @Transactional(readOnly = true)
     public long getTotalUsers() {
         return userRepository.count();
     }
@@ -216,7 +228,8 @@ public class UserService {
     // ================== PASSWORD RESET ==================
 
     private String buildResetLink(String token) {
-        String baseUrl = appBaseUrl.endsWith("/") ? appBaseUrl.substring(0, appBaseUrl.length() - 1) : appBaseUrl;
+        String baseUrl = appBaseUrl.endsWith("/") ?
+                appBaseUrl.substring(0, appBaseUrl.length() - 1) : appBaseUrl;
         return baseUrl + "/reset-password?token=" + token;
     }
 
@@ -224,8 +237,10 @@ public class UserService {
     public void sendPasswordResetForUser(Long id) {
         User user = getUserById(id);
         String token = UUID.randomUUID().toString().replace("-", "");
+
         user.setPasswordResetToken(token);
         user.setPasswordResetTokenExpiry(LocalDateTime.now().plusMinutes(RESET_TOKEN_EXPIRY_MINUTES));
+
         userRepository.save(user);
         passwordResetDeliveryService.sendResetLink(user.getEmail(), buildResetLink(token));
     }
