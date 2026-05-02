@@ -160,7 +160,7 @@ public class PaymentController {
             model.addAttribute("receipt", paymentService.getAdminReceipt(id));
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/admin/payments/history";
+            return "redirect:/admin/payments";
         }
         return "payments/receipt-admin";
     }

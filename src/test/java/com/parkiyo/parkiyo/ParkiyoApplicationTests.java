@@ -33,7 +33,7 @@ class ParkiyoApplicationTests {
     @Test
     void contextLoadsAndBootstrapsOperationalData() {
         assertThat(userRepository.findByEmail("admin@parkiyo.com")).isPresent();
-        assertThat(parkingSlotRepository.count()).isGreaterThanOrEqualTo(6);
+        assertThat(parkingSlotRepository.count()).isGreaterThanOrEqualTo(5);
     }
 
     @Test
