@@ -1,7 +1,7 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.parkiyo.model.User;
-import com.parkiyo.parkiyo.service.UserService;
+import com.parkiyo.parkiyo.model.User;           // ← change if different
+import com.parkiyo.parkiyo.service.UserService; // ← change if different
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -26,7 +26,6 @@ public class GlobalModelAttributes {
             return userService.getUserByEmail(authentication.getName());
         } catch (Exception e) {
             System.err.println("Failed to load currentUser: " + authentication.getName());
-            e.printStackTrace();
             return null;
         }
     }
