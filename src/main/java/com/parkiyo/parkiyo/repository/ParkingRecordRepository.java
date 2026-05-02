@@ -2,6 +2,7 @@ package com.parkiyo.parkiyo.repository;
 
 import com.parkiyo.parkiyo.model.ParkingRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -71,4 +72,8 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
     @Query("SELECT COUNT(pr) > 0 FROM ParkingRecord pr " +
             "WHERE pr.vehicle.licensePlate = :licensePlate AND pr.active = true")
     boolean existsByVehicleLicensePlateAndActiveTrue(@Param("licensePlate") String licensePlate);
+
+    @Modifying(clearAutomatically = true)
+    @Query("DELETE FROM ParkingRecord pr WHERE (pr.user IS NOT NULL AND pr.user.id = :userId) OR (pr.vehicle.user IS NOT NULL AND pr.vehicle.user.id = :userId)")
+    void deleteAllLinkedToUser(@Param("userId") Long userId);
 }

@@ -32,4 +32,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Double sumRevenueByUser(String email);
 
     List<Payment> findTop10ByOrderByCreatedAtDesc();
+
+    List<Payment> findByUser_Id(Long userId);
 }

@@ -3,6 +3,7 @@ package com.parkiyo.parkiyo.repository;
 import com.parkiyo.parkiyo.enums.ReservationStatus;
 import com.parkiyo.parkiyo.model.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -39,4 +40,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("today") LocalDate today);
 
     long countByUserEmail(String email);
+
+    @Modifying(clearAutomatically = true)
+    @Query("DELETE FROM Reservation r WHERE r.user.id = :userId")
+    void deleteByUser_Id(@Param("userId") Long userId);
 }

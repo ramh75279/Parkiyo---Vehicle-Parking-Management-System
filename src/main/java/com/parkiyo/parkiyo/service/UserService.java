@@ -2,10 +2,20 @@ package com.parkiyo.parkiyo.service;
 
 import com.parkiyo.parkiyo.dto.*;
 import com.parkiyo.parkiyo.exception.*;
+import com.parkiyo.parkiyo.model.Payment;
 import com.parkiyo.parkiyo.model.User;
 import com.parkiyo.parkiyo.enums.Role;
 import com.parkiyo.parkiyo.enums.UserStatus;
+import com.parkiyo.parkiyo.repository.AuditLogRepository;
+import com.parkiyo.parkiyo.repository.NotificationRepository;
+import com.parkiyo.parkiyo.repository.ParkingRecordRepository;
+import com.parkiyo.parkiyo.repository.PaymentRepository;
+import com.parkiyo.parkiyo.repository.ReceiptRepository;
+import com.parkiyo.parkiyo.repository.ReservationRepository;
 import com.parkiyo.parkiyo.repository.UserRepository;
+import com.parkiyo.parkiyo.repository.VehicleRepository;
+import com.parkiyo.parkiyo.repository.WalletRepository;
+import com.parkiyo.parkiyo.repository.WalletTransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -20,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,6 +41,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetDeliveryService passwordResetDeliveryService;
+    private final ReceiptRepository receiptRepository;
+    private final PaymentRepository paymentRepository;
+    private final WalletTransactionRepository walletTransactionRepository;
+    private final WalletRepository walletRepository;
+    private final ReservationRepository reservationRepository;
+    private final ParkingRecordRepository parkingRecordRepository;
+    private final VehicleRepository vehicleRepository;
+    private final NotificationRepository notificationRepository;
+    private final AuditLogRepository auditLogRepository;
 
     @Value("${app.upload.dir:./uploads/profiles}")
     private String uploadDir;
@@ -196,7 +216,32 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         User user = getUserById(id);
+        Long userId = user.getId();
+
         deleteOldProfilePicture(user.getProfilePicturePath());
+
+        List<Payment> payments = paymentRepository.findByUser_Id(userId);
+        for (Payment p : payments) {
+            receiptRepository.findByPaymentId(p.getId()).ifPresent(receiptRepository::delete);
+        }
+
+        walletRepository.findByUserId(userId).ifPresent(w ->
+                walletTransactionRepository.deleteByWallet_Id(w.getId()));
+
+        paymentRepository.deleteAll(payments);
+
+        reservationRepository.deleteByUser_Id(userId);
+
+        parkingRecordRepository.deleteAllLinkedToUser(userId);
+
+        vehicleRepository.deleteAll(vehicleRepository.findByUserId(userId));
+
+        notificationRepository.deleteByUser_Id(userId);
+
+        auditLogRepository.deleteByPerformedBy_Id(userId);
+
+        walletRepository.findByUserId(userId).ifPresent(walletRepository::delete);
+
         userRepository.delete(user);
     }
 
@@ -223,6 +268,16 @@ public class UserService {
     @Transactional(readOnly = true)
     public long getTotalUsers() {
         return userRepository.count();
+    }
+
+    @Transactional(readOnly = true)
+    public long countAdmins() {
+        return userRepository.countByRole(Role.ADMIN);
+    }
+
+    @Transactional(readOnly = true)
+    public long countActiveUsers() {
+        return userRepository.countByStatus(UserStatus.ACTIVE);
     }
 
     // ================== PASSWORD RESET ==================

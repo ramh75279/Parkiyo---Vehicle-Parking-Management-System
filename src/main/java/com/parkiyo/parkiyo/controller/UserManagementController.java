@@ -39,10 +39,9 @@ public class UserManagementController {
 
         model.addAttribute("users", usersPage.getContent());
         model.addAttribute("totalUsers", userService.getTotalUsers());
-
-        // TODO: You can implement real stats later
-        model.addAttribute("activeUsers", 0);
-        model.addAttribute("adminUsers", 0);
+        model.addAttribute("activeUsers", userService.countActiveUsers());
+        model.addAttribute("adminUsers", userService.countAdmins());
+        model.addAttribute("usersOnPage", usersPage.getNumberOfElements());
 
         return "admin/usermanagement";
     }
