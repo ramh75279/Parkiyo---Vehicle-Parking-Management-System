@@ -1,6 +1,7 @@
 package com.parkiyo.parkiyo.controller;
 
 import com.parkiyo.parkiyo.dto.VehicleRequest;
+import com.parkiyo.parkiyo.model.ParkingRecord;
 import com.parkiyo.parkiyo.model.Vehicle;
 import com.parkiyo.parkiyo.service.VehicleService;
 import jakarta.servlet.http.HttpSession;
@@ -16,11 +17,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/admin/vehicles")
@@ -159,9 +164,55 @@ public class VehicleController {
 
     @GetMapping("/{id}")
     public String vehicleDetails(@PathVariable Long id, Model model) {
-        model.addAttribute("vehicle", vehicleService.getVehicleById(id));
-        model.addAttribute("parkingHistory", vehicleService.getVehicleParkingHistory(id));
+        Vehicle vehicle = vehicleService.getVehicleByIdForView(id);
+        List<ParkingRecord> parkingHistory = vehicleService.getVehicleParkingHistory(id);
+        model.addAttribute("vehicle", vehicle);
+        model.addAttribute("parkingHistory", parkingHistory);
+
+        ParkingRecord activeSession = parkingHistory.stream()
+                .filter(ParkingRecord::isActive)
+                .findFirst()
+                .orElse(null);
+        model.addAttribute("activeSession", activeSession);
+
+        int totalVisits = parkingHistory.size();
+        BigDecimal totalPaid = parkingHistory.stream()
+                .filter(ParkingRecord::isPaid)
+                .map(pr -> pr.getAmountCharged() != null ? pr.getAmountCharged() : pr.getAmount())
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        long unpaidCount = parkingHistory.stream().filter(pr -> !pr.isPaid()).count();
+        int avgMins = (int) parkingHistory.stream()
+                .filter(pr -> pr.getDurationMinutes() != null && pr.getDurationMinutes() > 0)
+                .mapToInt(ParkingRecord::getDurationMinutes)
+                .average()
+                .orElse(0.0);
+
+        model.addAttribute("totalVisits", totalVisits);
+        model.addAttribute("totalPaidSum", totalPaid);
+        model.addAttribute("unpaidCount", unpaidCount);
+        model.addAttribute("avgDurationLabel", formatMinutesShort(avgMins));
+
+        if (activeSession != null && activeSession.getEntryTime() != null) {
+            long runMins = ChronoUnit.MINUTES.between(activeSession.getEntryTime(), LocalDateTime.now());
+            model.addAttribute("activeDurationLabel", formatMinutesShort((int) Math.max(0, runMins)));
+        } else {
+            model.addAttribute("activeDurationLabel", "—");
+        }
+
         return "vehicles/vehicle-details-page";
+    }
+
+    private static String formatMinutesShort(int mins) {
+        if (mins <= 0) {
+            return "—";
+        }
+        int h = mins / 60;
+        int m = mins % 60;
+        if (h == 0) {
+            return m + "m";
+        }
+        return h + "h " + m + "m";
     }
 
     @GetMapping("/{id}/edit")

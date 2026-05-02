@@ -62,6 +62,12 @@ public class VehicleService {
                 .orElseThrow(() -> new RuntimeException("Vehicle not found: " + id));
     }
 
+    @Transactional(readOnly = true)
+    public Vehicle getVehicleByIdForView(Long id) {
+        return vehicleRepository.findByIdWithUserAndWallet(id)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found: " + id));
+    }
+
     public List<Vehicle> getVehiclesByUser(String email) {
         return vehicleRepository.findByUserEmail(email);
     }
@@ -76,7 +82,7 @@ public class VehicleService {
     }
 
     public List<ParkingRecord> getVehicleParkingHistory(Long vehicleId) {
-        return parkingRecordRepository.findByVehicleId(vehicleId);
+        return parkingRecordRepository.findParkingHistoryForVehicle(vehicleId);
     }
 
     @Transactional

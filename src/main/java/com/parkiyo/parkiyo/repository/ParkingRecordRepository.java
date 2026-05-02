@@ -36,6 +36,12 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
 
     // History & User related
     List<ParkingRecord> findByVehicleId(Long vehicleId);
+
+    @Query("SELECT DISTINCT pr FROM ParkingRecord pr "
+            + "LEFT JOIN FETCH pr.parkingSlot "
+            + "WHERE pr.vehicle.id = :vehicleId "
+            + "ORDER BY pr.entryTime DESC")
+    List<ParkingRecord> findParkingHistoryForVehicle(@Param("vehicleId") Long vehicleId);
     List<ParkingRecord> findByParkingSlot_Id(Long slotId);
     List<ParkingRecord> findByUserEmail(String email);
     List<ParkingRecord> findByUserEmailAndActiveTrue(String email);
