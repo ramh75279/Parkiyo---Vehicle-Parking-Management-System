@@ -9,6 +9,8 @@ import com.parkiyo.parkiyo.service.AuditLogService;
 import com.parkiyo.parkiyo.service.NotificationService;
 import com.parkiyo.parkiyo.service.WalletService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +60,10 @@ public class PaymentService {
 
     public List<Payment> getUserPaymentHistory(String email) {
         return paymentRepository.findByUserEmail(email);
+    }
+
+    public Page<Payment> getUserPaymentHistoryPaginated(String email, Pageable pageable) {
+        return paymentRepository.findByUserEmail(email, pageable);
     }
 
     public List<Payment> getAllPaymentHistory() {
