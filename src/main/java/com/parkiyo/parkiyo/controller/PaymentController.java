@@ -80,7 +80,7 @@ public class PaymentController {
         int pageSize = 6;
         Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Payment> paymentPage = paymentService.getUserPaymentHistoryPaginated(auth.getName(), pageable);
-        
+
         model.addAttribute("payments", paymentPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", paymentPage.getTotalPages());
