@@ -213,7 +213,7 @@
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">event_available</span><span
                     class="nav-label text-sm">Reservations</span></a>
-            <a th:href="@{/payments}"
+                <a th:href="@{/payments/history}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">payments</span><span
                     class="nav-label text-sm">Payments</span></a>
@@ -412,7 +412,7 @@
                 <div class="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/6" style="border-color:rgba(255,255,255,0.06)"><div><p class="text-xs font-black text-white">ABC-1234 · Walk-in</p><p class="text-[9px] text-slate-500 font-bold">09 Mar 2026</p></div><span class="text-emerald-400 font-black text-sm">-$18.75</span></div>
                 <div class="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/6" style="border-color:rgba(255,255,255,0.06)"><div><p class="text-xs font-black text-white">GHI-7721 · Walk-in</p><p class="text-[9px] text-slate-500 font-bold">08 Mar 2026</p></div><span class="text-emerald-400 font-black text-sm">-$13.75</span></div>
             </div>
-            <p class="mt-2 text-xs">Total spent this month: <strong class="text-white">$124.75</strong>. <a href="/payments" class="text-primary underline">View full history →</a></p>`
+            <p class="mt-2 text-xs">Total spent this month: <strong class="text-white">$124.75</strong>. <a href="/payments/history" class="text-primary underline">View full history →</a></p>`
         },
         'What are the parking rates?': {
             text: "Here's our current pricing structure:",
