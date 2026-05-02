@@ -2,6 +2,8 @@ package com.parkiyo.parkiyo.repository;
 
 import com.parkiyo.parkiyo.model.Payment;
 import com.parkiyo.parkiyo.enums.PaymentStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -15,6 +17,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Optional<Payment> findByTransactionCode(String transactionCode);
 
     List<Payment> findByUserEmail(String email);
+
+    Page<Payment> findByUserEmail(String email, Pageable pageable);
 
     List<Payment> findByStatus(PaymentStatus status);
 
