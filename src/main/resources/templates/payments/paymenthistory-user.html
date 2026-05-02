@@ -344,9 +344,9 @@
                 <div class="flex-1 min-w-[180px] relative">
                         <span
                                 class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg">search</span>
-<<<<<<< Updated upstream
+                    <<<<<<< Updated upstream
                     <input type
-=======
+                                   =======
                     <input type="text" placeholder="Search by plate or transaction ID…"
                            class="bg-white/5 border border-white/20 input-glass rounded-2xl px-4 h-12 w-full pl-10" />
                 </div>
@@ -393,7 +393,7 @@
                             <td class="px-8 py-5 font-mono text-xs text-slate-400" th:text="${payment.transactionCode}">TXN-88291047</td>
                             <td class="px-8 py-5 opacity-70 text-xs" th:text="${#temporals.format(payment.createdAt, 'dd MMM yyyy')}">10 Mar 2026</td>
                             <td class="px-8 py-5"><span
-                                    class="text-white font-black tracking-wider bg-white/5 px-2.5 py-1 rounded-lg text-xs" th:text="${payment.reservation != null ? payment.reservation.vehicle.licensePlate : payment.parkingRecord.vehicle.licensePlate}">XYZ-8899</span>
+                                    class="text-white font-black tracking-wider bg-white/5 px-2.5 py-1 rounded-lg text-xs" th:text="${payment.reservation != null ? payment.reservation.vehicle.licensePlate : (payment.parkingRecord != null ? payment.parkingRecord.vehicle.licensePlate : 'N/A')}">XYZ-8899</span>
                             </td>
                             <td class="px-8 py-5 opacity-70" th:text="${payment.reservation != null ? 'Reservation' : 'Walk-in'}">Reservation</td>
                             <td class="px-8 py-5 opacity-70 flex items-center gap-1.5 text-xs">
@@ -421,7 +421,7 @@
                     </table>
                 </div>
                 <div class="px-8 py-5 border-t border-white/5 flex items-center justify-between">
-                    <p class="text-xs font-bold text-slate-500" 
+                    <p class="text-xs font-bold text-slate-500"
                        th:text="${'Showing ' + (currentPage * pageSize + 1) + ' to ' + (currentPage * pageSize + payments.size()) + ' of ' + totalPayments + ' transactions · Page ' + (currentPage + 1) + ' of ' + (totalPages > 0 ? totalPages : 1)}">Showing 6 of 47 transactions · Page 1 of 8</p>
                     <div class="flex items-center gap-2">
                         <!-- Previous Button -->
@@ -481,4 +481,4 @@
 </body>
 
 </html>
->>>>>>> Stashed changes
+
