@@ -36,7 +36,7 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
 
     // History & User related
     List<ParkingRecord> findByVehicleId(Long vehicleId);
-    List<ParkingRecord> findBySlotId(Long slotId);
+    List<ParkingRecord> findByParkingSlot_Id(Long slotId);
     List<ParkingRecord> findByUserEmail(String email);
     List<ParkingRecord> findByUserEmailAndActiveTrue(String email);
     List<ParkingRecord> findByActiveTrue();
