@@ -51,8 +51,8 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
 
     Optional<ParkingRecord> findByIdAndUserEmail(Long id, String email);
 
-    @Query("SELECT pr FROM ParkingRecord pr WHERE pr.user.email = :email " +
-            "ORDER BY pr.entryTime DESC")
+    @Query(value = "SELECT * FROM parking_records pr JOIN users u ON pr.user_id = u.id " +
+            "WHERE u.email = :email ORDER BY pr.entry_time DESC LIMIT :limit", nativeQuery = true)
     List<ParkingRecord> findByUserEmailRecent(@Param("email") String email, @Param("limit") int limit);
 
     @Query("SELECT pr FROM ParkingRecord pr WHERE pr.user.email = :email AND pr.exitTime IS NULL")
