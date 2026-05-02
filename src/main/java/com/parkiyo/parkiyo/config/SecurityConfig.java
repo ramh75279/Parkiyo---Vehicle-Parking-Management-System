@@ -2,6 +2,8 @@ package com.parkiyo.parkiyo.config;
 
 import com.parkiyo.parkiyo.service.AuthService;
 import com.parkiyo.parkiyo.service.AuditLogService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

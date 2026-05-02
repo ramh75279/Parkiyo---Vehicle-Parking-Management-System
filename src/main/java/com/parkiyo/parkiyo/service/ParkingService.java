@@ -48,8 +48,8 @@ public class ParkingService {
         ParkingRecord record = getRecordByIdAndUser(recordId, email);
         return Map.of(
                 "record", record,
-                "vehicle", record.getVehicle(),
-                "slot", record.getSlot()
+                "vehicle", record.getVehicle() != null ? record.getVehicle() : "N/A",
+                "slot", record.getSlot() != null ? record.getSlot() : "N/A"
         );
     }
 
@@ -57,8 +57,8 @@ public class ParkingService {
         ParkingRecord record = getRecordById(recordId);
         return Map.of(
                 "record", record,
-                "vehicle", record.getVehicle(),
-                "slot", record.getSlot()
+                "vehicle", record.getVehicle() != null ? record.getVehicle() : "N/A",
+                "slot", record.getSlot() != null ? record.getSlot() : "N/A"
         );
     }
 }
