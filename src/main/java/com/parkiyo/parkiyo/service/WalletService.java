@@ -114,7 +114,7 @@ public class WalletService {
             throw new IllegalArgumentException("Email cannot be null or empty");
         }
 
-        return walletRepository.findByUserEmail(email)
+        return walletRepository.findByUser_Email(email)
                 .orElseGet(() -> {
                     User user = userRepository.findByEmail(email)
                             .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
