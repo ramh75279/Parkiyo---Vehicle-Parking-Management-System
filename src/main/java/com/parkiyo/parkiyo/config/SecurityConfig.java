@@ -2,8 +2,6 @@ package com.parkiyo.parkiyo.config;
 
 import com.parkiyo.parkiyo.service.AuthService;
 import com.parkiyo.parkiyo.service.AuditLogService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -36,26 +35,41 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authenticationProvider(authenticationProvider())
+
+                // CSRF Protection
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                )
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/", "/home", "/features", "/solutions", "/analytics",
-                                "/faq", "/privacy", "/sign-in", "/perform-login", "/login", "/register",
-                                "/forgot-password", "/reset-password", "/access-denied",
+                                "/",
+                                "/home", "/features", "/solutions", "/analytics",
+                                "/faq", "/privacy",
+                                "/sign-in", "/perform-login", "/login",
+                                "/register", "/forgot-password", "/reset-password",
+                                "/access-denied",
                                 "/uploads/**", "/css/**", "/js/**", "/images/**", "/webjars/**"
                         ).permitAll()
+
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/assistant/**").hasAnyRole("ADMIN", "ASSISTANT")
+
                         .anyRequest().authenticated()
                 )
+
                 .formLogin(form -> form
                         .loginPage("/sign-in")
                         .loginProcessingUrl("/perform-login")
                         .usernameParameter("email")
                         .passwordParameter("password")
                         .successHandler((request, response, authentication) -> {
-                            authService.markSuccessfulLogin(authentication.getName());
+                            String username = authentication.getName();
+                            authService.markSuccessfulLogin(username);
+
                             auditLogService.logAction(
                                     "LOGIN",
-                                    authentication.getName(),
+                                    username,
                                     "Authentication",
                                     null,
                                     "User logged in successfully",
@@ -68,6 +82,7 @@ public class SecurityConfig {
                         .failureUrl("/sign-in?error=true")
                         .permitAll()
                 )
+
                 .logout(logout -> logout
                         .logoutUrl("/perform-logout")
                         .logoutSuccessUrl("/sign-in?logout=true")
@@ -75,8 +90,19 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
+
+                // Session Management - Fixed for Spring Security 6
+                .sessionManagement(session -> session
+                        .maximumSessions(1)                    // Only one active session
+                        .expiredUrl("/sign-in?expired=true")
+                )
+
+                // Security Headers & Exception Handling
                 .exceptionHandling(ex -> ex
                         .accessDeniedPage("/access-denied")
+                )
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.sameOrigin())   // For H2 console if used
                 );
 
         return http.build();
