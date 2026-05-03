@@ -270,7 +270,26 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Page<User> getAllUsersPaginated(Pageable pageable, String search, String role, String status) {
-        return userRepository.findAll(pageable);
+        // Parse role enum safely
+        Role roleEnum = null;
+        if (role != null && !role.isBlank()) {
+            try {
+                roleEnum = Role.valueOf(role.trim().toUpperCase());
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        // Parse status enum safely
+        UserStatus statusEnum = null;
+        if (status != null && !status.isBlank()) {
+            try {
+                statusEnum = UserStatus.valueOf(status.trim().toUpperCase());
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        // Normalize search — null if blank so JPQL ignores it
+        String searchTerm = (search != null && !search.isBlank()) ? search.trim() : null;
+
+        return userRepository.findWithFilters(searchTerm, roleEnum, statusEnum, pageable);
     }
 
     @Transactional(readOnly = true)
