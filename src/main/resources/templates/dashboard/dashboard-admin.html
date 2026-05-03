@@ -63,8 +63,7 @@
             <a th:href="@{/admin/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
                 <span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a th:href="@{/admin/slots/overview}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a th:href="@{/admin/slots/overview}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">grid_view</span>
                 <span class="nav-label text-sm">Parking Slots</span>
             </a>
@@ -99,9 +98,16 @@
 
     <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
         <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur">
-            <div>
-                <h2 class="text-xl font-black text-white">Admin System Overview</h2>
-                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Parkiyo Control Center</p>
+            <div class="flex items-center gap-4">
+                <div>
+                    <h2 class="text-xl font-black text-white">Admin System Overview</h2>
+                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Parkiyo Control Center</p>
+                </div>
+                <!-- Live indicator -->
+                <div class="flex items-center gap-2 ml-4">
+                    <span id="live-indicator" class="h-2 w-2 rounded-full bg-emerald-400 opacity-30 transition-opacity duration-500"></span>
+                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Live</span>
+                </div>
             </div>
             <div class="flex items-center gap-6">
                 <!-- Search -->
@@ -113,13 +119,13 @@
                 <!-- Revenue -->
                 <div class="hidden md:flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2">
                     <span class="material-symbols-outlined text-emerald-400 text-base">account_balance_wallet</span>
-                    <span class="text-[11px] font-black uppercase tracking-[0.16em] text-emerald-400">Rs. [[${stats.totalRevenue}]]</span>
+                    <span class="text-[11px] font-black uppercase tracking-[0.16em] text-emerald-400">Rs. <span id="stat-total-revenue" th:text="${stats.totalRevenue}">0</span></span>
                 </div>
 
                 <!-- Notifications -->
                 <div class="relative cursor-pointer" onclick="openNotif()">
                     <span class="material-symbols-outlined text-slate-400 hover:text-white transition-colors">notifications</span>
-                    <span class="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full ring-4 ring-background-dark"></span>
+                    <span id="stat-unread-count-dot" class="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full ring-4 ring-background-dark"></span>
                 </div>
 
                 <div class="h-8 w-[1px] bg-white/10"></div>
@@ -137,8 +143,8 @@
                                  alt="Profile"
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
                             <span th:class="${currentUser != null and currentUser.profilePicturePath != null} ? 'material-symbols-outlined text-white/70 text-2xl items-center justify-center h-full w-full hidden' : 'material-symbols-outlined text-white/70 text-2xl flex items-center justify-center h-full w-full'">
-                    person
-                </span>
+                                person
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -150,24 +156,24 @@
                 <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
                     <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/[0.02] group-hover:text-primary/5 transition-all">check_circle</span>
                     <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Available Slots</p>
-                    <h3 class="text-3xl font-black text-white" th:text="${stats.availableSlots}">42</h3>
-                    <p class="text-slate-500 text-sm font-bold mt-1">of <span th:text="${stats.totalSlots}">100</span> total</p>
+                    <h3 id="stat-available-slots" class="text-3xl font-black text-white" th:text="${stats.availableSlots}">42</h3>
+                    <p class="text-slate-500 text-sm font-bold mt-1">of <span id="stat-total-slots" th:text="${stats.totalSlots}">100</span> total</p>
                 </div>
                 <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
                     <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/[0.02] group-hover:text-primary/5 transition-all">payments</span>
                     <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Daily Revenue</p>
-                    <h3 class="text-3xl font-black text-white">Rs. <span th:text="${stats.totalRevenue}">0</span></h3>
+                    <h3 class="text-3xl font-black text-white">Rs. <span id="stat-daily-revenue" th:text="${stats.totalRevenue}">0</span></h3>
                 </div>
                 <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
                     <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/[0.02] group-hover:text-primary/5 transition-all">directions_car</span>
                     <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Active Sessions</p>
-                    <h3 class="text-3xl font-black text-white" th:text="${stats.activeRecords}">0</h3>
-                    <p class="text-slate-500 text-[10px] font-bold mt-2 tracking-wide"><span th:text="${#numbers.formatDecimal(slotSummary.occupancyRate, 1, 1)}">0</span>% occupancy rate</p>
+                    <h3 id="stat-active-records" class="text-3xl font-black text-white" th:text="${stats.activeRecords}">0</h3>
+                    <p class="text-slate-500 text-[10px] font-bold mt-2 tracking-wide"><span id="stat-occupancy-rate" th:text="${#numbers.formatDecimal(slotSummary.occupancyRate, 1, 1)}">0</span>% occupancy rate</p>
                 </div>
                 <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
                     <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/[0.02] group-hover:text-primary/5 transition-all">group</span>
                     <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Active Users</p>
-                    <h3 class="text-3xl font-black text-primary" th:text="${stats.totalUsers}">0</h3>
+                    <h3 id="stat-total-users" class="text-3xl font-black text-primary" th:text="${stats.totalUsers}">0</h3>
                 </div>
             </div>
 
@@ -212,10 +218,10 @@
                         <div>
                             <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
                                 <span>Current Occupancy</span>
-                                <span class="text-white" th:text="${#numbers.formatDecimal(slotSummary.occupancyRate, 1, 1) + '%'}">0%</span>
+                                <span class="text-white"><span id="stat-occupancy-rate-display" th:text="${#numbers.formatDecimal(slotSummary.occupancyRate, 1, 1)}">0</span>%</span>
                             </div>
                             <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                                <div class="h-full bg-primary rounded-full" th:style="'width: ' + ${slotSummary.occupancyRate} + '%'"></div>
+                                <div id="stat-occupancy-bar" class="h-full bg-primary rounded-full" th:style="'width: ' + ${slotSummary.occupancyRate} + '%'"></div>
                             </div>
                         </div>
                         <div class="mt-8 p-6 rounded-2xl bg-primary/5 border border-primary/10">
@@ -235,18 +241,18 @@
                 <div class="glass-card rounded-[2.5rem] p-8">
                     <h3 class="text-lg font-black text-white mb-6">User Summary</h3>
                     <div class="space-y-5">
-                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Total Users</span><span class="status-pill status-active" th:text="${stats.totalUsers}">0</span></div>
-                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Total Slots</span><span class="text-white font-black" th:text="${stats.totalSlots}">0</span></div>
-                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Available Slots</span><span class="status-pill status-available" th:text="${stats.availableSlots}">0</span></div>
-                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Occupied Slots</span><span class="status-pill status-occupied" th:text="${stats.occupiedSlots}">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Total Users</span><span class="status-pill status-active" id="stat-total-users-2" th:text="${stats.totalUsers}">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Total Slots</span><span class="text-white font-black" id="stat-total-slots-2" th:text="${stats.totalSlots}">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Available Slots</span><span class="status-pill status-available" id="stat-available-slots-2" th:text="${stats.availableSlots}">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Occupied Slots</span><span class="status-pill status-occupied" id="stat-occupied-slots" th:text="${stats.occupiedSlots}">0</span></div>
                     </div>
                 </div>
                 <div class="glass-card rounded-[2.5rem] p-8">
                     <h3 class="text-lg font-black text-white mb-6">Slot Status</h3>
                     <div class="space-y-5">
-                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Available</span><span class="status-pill status-available" th:text="${slotSummary.available}">0</span></div>
-                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Occupied</span><span class="status-pill status-occupied" th:text="${slotSummary.occupied}">0</span></div>
-                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Total Slots</span><span class="text-white font-black" th:text="${slotSummary.total}">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Available</span><span class="status-pill status-available" id="stat-slot-available" th:text="${slotSummary.available}">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Occupied</span><span class="status-pill status-occupied" id="stat-slot-occupied" th:text="${slotSummary.occupied}">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Total Slots</span><span class="text-white font-black" id="stat-slot-total" th:text="${slotSummary.total}">0</span></div>
                     </div>
                 </div>
                 <div class="glass-card rounded-[2.5rem] p-8">
@@ -279,7 +285,7 @@
         <div>
             <h3 class="text-base font-black text-white">Notifications</h3>
             <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-0.5">
-                <span th:text="${adminUnreadCount}">0</span> unread
+                <span id="stat-unread-count" th:text="${adminUnreadCount}">0</span> unread
             </p>
         </div>
         <div class="flex items-center gap-2">
@@ -366,6 +372,54 @@
             else if (tab === 'system') { el.style.display = el.dataset.type === 'system' ? '' : 'none'; }
         });
     }
+</script>
+
+<script>
+    function updateDashboard() {
+        fetch('/api/dashboard/stats', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(res => { if (!res.ok) return; return res.json(); })
+        .then(data => {
+            if (!data) return;
+
+            setText('stat-available-slots', data.availableSlots);
+            setText('stat-available-slots-2', data.availableSlots);
+            setText('stat-total-slots', data.totalSlots);
+            setText('stat-total-slots-2', data.totalSlots);
+            setText('stat-occupied-slots', data.occupiedSlots);
+            setText('stat-active-records', data.activeRecords);
+            setText('stat-total-users', data.totalUsers);
+            setText('stat-total-users-2', data.totalUsers);
+            setText('stat-occupancy-rate', data.occupancyRate);
+            setText('stat-occupancy-rate-display', data.occupancyRate);
+            setText('stat-daily-revenue', data.totalRevenue);
+            setText('stat-total-revenue', data.totalRevenue);
+            setText('stat-unread-count', data.unreadNotifications);
+            setText('stat-slot-available', data.availableSlots);
+            setText('stat-slot-occupied', data.occupiedSlots);
+            setText('stat-slot-total', data.totalSlots);
+
+            // Update occupancy bar width
+            const bar = document.getElementById('stat-occupancy-bar');
+            if (bar) bar.style.width = data.occupancyRate + '%';
+
+            // Flash live indicator
+            const indicator = document.getElementById('live-indicator');
+            if (indicator) {
+                indicator.classList.add('opacity-100');
+                setTimeout(() => indicator.classList.remove('opacity-100'), 1500);
+            }
+        })
+        .catch(() => {});
+    }
+
+    function setText(id, value) {
+        const el = document.getElementById(id);
+        if (el && value !== undefined && value !== null) el.textContent = value;
+    }
+
+    setInterval(updateDashboard, 30000);
 </script>
 
 </body>
