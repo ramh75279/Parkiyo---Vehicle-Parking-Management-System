@@ -54,7 +54,7 @@ public class AuthController {
         }
         try {
             authService.register(request);
-            redirectAttributes.addFlashAttribute("success", "Account created! Please log in.");
+            redirectAttributes.addFlashAttribute("success", "Account created! Please check your email to verify your account before logging in.");
             return "redirect:/sign-in";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
@@ -83,6 +83,22 @@ public class AuthController {
         model.addAttribute("token", token);
         model.addAttribute("passwordResetRequest", new PasswordResetRequest());
         return "auth/reset-password";
+    }
+
+    @GetMapping("/verify-email")
+    public String verifyEmail(@RequestParam String token,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            String result = authService.verifyEmail(token);
+            if ("already_verified".equals(result)) {
+                redirectAttributes.addFlashAttribute("success", "Email already verified. Please log in.");
+            } else {
+                redirectAttributes.addFlashAttribute("success", "Email verified! You can now log in.");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Invalid or expired verification link.");
+        }
+        return "redirect:/sign-in";
     }
 
     @PostMapping("/reset-password")

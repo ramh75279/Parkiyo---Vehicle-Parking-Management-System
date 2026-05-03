@@ -47,6 +47,9 @@ public class User {
     private String passwordResetToken;
     private LocalDateTime passwordResetTokenExpiry;
 
+    private String emailVerificationToken;
+    private boolean emailVerified;
+
     @Builder.Default
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean emailNotificationsEnabled = true;
