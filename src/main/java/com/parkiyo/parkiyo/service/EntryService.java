@@ -115,7 +115,7 @@ public class EntryService {
 
     private Optional<ParkingSlot> findAvailableSlot(VehicleCategory category) {
         return slotRepository
-                .findFirstByStatusAndVehicleCategoryOrderBySlotNumberAsc(SlotStatus.AVAILABLE, category)
+                .findFirstByStatusAndPreferredVehicleCategoryOrderBySlotNumberAsc(SlotStatus.AVAILABLE, category)
                 .or(() -> slotRepository.findFirstByStatusOrderBySlotNumberAsc(SlotStatus.AVAILABLE));
     }
 

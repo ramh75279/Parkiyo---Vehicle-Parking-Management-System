@@ -44,7 +44,7 @@ public class ParkingSlot {
     @Column(length = 255)
     private String description;
 
-    @OneToMany(mappedBy = "slot", fetch = FetchType.LAZY, cascade = CascadeType.ALL)   // Must match field name in ParkingRecord
+    @OneToMany(mappedBy = "parkingSlot", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ParkingRecord> parkingRecords = new ArrayList<>();
 
     @OneToMany(mappedBy = "slot", fetch = FetchType.LAZY)

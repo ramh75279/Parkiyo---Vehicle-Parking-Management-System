@@ -29,11 +29,11 @@ public interface ParkingSlotRepository extends JpaRepository<ParkingSlot, Long> 
     // ==================== IMPORTANT FOR ENTRY ====================
 
     /** Prefer slots tagged for this vehicle category; see EntryService for fallback when none match. */
-    Optional<ParkingSlot> findFirstByStatusAndVehicleCategoryOrderBySlotNumberAsc(SlotStatus status, VehicleCategory category);
+    Optional<ParkingSlot> findFirstByStatusAndPreferredVehicleCategoryOrderBySlotNumberAsc(SlotStatus status, VehicleCategory category);
 
     /** Simple fallback - any available slot */
     Optional<ParkingSlot> findFirstByStatusOrderBySlotNumberAsc(SlotStatus status);
 
     /** Count available slots by vehicle category */
-    long countByStatusAndVehicleCategory(SlotStatus status, VehicleCategory category);
+    long countByStatusAndPreferredVehicleCategory(SlotStatus status, VehicleCategory category);
 }
