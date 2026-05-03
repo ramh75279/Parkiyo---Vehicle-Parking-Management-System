@@ -4,6 +4,8 @@ import com.parkiyo.parkiyo.dto.EntryRequest;
 import com.parkiyo.parkiyo.enums.NotificationType;
 import com.parkiyo.parkiyo.enums.SlotStatus;
 import com.parkiyo.parkiyo.enums.VehicleCategory;
+import com.parkiyo.parkiyo.exception.BadRequestException;
+import com.parkiyo.parkiyo.exception.ResourceNotFoundException;
 import com.parkiyo.parkiyo.model.ParkingRecord;
 import com.parkiyo.parkiyo.model.ParkingSlot;
 import com.parkiyo.parkiyo.model.User;
@@ -36,34 +38,28 @@ public class EntryService {
 
     @Transactional
     public void processEntry(EntryRequest request, String operatorEmail) {
+        if (request == null || request.getLicensePlate() == null || request.getLicensePlate().trim().isEmpty()) {
+            throw new BadRequestException("License plate is required");
+        }
+
         String normalizedPlate = normalizeLicensePlate(request.getLicensePlate());
 
-        // 1. Check for duplicate active entry
-        Optional<ParkingRecord> existing = parkingRecordRepository.findByVehicleLicensePlateAndActiveTrue(normalizedPlate);
-        if (existing.isPresent()) {
-            throw new RuntimeException("Vehicle " + normalizedPlate + " is already parked.");
+        // 1. Prevent duplicate entry
+        if (parkingRecordRepository.existsByVehicleLicensePlateAndActiveTrue(normalizedPlate)) {
+            throw new BadRequestException("Vehicle " + normalizedPlate + " is already parked.");
         }
 
         // 2. Get or Create Vehicle
         Vehicle vehicle = vehicleRepository.findByLicensePlate(normalizedPlate)
-                .orElseGet(() -> {
-                    VehicleCategory category = convertToVehicleCategory(request.getVehicleType());
-                    Vehicle v = Vehicle.builder()
-                            .licensePlate(normalizedPlate)
-                            .category(category)
-                            .active(true)
-                            .build();
-                    return vehicleRepository.save(v);
-                });
+                .orElseGet(() -> createNewVehicle(request, normalizedPlate));
 
-        // 3. Auto-assign available slot
-        ParkingSlot slot = slotRepository
-                .findFirstByStatusAndVehicleCategoryOrderBySlotNumberAsc(SlotStatus.AVAILABLE, vehicle.getCategory())
-                .or(() -> slotRepository.findFirstByStatusOrderBySlotNumberAsc(SlotStatus.AVAILABLE))
-                .orElseThrow(() -> new RuntimeException("No available slot for vehicle type: " + request.getVehicleType()));
+        // 3. Find available slot
+        ParkingSlot slot = findAvailableSlot(vehicle.getCategory())
+                .orElseThrow(() -> new BadRequestException("No available parking slot at the moment."));
 
-        // 4. Get User (operator or owner)
-        User user = userRepository.findByEmail(operatorEmail).orElse(null);
+        // 4. Get Operator
+        User operator = userRepository.findByEmail(operatorEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Operator not found: " + operatorEmail));
 
         // 5. Create Parking Record
         LocalDateTime entryTime = LocalDateTime.now(COLOMBO_ZONE);
@@ -71,7 +67,7 @@ public class EntryService {
         ParkingRecord record = ParkingRecord.builder()
                 .vehicle(vehicle)
                 .slot(slot)
-                .user(user)
+                .user(operator)
                 .entryTime(entryTime)
                 .entryOperator(operatorEmail)
                 .active(true)
@@ -79,17 +75,14 @@ public class EntryService {
 
         parkingRecordRepository.save(record);
 
-        // 6. Mark slot occupied
+        // 6. Update slot status
         slot.setStatus(SlotStatus.OCCUPIED);
+        // slot.setLastOccupiedTime(entryTime);   // Removed - field doesn't exist yet
         slotRepository.save(slot);
 
-        // Notifications & Audit
-        notificationService.createNotification(user, NotificationType.ENTRY,
-                "Vehicle Entry",
-                "Vehicle " + normalizedPlate + " entered slot " + slot.getSlotNumber(), "/parking");
-
+        // 7. Audit & Notification
         auditLogService.logAction(
-                "ENTRY",
+                "VEHICLE_ENTRY",
                 operatorEmail,
                 "ParkingRecord",
                 record.getId(),
@@ -98,14 +91,47 @@ public class EntryService {
                 null,
                 null
         );
+
+        notificationService.createNotification(
+                operator,
+                NotificationType.ENTRY,
+                "Vehicle Entry",
+                "Vehicle " + normalizedPlate + " entered slot " + slot.getSlotNumber(),
+                "/parking"
+        );
+    }
+
+    private Vehicle createNewVehicle(EntryRequest request, String normalizedPlate) {
+        VehicleCategory category = convertToVehicleCategory(request.getVehicleType());
+
+        Vehicle vehicle = Vehicle.builder()
+                .licensePlate(normalizedPlate)
+                .category(category)
+                .active(true)
+                .build();
+
+        return vehicleRepository.save(vehicle);
+    }
+
+    private Optional<ParkingSlot> findAvailableSlot(VehicleCategory category) {
+        return slotRepository
+                .findFirstByStatusAndVehicleCategoryOrderBySlotNumberAsc(SlotStatus.AVAILABLE, category)
+                .or(() -> slotRepository.findFirstByStatusOrderBySlotNumberAsc(SlotStatus.AVAILABLE));
     }
 
     private String normalizeLicensePlate(String plate) {
         if (plate == null) return "";
-        return plate.toUpperCase().replaceAll("\\s+", "").replace("-", "");
+        return plate.trim()
+                .toUpperCase()
+                .replaceAll("\\s+", "")
+                .replace("-", "")
+                .replace(".", "");
     }
 
     private VehicleCategory convertToVehicleCategory(String type) {
+        if (type == null || type.trim().isEmpty()) {
+            return VehicleCategory.CAR;
+        }
         try {
             return VehicleCategory.valueOf(type.trim().toUpperCase());
         } catch (Exception e) {
@@ -115,6 +141,8 @@ public class EntryService {
 
     public List<ParkingRecord> getRecentEntries(int limit) {
         return parkingRecordRepository.findTop20ByOrderByEntryTimeDesc()
-                .stream().limit(limit).toList();
+                .stream()
+                .limit(limit)
+                .toList();
     }
 }
