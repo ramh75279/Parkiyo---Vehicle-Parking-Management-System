@@ -2,12 +2,15 @@ package com.parkiyo.parkiyo.service;
 
 import com.parkiyo.parkiyo.dto.DashboardStats;
 import com.parkiyo.parkiyo.dto.SlotOccupancySummary;
+import com.parkiyo.parkiyo.model.Notification;
 import com.parkiyo.parkiyo.model.ParkingRecord;
+import com.parkiyo.parkiyo.repository.NotificationRepository;
 import com.parkiyo.parkiyo.repository.ParkingRecordRepository;
 import com.parkiyo.parkiyo.repository.ParkingSlotRepository;
 import com.parkiyo.parkiyo.repository.UserRepository;
 import com.parkiyo.parkiyo.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,10 +26,11 @@ public class DashboardService {
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
     private final ParkingRecordRepository parkingRecordRepository;
+    private final NotificationRepository notificationRepository;
 
     public DashboardStats getAdminDashboardStats() {
         long totalSlots = slotRepository.count();
-        long occupiedSlots = slotRepository.countByStatusOccupied();  // Fixed
+        long occupiedSlots = slotRepository.countByStatusOccupied();
         long availableSlots = totalSlots - occupiedSlots;
 
         long totalVehicles = vehicleRepository.count();
@@ -48,7 +52,7 @@ public class DashboardService {
 
     public SlotOccupancySummary getSlotOccupancySummary() {
         long total = slotRepository.count();
-        long occupied = slotRepository.countByStatusOccupied();   // Fixed
+        long occupied = slotRepository.countByStatusOccupied();
         double occupancyRate = total > 0 ? (occupied * 100.0 / total) : 0.0;
 
         return SlotOccupancySummary.builder()
@@ -60,20 +64,21 @@ public class DashboardService {
     }
 
     public List<ParkingRecord> getRecentEntries(int limit) {
-        return parkingRecordRepository.findTopRecentEntries(limit);   // Fixed
+        return parkingRecordRepository.findTopRecentEntries(limit);
     }
 
     public List<ParkingRecord> getRecentPayments(int limit) {
-        return parkingRecordRepository.findRecentPaid(limit);         // Fixed
+        return parkingRecordRepository.findRecentPaid(limit);
     }
 
-    public List<Object> getAdminRecentNotifications(int limit) {
-        // TODO: Replace with real Notification entity later
-        return List.of();
+    // Real notifications — fetches latest N across all users
+    public List<Notification> getAdminRecentNotifications(int limit) {
+        return notificationRepository.findTopByOrderByCreatedAtDesc(PageRequest.of(0, limit));
     }
 
+    // Real unread count — counts all unread notifications in the system
     public long getAdminUnreadNotificationCount() {
-        return 3; // Temporary
+        return notificationRepository.countByReadFalse();
     }
 
     // ================== USER DASHBOARD METHODS ==================
