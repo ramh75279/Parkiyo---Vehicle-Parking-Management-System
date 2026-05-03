@@ -9,11 +9,16 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "parking_slots")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ParkingSlot {
 
     @Id
@@ -25,28 +30,43 @@ public class ParkingSlot {
 
     private String zone;
 
+    private String floor;
+
     @Enumerated(EnumType.STRING)
-    @Builder.Default
     @Column(nullable = false)
     private SlotStatus status = SlotStatus.AVAILABLE;
 
-    @Builder.Default
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal hourlyRate = BigDecimal.ZERO;
 
-    /** When set, entry flow prefers this slot for matching vehicle type; when null, slot matches any type (with fallback in {@code EntryService}). */
     @Enumerated(EnumType.STRING)
-    private VehicleCategory vehicleCategory;
+    private VehicleCategory preferredVehicleCategory;
 
-    @OneToMany(mappedBy = "parkingSlot", fetch = FetchType.LAZY)
-    private List<ParkingRecord> parkingRecords;
+    @Column(length = 255)
+    private String description;
+
+    @OneToMany(mappedBy = "slot", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ParkingRecord> parkingRecords = new ArrayList<>();
 
     @OneToMany(mappedBy = "slot", fetch = FetchType.LAZY)
-    private List<Reservation> reservations;
+    private List<Reservation> reservations = new ArrayList<>();
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @Column(name = "last_occupied_time")
+    private LocalDateTime lastOccupiedTime;
+
+    // ==================== HELPER METHODS ====================
+
+    public boolean isAvailable() {
+        return status == SlotStatus.AVAILABLE;
+    }
+
+    public boolean isOccupied() {
+        return status == SlotStatus.OCCUPIED;
+    }
 }
