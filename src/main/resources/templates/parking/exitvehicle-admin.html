@@ -267,21 +267,27 @@
     </aside>
 
     <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
-        <header
-                class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
             <div>
                 <h2 class="text-xl font-black text-white">Vehicle Exit</h2>
-                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Process departure
-                    & collect payment</p>
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Process departure & collect payment</p>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="text-right hidden xl:block">
-                    <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Admin'">Admin</p>
-                    <p class="text-[10px] text-primary font-bold uppercase tracking-tighter">Admin</p>
+
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Admin'"></p>
+                    <p class="text-[10px] text-primary font-bold uppercase tracking-tighter" th:text="${currentUser?.role} ?: 'ADMIN'"></p>
                 </div>
-                <div class="h-10 w-10 rounded-[14px] bg-gradient-to-tr from-emerald-400 to-primary p-[2px]">
-                    <div class="h-full w-full rounded-[14px] bg-background-dark flex items-center justify-center">
-                        <span class="material-symbols-outlined text-white/50">person</span>
+                <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-blue-400 p-[2px] shrink-0">
+                    <div class="h-full w-full rounded-full overflow-hidden flex items-center justify-center bg-[#1e2535]">
+                        <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
+                             th:src="@{${currentUser.profilePicturePath}}"
+                             class="h-full w-full object-cover rounded-full"
+                             alt="Profile"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+                        <span th:class="${currentUser != null and currentUser.profilePicturePath != null} ? 'material-symbols-outlined text-white/70 text-2xl items-center justify-center h-full w-full hidden' : 'material-symbols-outlined text-white/70 text-2xl flex items-center justify-center h-full w-full'">
+                    person
+                </span>
                     </div>
                 </div>
             </div>

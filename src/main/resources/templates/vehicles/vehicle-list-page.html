@@ -127,9 +127,22 @@
                 <a th:href="@{/admin/vehicles/add}" class="flex items-center gap-2 bg-primary text-white font-black px-5 py-2.5 rounded-xl hover:bg-primary/80 transition-all text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(31,104,249,0.3)]">
                     <span class="material-symbols-outlined text-lg">add</span> Add Vehicle
                 </a>
-                <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-primary to-blue-400 p-[2px] ml-2">
-                    <div class="h-full w-full rounded-squircle bg-background-dark flex items-center justify-center">
-                        <span class="material-symbols-outlined text-white/50">person</span>
+                <div class="flex items-center gap-3">
+                    <div class="text-right">
+                        <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Admin'"></p>
+                        <p class="text-[10px] text-primary font-bold uppercase tracking-tighter" th:text="${currentUser?.role} ?: 'ADMIN'"></p>
+                    </div>
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-blue-400 p-[2px] shrink-0">
+                        <div class="h-full w-full rounded-full overflow-hidden flex items-center justify-center bg-[#1e2535]">
+                            <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
+                                 th:src="@{${currentUser.profilePicturePath}}"
+                                 class="h-full w-full object-cover rounded-full"
+                                 alt="Profile"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+                            <span th:class="${currentUser != null and currentUser.profilePicturePath != null} ? 'material-symbols-outlined text-white/70 text-2xl items-center justify-center h-full w-full hidden' : 'material-symbols-outlined text-white/70 text-2xl flex items-center justify-center h-full w-full'">
+                    person
+                </span>
+                        </div>
                     </div>
                 </div>
             </div>

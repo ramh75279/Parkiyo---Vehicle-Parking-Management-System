@@ -197,9 +197,19 @@
                     <p class="text-[10px] text-primary font-bold uppercase tracking-tighter" id="roleBadge"
                        th:text="${user.role.name() == 'ADMIN' ? 'Admin' : 'User'}">User</p>
                 </div>
-                <div class="h-10 w-10 rounded-[14px] bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
-                    <div class="h-full w-full rounded-[14px] bg-background-dark flex items-center justify-center">
-                        <span class="material-symbols-outlined text-white/50">person</span>
+                <div class="flex items-center gap-3">
+
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-blue-400 p-[2px] shrink-0">
+                        <div class="h-full w-full rounded-full overflow-hidden flex items-center justify-center bg-[#1e2535]">
+                            <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
+                                 th:src="@{${currentUser.profilePicturePath}}"
+                                 class="h-full w-full object-cover rounded-full"
+                                 alt="Profile"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+                            <span th:class="${currentUser != null and currentUser.profilePicturePath != null} ? 'material-symbols-outlined text-white/70 text-2xl items-center justify-center h-full w-full hidden' : 'material-symbols-outlined text-white/70 text-2xl flex items-center justify-center h-full w-full'">
+                    person
+                </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -318,16 +328,16 @@
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <div>
                                 <label class="field-label">Current Password</label>
-                                <input type="password" name="currentPassword" autocomplete="current-password" placeholder="••••••••" class="input-glass text-white" />
+                                <input type="password" name="currentPassword" autocomplete="current-password" placeholder="••••••••" class="py-3 bg-transparent border focus:ring-0 w-full text-sm text-white rounded-2xl" />
                             </div>
                             <div>
                                 <label class="field-label">New Password</label>
-                                <input type="password" name="newPassword" autocomplete="new-password" placeholder="Min. 8 characters" class="input-glass text-white"
+                                <input type="password" name="newPassword" autocomplete="new-password" placeholder="Min. 8 characters" class="py-3 bg-transparent border focus:ring-0 w-full text-sm text-white rounded-2xl"
                                        id="newPw" />
                             </div>
                             <div>
                                 <label class="field-label">Confirm New Password</label>
-                                <input type="password" name="confirmNewPassword" autocomplete="new-password" placeholder="Repeat new password" class="input-glass text-white"
+                                <input type="password" name="confirmNewPassword" autocomplete="new-password" placeholder="Repeat new password" class="py-3 bg-transparent border focus:ring-0 w-full text-sm text-white rounded-2xl"
                                        id="confirmPw" />
                             </div>
                             <div
