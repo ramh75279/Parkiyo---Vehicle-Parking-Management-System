@@ -164,6 +164,8 @@
                                 Email Address
                                 <span class="ml-2 text-[9px] font-black uppercase tracking-wider text-slate-500 bg-white/5 px-2 py-0.5 rounded-full">Read Only</span>
                             </label>
+                            <!-- Hidden input submits the email value so it's never lost on save -->
+                            <input type="hidden" name="email" th:value="${user != null ? user.email : ''}"/>
                             <input type="text"
                                    th:value="${user != null ? user.email : ''}"
                                    class="w-full h-14 rounded-2xl px-5 input-readonly font-medium" readonly/>
