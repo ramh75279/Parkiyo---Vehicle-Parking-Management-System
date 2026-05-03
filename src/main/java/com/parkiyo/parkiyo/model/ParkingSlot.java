@@ -29,7 +29,6 @@ public class ParkingSlot {
     private String slotNumber;
 
     private String zone;
-
     private String floor;
 
     @Enumerated(EnumType.STRING)
@@ -45,7 +44,7 @@ public class ParkingSlot {
     @Column(length = 255)
     private String description;
 
-    @OneToMany(mappedBy = "slot", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "slot", fetch = FetchType.LAZY, cascade = CascadeType.ALL)   // Must match field name in ParkingRecord
     private List<ParkingRecord> parkingRecords = new ArrayList<>();
 
     @OneToMany(mappedBy = "slot", fetch = FetchType.LAZY)
@@ -60,13 +59,7 @@ public class ParkingSlot {
     @Column(name = "last_occupied_time")
     private LocalDateTime lastOccupiedTime;
 
-    // ==================== HELPER METHODS ====================
-
     public boolean isAvailable() {
         return status == SlotStatus.AVAILABLE;
-    }
-
-    public boolean isOccupied() {
-        return status == SlotStatus.OCCUPIED;
     }
 }
