@@ -76,25 +76,39 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void createVehiclesIfNeeded() {
-        if (vehicleRepository.count() < 3) {
-            User kamal = userRepository.findByEmail("kamal@parkiyo.com").orElse(null);
-            User nimali = userRepository.findByEmail("nimali@parkiyo.com").orElse(null);
+        User kamal = userRepository.findByEmail("kamal@parkiyo.com").orElse(null);
+        User nimali = userRepository.findByEmail("nimali@parkiyo.com").orElse(null);
 
-            vehicleRepository.save(Vehicle.builder()
-                    .licensePlate("ABC-1234").category(VehicleCategory.CAR)
-                    .make("Toyota").model("Prius").color("Silver").year(2023)
-                    .user(kamal).active(true).build());
-
-            vehicleRepository.save(Vehicle.builder()
-                    .licensePlate("DEF-5678").category(VehicleCategory.CAR)
-                    .make("Honda").model("Civic").color("Blue").year(2022)
-                    .user(kamal).active(true).build());
-
-            vehicleRepository.save(Vehicle.builder()
-                    .licensePlate("GHI-9012").category(VehicleCategory.MOTORCYCLE)
-                    .make("Yamaha").model("R15").color("Black").year(2024)
-                    .user(nimali).active(true).build());
+        if (kamal != null) {
+            saveVehicleIfAbsent("ABC-1234", VehicleCategory.CAR, "Toyota", "Prius", "Silver", 2023, kamal);
+            saveVehicleIfAbsent("DEF-5678", VehicleCategory.CAR, "Honda", "Civic", "Blue", 2022, kamal);
         }
+        if (nimali != null) {
+            saveVehicleIfAbsent("GHI-9012", VehicleCategory.MOTORCYCLE, "Yamaha", "R15", "Black", 2024, nimali);
+        }
+    }
+
+    private void saveVehicleIfAbsent(
+            String plate,
+            VehicleCategory category,
+            String make,
+            String model,
+            String color,
+            int year,
+            User user) {
+        if (vehicleRepository.existsByLicensePlate(plate)) {
+            return;
+        }
+        vehicleRepository.save(Vehicle.builder()
+                .licensePlate(plate)
+                .category(category)
+                .make(make)
+                .model(model)
+                .color(color)
+                .year(year)
+                .user(user)
+                .active(true)
+                .build());
     }
 
     private void createSlotsSafely() {
