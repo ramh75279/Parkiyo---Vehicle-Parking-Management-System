@@ -6,6 +6,8 @@ import com.parkiyo.parkiyo.model.Payment;
 import com.parkiyo.parkiyo.model.User;
 import com.parkiyo.parkiyo.enums.Role;
 import com.parkiyo.parkiyo.enums.UserStatus;
+import com.parkiyo.parkiyo.model.Wallet;
+import java.math.BigDecimal;
 import com.parkiyo.parkiyo.repository.AuditLogRepository;
 import com.parkiyo.parkiyo.repository.NotificationRepository;
 import com.parkiyo.parkiyo.repository.ParkingRecordRepository;
@@ -184,7 +186,13 @@ public class UserService {
             user.setRole(Role.USER);
         }
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        // Create a wallet for every new user so wallet page never crashes
+        Wallet wallet = Wallet.builder().user(savedUser).balance(BigDecimal.ZERO).build();
+        walletRepository.save(wallet);
+
+        return savedUser;
     }
 
     @Transactional
