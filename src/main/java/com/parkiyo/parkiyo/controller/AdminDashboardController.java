@@ -34,7 +34,7 @@ public class AdminDashboardController {
     }
 
     @GetMapping("/system-status")
-    public String systemStatus(Model model) {
+    public String systemStatus(Model model, Authentication auth) {
         Runtime runtime = Runtime.getRuntime();
         long usedMemoryMB = (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024);
         long totalMemoryMB = runtime.totalMemory() / (1024 * 1024);
@@ -44,6 +44,7 @@ public class AdminDashboardController {
         model.addAttribute("availableProcessors", runtime.availableProcessors());
         model.addAttribute("totalUsers", userService.getTotalUsers());
         model.addAttribute("activeUsers", userService.countActiveUsers());
+        model.addAttribute("currentUser", userService.getUserByEmail(auth.getName()));
         return "admin/systemstatuspage";
     }
 
