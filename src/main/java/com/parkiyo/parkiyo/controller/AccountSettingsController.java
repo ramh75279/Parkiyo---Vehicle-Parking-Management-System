@@ -30,6 +30,7 @@ public class AccountSettingsController {
     public String adminSettings(Authentication auth, Model model) {
         User user = userService.getUserByEmail(auth.getName());
         model.addAttribute("user", user);
+        model.addAttribute("currentUser", user); // fixes profile pic in header
         ProfileUpdateRequest profileRequest = new ProfileUpdateRequest();
         profileRequest.setFirstName(user.getFirstName());
         profileRequest.setLastName(user.getLastName());
