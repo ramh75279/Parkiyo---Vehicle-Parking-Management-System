@@ -3,6 +3,7 @@ package com.parkiyo.parkiyo.controller;
 import com.parkiyo.parkiyo.dto.ProfileUpdateRequest;
 import com.parkiyo.parkiyo.dto.PasswordChangeRequest;
 import com.parkiyo.parkiyo.dto.NotificationPreferenceRequest;
+import com.parkiyo.parkiyo.model.User;
 import com.parkiyo.parkiyo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,16 @@ public class AccountSettingsController {
 
     @GetMapping("/account/settings")
     public String adminSettings(Authentication auth, Model model) {
-        model.addAttribute("user", userService.getUserByEmail(auth.getName()));
+        User user = userService.getUserByEmail(auth.getName());
+        model.addAttribute("user", user);
+        ProfileUpdateRequest profileRequest = new ProfileUpdateRequest();
+        profileRequest.setFirstName(user.getFirstName());
+        profileRequest.setLastName(user.getLastName());
+        profileRequest.setPhone(user.getPhone());
+        model.addAttribute("profileRequest", profileRequest);
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+        model.addAttribute("isAdmin", isAdmin);
         return "account/accountsetting";
     }
 
