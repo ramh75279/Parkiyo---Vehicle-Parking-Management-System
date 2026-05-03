@@ -104,36 +104,40 @@
                 <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Parkiyo Control Center</p>
             </div>
             <div class="flex items-center gap-6">
+                <!-- Search -->
                 <div class="hidden xl:flex items-center h-12 w-80 rounded-2xl px-4 search-glass">
                     <span class="material-symbols-outlined text-slate-500">search</span>
                     <input type="text" placeholder="Search plate, slot, user..." class="bg-transparent border-none focus:ring-0 w-full text-sm text-white placeholder:text-slate-500 px-3">
                 </div>
+
+                <!-- Revenue -->
                 <div class="hidden md:flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2">
                     <span class="material-symbols-outlined text-emerald-400 text-base">account_balance_wallet</span>
                     <span class="text-[11px] font-black uppercase tracking-[0.16em] text-emerald-400">Rs. [[${stats.totalRevenue}]]</span>
                 </div>
-                <div class="relative">
-                    <span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-white transition-colors" onclick="openNotif()">notifications</span>
+
+                <!-- Notifications -->
+                <div class="relative cursor-pointer" onclick="openNotif()">
+                    <span class="material-symbols-outlined text-slate-400 hover:text-white transition-colors">notifications</span>
                     <span class="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full ring-4 ring-background-dark"></span>
                 </div>
+
                 <div class="h-8 w-[1px] bg-white/10"></div>
+
+                <!-- Profile -->
                 <div class="flex items-center gap-4">
                     <div class="text-right">
-                        <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Alex Johnson'"></p>
+                        <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Admin'"></p>
                         <p class="text-[10px] text-primary font-bold uppercase tracking-tighter" th:text="${currentUser?.role} ?: 'ADMIN'"></p>
                     </div>
-                    <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-primary to-blue-400 p-[2px] overflow-hidden">
-                        <div class="h-full w-full rounded-squircle bg-background-dark flex items-center justify-center overflow-hidden">
-                            <!-- Profile Picture -->
-                            <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
-                                 th:src="@{${currentUser.profilePicturePath}}"
-                                 class="h-full w-full object-cover"
-                                 alt="Profile"
-                                 onerror="this.style.display='none'; this.parentElement.innerHTML = '<span class=\'material-symbols-outlined text-white/50\'>person</span>'"/>
-                            <!-- Default Icon -->
-                            <span th:unless="${currentUser != null and currentUser.profilePicturePath != null}"
-                                  class="material-symbols-outlined text-white/50">person</span>
-                        </div>
+                    <div class="h-10 w-10 rounded-2xl overflow-hidden ring-2 ring-white/20 shadow-lg cursor-pointer hover:ring-primary transition-all">
+                        <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
+                             th:src="@{${currentUser.profilePicturePath}}"
+                             class="h-full w-full object-cover"
+                             alt="Profile"
+                             onerror="this.style.display='none'; this.parentElement.innerHTML = '<span class=\'material-symbols-outlined text-white text-2xl flex items-center justify-center h-full w-full\'>person</span>'"/>
+                        <span th:unless="${currentUser != null and currentUser.profilePicturePath != null}"
+                              class="material-symbols-outlined text-white/70 text-2xl flex items-center justify-center h-full w-full">person</span>
                     </div>
                 </div>
             </div>
