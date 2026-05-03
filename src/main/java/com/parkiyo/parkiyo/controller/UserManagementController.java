@@ -30,11 +30,11 @@ public class UserManagementController {
     public String userList(@RequestParam(required = false) String search,
                            @RequestParam(required = false) String role,
                            @RequestParam(required = false) String status,
+                           @RequestParam(defaultValue = "0") int page,
+                           @RequestParam(defaultValue = "20") int size,
                            Model model) {
 
-        // Fixed: Create proper Pageable instead of passing null
-        Pageable pageable = PageRequest.of(0, 50); // Page 0, 50 users per page
-
+        Pageable pageable = PageRequest.of(page, size);
         var usersPage = userService.getAllUsersPaginated(pageable, search, role, status);
 
         model.addAttribute("users", usersPage.getContent());
@@ -42,6 +42,14 @@ public class UserManagementController {
         model.addAttribute("activeUsers", userService.countActiveUsers());
         model.addAttribute("adminUsers", userService.countAdmins());
         model.addAttribute("usersOnPage", usersPage.getNumberOfElements());
+        model.addAttribute("currentPage", usersPage.getNumber());
+        model.addAttribute("totalPages", usersPage.getTotalPages());
+        model.addAttribute("hasPrevious", usersPage.hasPrevious());
+        model.addAttribute("hasNext", usersPage.hasNext());
+        model.addAttribute("search", search);
+        model.addAttribute("role", role);
+        model.addAttribute("status", status);
+        model.addAttribute("size", size);
 
         return "admin/usermanagement";
     }
