@@ -51,7 +51,7 @@ public class UserService {
     private final NotificationRepository notificationRepository;
     private final AuditLogRepository auditLogRepository;
 
-    @Value("${app.upload.dir:./uploads/profiles}")
+    @Value("${parkiyo.upload.dir}")
     private String uploadDir;
 
     @Value("${parkiyo.app-base-url:http://localhost:8080}")
