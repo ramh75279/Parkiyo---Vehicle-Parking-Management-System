@@ -174,7 +174,6 @@ public class UserService {
         user.setPhone(request.getPhone());
         user.setStatus(UserStatus.ACTIVE);
 
-        // Safe Role Setting
         if (request.getRole() != null && !request.getRole().toString().isBlank()) {
             try {
                 user.setRole(Role.valueOf(request.getRole().toString().trim().toUpperCase()));
@@ -210,6 +209,15 @@ public class UserService {
             }
         }
 
+        // Safe Status Setting
+        if (request.getStatus() != null && !request.getStatus().isBlank()) {
+            try {
+                user.setStatus(UserStatus.valueOf(request.getStatus().trim().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new BadRequestException("Invalid status: " + request.getStatus());
+            }
+        }
+
         return userRepository.save(user);
     }
 
@@ -229,19 +237,12 @@ public class UserService {
                 walletTransactionRepository.deleteByWallet_Id(w.getId()));
 
         paymentRepository.deleteAll(payments);
-
         reservationRepository.deleteByUser_Id(userId);
-
         parkingRecordRepository.deleteAllLinkedToUser(userId);
-
         vehicleRepository.deleteAllForUser(userId);
-
         notificationRepository.deleteByUser_Id(userId);
-
         auditLogRepository.deleteByPerformedBy_Id(userId);
-
         walletRepository.findByUser_Id(userId).ifPresent(walletRepository::delete);
-
         userRepository.delete(user);
     }
 
@@ -261,7 +262,6 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Page<User> getAllUsersPaginated(Pageable pageable, String search, String role, String status) {
-        // TODO: Later improve with actual filtering using custom repository query
         return userRepository.findAll(pageable);
     }
 

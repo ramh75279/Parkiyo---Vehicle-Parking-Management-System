@@ -9,7 +9,6 @@ public class EditUserRequest {
     private String lastName;
     private String phone;
     private String role;
-
-    // Add this line
-    private String email;   // Important for update
+    private String email;
+    private String status;
 }
