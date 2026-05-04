@@ -23,9 +23,24 @@ public class SlotController {
     @GetMapping
     public String slotList(@RequestParam(required = false) String status,
                            @RequestParam(required = false) String zone,
+                           @RequestParam(required = false) String search,
                            Model model) {
-        model.addAttribute("slots", slotService.getSlots(status, zone));
+        var slots = slotService.getSlots(status, zone);
+
+        // Apply search filter if provided
+        if (search != null && !search.isBlank()) {
+            String q = search.toLowerCase();
+            slots = slots.stream()
+                    .filter(s -> (s.getSlotNumber() != null && s.getSlotNumber().toLowerCase().contains(q))
+                            || (s.getZone() != null && s.getZone().toLowerCase().contains(q)))
+                    .toList();
+        }
+
+        model.addAttribute("slots", slots);
         model.addAttribute("zones", slotService.getAllZones());
+        model.addAttribute("search", search);
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("selectedZone", zone);
         return "slots/slot-list";
     }
 
@@ -34,6 +49,7 @@ public class SlotController {
     public String slotOverview(Model model) {
         model.addAttribute("overview", slotService.getSlotOverview());
         model.addAttribute("zones", slotService.getZoneSummaries());
+        model.addAttribute("slots", slotService.getSlots(null, null));
         return "slots/slot-overview";
     }
 
