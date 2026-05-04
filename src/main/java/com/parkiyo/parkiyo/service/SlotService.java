@@ -103,8 +103,10 @@ public class SlotService {
         ParkingSlot slot = ParkingSlot.builder()
                 .slotNumber(request.getSlotNumber())
                 .zone(request.getZone())
+                .floor(request.getFloor())
                 .status(SlotStatus.AVAILABLE)
                 .hourlyRate(request.getHourlyRate())
+                .description(request.getDescription())
                 .build();
         slotRepository.save(slot);
 
@@ -125,7 +127,9 @@ public class SlotService {
         ParkingSlot slot = getSlotById(id);
         slot.setSlotNumber(request.getSlotNumber());
         slot.setZone(request.getZone());
+        slot.setFloor(request.getFloor());
         slot.setHourlyRate(request.getHourlyRate());
+        slot.setDescription(request.getDescription());
         slotRepository.save(slot);
     }
 
