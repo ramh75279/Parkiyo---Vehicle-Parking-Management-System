@@ -36,7 +36,6 @@ public class SecurityConfig {
         http
                 .authenticationProvider(authenticationProvider())
 
-                // CSRF Protection
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
@@ -48,6 +47,7 @@ public class SecurityConfig {
                                 "/faq", "/privacy",
                                 "/sign-in", "/perform-login", "/login",
                                 "/register", "/forgot-password", "/reset-password",
+                                "/verify-email",
                                 "/access-denied",
                                 "/uploads/**", "/css/**", "/js/**", "/images/**", "/webjars/**"
                         ).permitAll()
@@ -91,18 +91,16 @@ public class SecurityConfig {
                         .permitAll()
                 )
 
-                // Session Management - Fixed for Spring Security 6
                 .sessionManagement(session -> session
-                        .maximumSessions(1)                    // Only one active session
+                        .maximumSessions(1)
                         .expiredUrl("/sign-in?expired=true")
                 )
 
-                // Security Headers & Exception Handling
                 .exceptionHandling(ex -> ex
                         .accessDeniedPage("/access-denied")
                 )
                 .headers(headers -> headers
-                        .frameOptions(frame -> frame.sameOrigin())   // For H2 console if used
+                        .frameOptions(frame -> frame.sameOrigin())
                 );
 
         return http.build();

@@ -44,11 +44,8 @@ public class DataBootstrapper {
         }
 
         log.info("🚀 Parkiyo Bootstrap Starting...");
-
-        // Create Admin
         createAdminIfNotExists();
 
-        // Seed slots only if enabled and none exist
         if (properties.isDemoSlotsEnabled() && slotRepository.count() == 0) {
             seedDemoSlots();
         }
@@ -71,12 +68,12 @@ public class DataBootstrapper {
                 .status(UserStatus.ACTIVE)
                 .emailNotificationsEnabled(true)
                 .smsNotificationsEnabled(true)
+                .emailVerified(true)
                 .build();
 
         userRepository.save(admin);
         log.info("✅ Admin user created: {}", admin.getEmail());
 
-        // Create wallet for admin
         Wallet wallet = Wallet.builder().user(admin).balance(BigDecimal.valueOf(5000)).build();
         walletRepository.save(wallet);
         log.info("💰 Admin wallet created with balance 5000");
