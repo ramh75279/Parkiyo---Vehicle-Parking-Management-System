@@ -102,7 +102,7 @@ public class UserService {
             validateImageFile(file);
             String filename = saveProfilePicture(file);
             deleteOldProfilePicture(user.getProfilePicturePath());
-            user.setProfilePicturePath("/uploads/profiles/" + filename);
+            user.setProfilePicturePath("/uploads/" + filename);
         }
 
         return userRepository.save(user);
