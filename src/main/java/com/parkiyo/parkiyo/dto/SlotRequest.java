@@ -8,5 +8,8 @@ import java.math.BigDecimal;
 public class SlotRequest {
     private String slotNumber;
     private String zone;
+    private String floor;
     private BigDecimal hourlyRate;
+    private String description;
+    private boolean active = true;
 }
