@@ -2,6 +2,7 @@ package com.parkiyo.parkiyo.service;
 
 import com.parkiyo.parkiyo.dto.DashboardStats;
 import com.parkiyo.parkiyo.dto.SlotOccupancySummary;
+import com.parkiyo.parkiyo.enums.SlotStatus;
 import com.parkiyo.parkiyo.model.Notification;
 import com.parkiyo.parkiyo.model.ParkingRecord;
 import com.parkiyo.parkiyo.repository.NotificationRepository;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -55,10 +58,13 @@ public class DashboardService {
         long occupied = slotRepository.countByStatusOccupied();
         double occupancyRate = total > 0 ? (occupied * 100.0 / total) : 0.0;
 
+        int reserved = (int) slotRepository.countByStatus(SlotStatus.RESERVED);
+
         return SlotOccupancySummary.builder()
                 .total((int) total)
                 .occupied((int) occupied)
                 .available((int) (total - occupied))
+                .reserved(reserved)
                 .occupancyRate(Math.round(occupancyRate * 10) / 10.0)
                 .build();
     }
@@ -93,5 +99,24 @@ public class DashboardService {
 
     public List<ParkingRecord> getUserPendingPayments(String email) {
         return parkingRecordRepository.findPendingPaymentsByUser(email);
+    }
+
+    public long countUserEntriesToday(String email) {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
+        return parkingRecordRepository.countUserEntriesBetween(email, start, end);
+    }
+
+    public long countUserExitsToday(String email) {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
+        return parkingRecordRepository.countUserExitsBetween(email, start, end);
+    }
+
+    /** Distinct sessions the user started or ended today (for dashboard throughput). */
+    public long countUserParkingTouchToday(String email) {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
+        return parkingRecordRepository.countUserParkingTouchBetween(email, start, end);
     }
 }

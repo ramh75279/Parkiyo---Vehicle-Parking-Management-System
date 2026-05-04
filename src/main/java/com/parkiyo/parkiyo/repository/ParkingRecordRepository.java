@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,4 +80,23 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
     @Query("DELETE FROM ParkingRecord pr WHERE (pr.user IS NOT NULL AND pr.user.id = :userId) " +
             "OR (pr.vehicle.user IS NOT NULL AND pr.vehicle.user.id = :userId)")
     void deleteAllLinkedToUser(@Param("userId") Long userId);
+
+    @Query("SELECT COUNT(pr) FROM ParkingRecord pr WHERE pr.user.email = :email " +
+            "AND pr.entryTime >= :start AND pr.entryTime < :end")
+    long countUserEntriesBetween(@Param("email") String email,
+                                 @Param("start") LocalDateTime start,
+                                 @Param("end") LocalDateTime end);
+
+    @Query("SELECT COUNT(pr) FROM ParkingRecord pr WHERE pr.user.email = :email " +
+            "AND pr.exitTime IS NOT NULL AND pr.exitTime >= :start AND pr.exitTime < :end")
+    long countUserExitsBetween(@Param("email") String email,
+                               @Param("start") LocalDateTime start,
+                               @Param("end") LocalDateTime end);
+
+    @Query("SELECT COUNT(DISTINCT pr.id) FROM ParkingRecord pr WHERE pr.user.email = :email " +
+            "AND ((pr.entryTime >= :start AND pr.entryTime < :end) " +
+            "OR (pr.exitTime IS NOT NULL AND pr.exitTime >= :start AND pr.exitTime < :end))")
+    long countUserParkingTouchBetween(@Param("email") String email,
+                                      @Param("start") LocalDateTime start,
+                                      @Param("end") LocalDateTime end);
 }
