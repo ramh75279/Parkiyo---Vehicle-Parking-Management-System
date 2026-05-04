@@ -13,4 +13,9 @@ public class RegisterRequest {
     private String phone;
     @NotBlank private String password;
     @NotBlank private String confirmPassword;
+
+    // Alias so the HTML form field "confirmPw" binds to confirmPassword
+    public void setConfirmPw(String confirmPw) {
+        this.confirmPassword = confirmPw;
+    }
 }
