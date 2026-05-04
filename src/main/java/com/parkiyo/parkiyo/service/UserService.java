@@ -133,7 +133,7 @@ public class UserService {
             Path oldFile = Paths.get(uploadDir, filename);
             Files.deleteIfExists(oldFile);
         } catch (Exception e) {
-            System.err.println("Could not delete old profile picture: " + e.getMessage());
+            log.warn("Could not delete old profile picture: {}", e.getMessage());
         }
     }
 

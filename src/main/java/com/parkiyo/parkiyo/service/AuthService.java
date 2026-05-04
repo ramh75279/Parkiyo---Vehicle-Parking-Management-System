@@ -9,6 +9,7 @@ import com.parkiyo.parkiyo.model.Wallet;
 import com.parkiyo.parkiyo.repository.UserRepository;
 import com.parkiyo.parkiyo.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -26,6 +27,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService implements UserDetailsService {
@@ -46,7 +48,6 @@ public class AuthService implements UserDetailsService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    // Spring Security calls this on every login
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
@@ -56,7 +57,6 @@ public class AuthService implements UserDetailsService {
             throw new UsernameNotFoundException("Account is " + user.getStatus().name().toLowerCase());
         }
 
-        // Block login if email not verified
         if (!user.isEmailVerified()) {
             throw new UsernameNotFoundException("Email not verified. Please check your inbox.");
         }
@@ -95,11 +95,9 @@ public class AuthService implements UserDetailsService {
 
         userRepository.save(user);
 
-        // Auto-create wallet
         Wallet wallet = Wallet.builder().user(user).balance(java.math.BigDecimal.ZERO).build();
         walletRepository.save(wallet);
 
-        // Send verification email
         sendVerificationEmail(user.getEmail(), verificationToken);
     }
 
@@ -122,7 +120,7 @@ public class AuthService implements UserDetailsService {
         try {
             mailSender.send(message);
         } catch (Exception e) {
-            System.err.println("Failed to send verification email: " + e.getMessage());
+            log.warn("Failed to send verification email to {}: {}", email, e.getMessage());
         }
     }
 

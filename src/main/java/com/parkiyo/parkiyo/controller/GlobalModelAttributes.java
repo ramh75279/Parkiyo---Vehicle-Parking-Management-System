@@ -3,10 +3,12 @@ package com.parkiyo.parkiyo.controller;
 import com.parkiyo.parkiyo.model.User;
 import com.parkiyo.parkiyo.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+@Slf4j
 @ControllerAdvice
 @RequiredArgsConstructor
 public class GlobalModelAttributes {
@@ -25,7 +27,7 @@ public class GlobalModelAttributes {
         try {
             return userService.getUserByEmail(authentication.getName());
         } catch (Exception e) {
-            System.err.println("Failed to load currentUser for: " + authentication.getName());
+            log.warn("Failed to load currentUser for: {}", authentication.getName());
             return null;
         }
     }
