@@ -2,6 +2,7 @@ package com.parkiyo.parkiyo.controller;
 
 import com.parkiyo.parkiyo.model.Payment;
 import com.parkiyo.parkiyo.service.PaymentService;
+import com.parkiyo.parkiyo.service.UserService;
 import com.parkiyo.parkiyo.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,12 +16,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class PaymentController {
 
     private final PaymentService paymentService;
     private final WalletService walletService;
+    private final UserService userService;
 
     // ─── USER ────────────────────────────────────────────────────────────────
 
@@ -75,18 +81,69 @@ public class PaymentController {
     @PreAuthorize("isAuthenticated()")
     public String userPaymentHistory(
             @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String method,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
             Authentication auth,
             Model model) {
+        String email = auth.getName();
+        LocalDate fromDate = null;
+        LocalDate toDate = null;
+        try {
+            if (from != null && !from.isBlank()) {
+                fromDate = LocalDate.parse(from);
+            }
+            if (to != null && !to.isBlank()) {
+                toDate = LocalDate.parse(to);
+            }
+        } catch (Exception ignored) {
+            fromDate = null;
+            toDate = null;
+        }
         int pageSize = 6;
         Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Payment> paymentPage = paymentService.getUserPaymentHistoryPaginated(auth.getName(), pageable);
+        Page<Payment> paymentPage = paymentService.getUserPaymentHistoryFiltered(
+                email, q, status, method, fromDate, toDate, pageable);
 
         model.addAttribute("payments", paymentPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", paymentPage.getTotalPages());
         model.addAttribute("totalPayments", paymentPage.getTotalElements());
         model.addAttribute("pageSize", pageSize);
-        model.addAttribute("totalSpent", paymentService.getUserTotalSpent(auth.getName()));
+        model.addAttribute("totalSpent", paymentService.getUserTotalSpent(email));
+        model.addAttribute("spentThisMonth", paymentService.getUserSpentInCurrentMonth(email));
+        model.addAttribute("thisMonthLabel", paymentService.getCurrentMonthDisplayLabel());
+        model.addAttribute("allTimeTxnCount", paymentService.countAllUserPayments(email));
+        model.addAttribute("avgPerTxn", paymentService.getUserAverageSuccessfulPayment(email));
+        model.addAttribute("monthlyBars", paymentService.getLastSixMonthlySpendBars(email));
+        model.addAttribute("search", q != null ? q : "");
+        model.addAttribute("statusFilter", status != null ? status : "ALL");
+        model.addAttribute("methodFilter", method != null ? method : "ALL");
+        model.addAttribute("dateFrom", fromDate);
+        model.addAttribute("dateTo", toDate);
+        model.addAttribute("currentUser", userService.getUserByEmail(email));
+
+        long total = paymentPage.getTotalElements();
+        int displayFrom = total == 0 ? 0 : page * pageSize + 1;
+        int displayTo = total == 0 ? 0 : page * pageSize + paymentPage.getNumberOfElements();
+        model.addAttribute("displayFrom", displayFrom);
+        model.addAttribute("displayTo", displayTo);
+
+        int tp = (int) paymentPage.getTotalPages();
+        List<Integer> pageNumbers = new ArrayList<>();
+        if (tp > 0) {
+            int window = 5;
+            int start = Math.max(0, page - window / 2);
+            int end = Math.min(tp - 1, start + window - 1);
+            start = Math.max(0, end - window + 1);
+            for (int i = start; i <= end; i++) {
+                pageNumbers.add(i);
+            }
+        }
+        model.addAttribute("pageNumbers", pageNumbers);
+
         return "payments/paymenthistory-user";
     }
 

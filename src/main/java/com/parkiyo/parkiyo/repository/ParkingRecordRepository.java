@@ -48,9 +48,28 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
     List<ParkingRecord> findByParkingSlot_Id(Long slotId);
     List<ParkingRecord> findByUserEmail(String email);
     List<ParkingRecord> findByUserEmailAndActiveTrue(String email);
+
+    /**
+     * Active sessions the user may exit: entered under their account or owning the vehicle.
+     * Fetches vehicle and slot for rendering with open-in-view disabled.
+     */
+    @Query("SELECT DISTINCT pr FROM ParkingRecord pr " +
+            "JOIN FETCH pr.vehicle v " +
+            "LEFT JOIN FETCH pr.parkingSlot " +
+            "WHERE pr.active = true AND (pr.user.email = :email OR (v.user IS NOT NULL AND v.user.email = :email))")
+    List<ParkingRecord> findActiveRecordsVisibleToUser(@Param("email") String email);
+
     List<ParkingRecord> findByActiveTrue();
 
     Optional<ParkingRecord> findByIdAndUserEmail(Long id, String email);
+
+    @Query("SELECT pr FROM ParkingRecord pr " +
+            "JOIN FETCH pr.vehicle v " +
+            "LEFT JOIN FETCH v.user " +
+            "LEFT JOIN FETCH pr.user " +
+            "WHERE pr.id = :id AND pr.active = true " +
+            "AND (pr.user.email = :email OR (v.user IS NOT NULL AND v.user.email = :email))")
+    Optional<ParkingRecord> findActiveByIdVisibleToAccount(@Param("id") Long id, @Param("email") String email);
 
     @Query(value = "SELECT * FROM parking_records WHERE user_id = " +
             "(SELECT id FROM users WHERE email = :email) " +

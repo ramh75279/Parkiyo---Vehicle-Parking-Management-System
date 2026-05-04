@@ -15,7 +15,7 @@ public class ParkingService {
     private final ParkingRecordRepository parkingRecordRepository;
 
     public List<ParkingRecord> getActiveRecordsByUser(String email) {
-        return parkingRecordRepository.findByUserEmailAndActiveTrue(email);
+        return parkingRecordRepository.findActiveRecordsVisibleToUser(email);
     }
 
     public List<ParkingRecord> getAllActiveRecords() {
@@ -42,6 +42,12 @@ public class ParkingService {
     public ParkingRecord getRecordById(Long id) {
         return parkingRecordRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Parking record not found."));
+    }
+
+    /** Active record the account may exit (operator or registered vehicle owner). */
+    public ParkingRecord getActiveRecordForExit(Long recordId, String email) {
+        return parkingRecordRepository.findActiveByIdVisibleToAccount(recordId, email)
+                .orElseThrow(() -> new RuntimeException("Parking record not found or you do not have access."));
     }
 
     public Map<String, Object> getTicket(Long recordId, String email) {

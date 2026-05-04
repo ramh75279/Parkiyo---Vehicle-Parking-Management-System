@@ -285,8 +285,11 @@
         <div class="flex-1 overflow-y-auto p-10">
             <div class="max-w-2xl mx-auto space-y-8">
 
+                <div th:if="${error}" class="rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm font-bold text-rose-200" th:text="${error}">Error</div>
+                <div th:if="${success}" class="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-bold text-emerald-200" th:text="${success}">Success</div>
+
                 <!-- Form Wrapper -->
-                <form id="exitForm" th:action="@{/exit}" th:object="${exitRequest}" method="post">
+                <form id="exitForm" th:action="@{/exit/process}" th:object="${exitRequest}" method="post">
 
                 <!-- Step 1: Plate lookup -->
                 <div class="glass-card rounded-[2.5rem] p-8" id="step1">
