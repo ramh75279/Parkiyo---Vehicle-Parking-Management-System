@@ -4,100 +4,461 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Parkiyo | User Dashboard</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#1f68f9",
+                        "background-dark": "#020617",
+                    },
+                    fontFamily: {
+                        display: ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        squircle: "14px",
+                        xl: "1.5rem",
+                        "2xl": "2.1rem",
+                        "3xl": "3rem",
+                    },
+                },
+            },
+        };
+    </script>
     <style>
-        body { font-family: 'Public Sans', sans-serif; background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%); }
-        .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.09); }
+        body { font-family: 'Public Sans', sans-serif; background-color: #020617; }
+        .premium-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .bg-subtle-radial { background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); }
+
+        .sidebar-container {
+            width: 80px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(2, 6, 23, 0.6);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .sidebar-container:hover {
+            width: 280px;
+            background: rgba(2, 6, 23, 0.95);
+        }
+        .nav-label {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            margin-left: 1rem;
+        }
+        .sidebar-container:hover .nav-label {
+            opacity: 1;
+        }
+
+        .status-pill {
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .status-active { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .status-exited { background: rgba(244, 63, 94, 0.1); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.2); }
+        .status-paid { background: rgba(31, 104, 249, 0.1); color: #60a5fa; border: 1px solid rgba(31, 104, 249, 0.2); }
+        .status-unpaid { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+
+        .search-glass {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        ::-webkit-scrollbar { width: 5px;display: none; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+        a { cursor: pointer; }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen">
-<main class="max-w-7xl mx-auto px-5 md:px-8 py-8 space-y-6">
-    <header class="flex items-center justify-between gap-4 flex-wrap">
-        <div>
-            <h1 class="text-2xl font-black">Welcome, <span th:text="${currentUser.firstName}">User</span></h1>
-            <p class="text-xs uppercase tracking-[0.2em] text-slate-500 mt-1">Real-time parking dashboard</p>
-        </div>
-        <div class="text-right">
-            <p class="text-xs font-black uppercase" th:text="${currentUser.fullName}">Full Name</p>
-            <p class="text-[10px] text-blue-400 font-bold uppercase" th:text="${currentUser.role}">USER</p>
-        </div>
-    </header>
+<body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
 
-    <section class="grid md:grid-cols-4 gap-4">
-        <div class="card rounded-2xl p-5">
-            <p class="text-[10px] uppercase tracking-widest text-slate-500 font-black">Available Slots</p>
-            <p class="text-2xl font-black mt-2" th:text="${slotSummary.available}">0</p>
-        </div>
-        <div class="card rounded-2xl p-5">
-            <p class="text-[10px] uppercase tracking-widest text-slate-500 font-black">My Recent Sessions</p>
-            <p class="text-2xl font-black mt-2" th:text="${#lists.size(recentParking)}">0</p>
-        </div>
-        <div class="card rounded-2xl p-5">
-            <p class="text-[10px] uppercase tracking-widest text-slate-500 font-black">Pending Payments</p>
-            <p class="text-2xl font-black mt-2 text-amber-300" th:text="${#lists.size(pendingPayments)}">0</p>
-        </div>
-        <div class="card rounded-2xl p-5">
-            <p class="text-[10px] uppercase tracking-widest text-slate-500 font-black">Wallet Balance</p>
-            <p class="text-2xl font-black mt-2 text-emerald-300">Rs. <span th:text="${#numbers.formatDecimal(walletBalance, 1, 2)}">0.00</span></p>
-        </div>
-    </section>
+    <div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
 
-    <section class="grid lg:grid-cols-3 gap-4">
-        <div class="card rounded-2xl p-5">
-            <h2 class="text-sm font-black uppercase tracking-widest text-slate-400">Quick Actions</h2>
-            <div class="mt-4 grid grid-cols-2 gap-3 text-xs font-black">
-                <a class="bg-blue-600/20 border border-blue-500/40 text-blue-300 px-3 py-2 rounded-xl text-center" th:href="@{/entry}">Vehicle Entry</a>
-                <a class="bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 px-3 py-2 rounded-xl text-center" th:href="@{/exit}">Vehicle Exit</a>
-                <a class="bg-amber-600/20 border border-amber-500/40 text-amber-300 px-3 py-2 rounded-xl text-center" th:href="@{/payments/history}">Payments</a>
-                <a class="bg-violet-600/20 border border-violet-500/40 text-violet-300 px-3 py-2 rounded-xl text-center" th:href="@{/settings/profile}">Settings</a>
+    <div class="flex flex-1 overflow-hidden">
+        <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
+            <div class="p-6 mb-4 flex items-center">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+                    <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
+                </div>
+                <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+            </div>
+
+            <nav class="flex-1 px-3 space-y-2 overflow-y-auto">
+                <a th:href="@{/dashboard/user}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
+                    <span class="material-symbols-outlined shrink-0">dashboard</span>
+                    <span class="nav-label text-sm">Dashboard</span>
+                </a>
+                <a th:href="@{/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">login</span>
+                    <span class="nav-label text-sm">Vehicle Entry</span>
+                </a>
+                <a th:href="@{/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">logout</span>
+                    <span class="nav-label text-sm">Vehicle Exit</span>
+                </a>
+                <a th:href="@{/parking}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">local_parking</span>
+                    <span class="nav-label text-sm">Active Parking</span>
+                </a>
+                <a th:href="@{/reservation}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">event_available</span>
+                    <span class="nav-label text-sm">Reservation</span>
+                </a>
+                <a th:href="@{/payments/history}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">payments</span>
+                    <span class="nav-label text-sm">Payments</span>
+                </a>
+                <a th:href="@{/receipts}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">receipt_long</span>
+                    <span class="nav-label text-sm">Receipts</span>
+                </a>
+                <a th:href="@{/wallet/overview}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">account_balance_wallet</span>
+                    <span class="nav-label text-sm">Wallet</span>
+                </a>
+                <a th:href="@{/notifications}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">notifications</span>
+                    <span class="nav-label text-sm">Notifications</span>
+                </a>
+                <a th:href="@{/account/settings}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">settings</span>
+                    <span class="nav-label text-sm">Account Settings</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-white/5">
+                <a th:href="@{/logout}" class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                    <span class="material-symbols-outlined shrink-0">power_settings_new</span>
+                    <span class="nav-label">Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
+            <header class="h-20 border-b border-white/5 flex items-center justify-between px-6 lg:px-10 bg-background-dark/30 premium-blur shrink-0">
+                <div>
+                    <h2 class="text-xl font-black text-white">User Dashboard</h2>
+                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Parkiyo Operations Panel</p>
+                </div>
+
+                <div class="flex items-center gap-4 lg:gap-6">
+                    <form th:action="@{/parking}" method="get" class="hidden xl:flex items-center h-12 w-80 rounded-2xl px-4 search-glass gap-0">
+                        <span class="material-symbols-outlined text-slate-500 shrink-0">search</span>
+                        <input type="search" name="q" placeholder="Search plate, slot, receipt..." class="bg-transparent border-none focus:ring-0 w-full text-sm text-white placeholder:text-slate-500 px-3"/>
+                    </form>
+
+                    <a th:href="@{/wallet/overview}" class="hidden md:flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 hover:bg-emerald-500/15 transition-colors">
+                        <span class="material-symbols-outlined text-emerald-400 text-base">account_balance_wallet</span>
+                        <span class="text-[11px] font-black uppercase tracking-[0.16em] text-emerald-400">Rs. <span th:text="${#numbers.formatDecimal(walletBalance, 1, 2)}">0.00</span></span>
+                    </a>
+
+                    <div class="relative">
+                        <button type="button" class="p-1 rounded-lg hover:bg-white/5 transition-colors" onclick="openNotif()" aria-label="Open notifications">
+                            <span class="material-symbols-outlined text-slate-400 hover:text-white transition-colors">notifications</span>
+                        </button>
+                        <span th:if="${notificationUnreadCount > 0}" class="absolute top-0 right-0 h-2 w-2 bg-primary rounded-full ring-4 ring-background-dark"></span>
+                    </div>
+
+                    <div class="h-8 w-[1px] bg-white/10 hidden sm:block"></div>
+
+                    <div class="flex items-center gap-3 lg:gap-4">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'User'">User</p>
+                            <p class="text-[10px] text-primary font-bold uppercase tracking-tighter" th:text="${currentUser?.role}">USER</p>
+                        </div>
+                        <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-primary to-blue-400 p-[2px] shrink-0">
+                            <div class="h-full w-full rounded-squircle bg-background-dark flex items-center justify-center overflow-hidden">
+                                <span class="material-symbols-outlined text-white/50">person</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-6 lg:p-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
+                        <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/[0.02] group-hover:text-primary/5 transition-all">check_circle</span>
+                        <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Available Slots</p>
+                        <h3 class="text-3xl font-black text-white" th:text="${slotSummary.available}">0</h3>
+                        <p class="text-slate-500 text-[10px] font-bold mt-2 tracking-wide">Ready for new entries</p>
+                    </div>
+
+                    <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
+                        <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/[0.02] group-hover:text-primary/5 transition-all">directions_car</span>
+                        <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Active Sessions</p>
+                        <h3 class="text-3xl font-black text-white" th:text="${slotSummary.occupied}">0</h3>
+                        <p class="text-slate-500 text-[10px] font-bold mt-2 tracking-wide">Currently parked vehicles</p>
+                    </div>
+
+                    <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
+                        <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/[0.02] group-hover:text-primary/5 transition-all">payments</span>
+                        <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Pending Payments</p>
+                        <h3 class="text-3xl font-black text-white" th:text="${#lists.size(pendingPayments)}">0</h3>
+                        <p class="text-amber-400 text-[10px] font-bold mt-2 tracking-wide" th:if="${#lists.size(pendingPayments) > 0}">Needs attention</p>
+                        <p class="text-slate-500 text-[10px] font-bold mt-2 tracking-wide" th:if="${#lists.isEmpty(pendingPayments)}">You are all caught up</p>
+                    </div>
+
+                    <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
+                        <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/[0.02] group-hover:text-primary/5 transition-all">task_alt</span>
+                        <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Your Activity Today</p>
+                        <h3 class="text-3xl font-black text-primary" th:text="${userParkingTouchToday}">0</h3>
+                        <p class="text-slate-500 text-[10px] font-bold mt-2 tracking-wide">Sessions you started or closed today</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+                    <div class="glass-card rounded-[2.5rem] p-8 lg:col-span-1">
+                        <h3 class="text-lg font-black text-white mb-6">Quick Actions</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <a th:href="@{/entry}" class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:bg-primary/15 transition">
+                                <span class="material-symbols-outlined text-white mb-2">login</span>
+                                <p class="text-xs font-black uppercase tracking-widest text-white">New Entry</p>
+                            </a>
+                            <a th:href="@{/exit}" class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:bg-white/10 transition">
+                                <span class="material-symbols-outlined text-white mb-2">logout</span>
+                                <p class="text-xs font-black uppercase tracking-widest text-white">Process Exit</p>
+                            </a>
+                            <a th:href="@{/reservations/slot-selection}" class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:bg-white/10 transition">
+                                <span class="material-symbols-outlined text-white mb-2">grid_view</span>
+                                <p class="text-xs font-black uppercase tracking-widest text-white">Assign Slot</p>
+                            </a>
+                            <a th:href="@{/parking}" class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:bg-white/10 transition">
+                                <span class="material-symbols-outlined text-white mb-2">payments</span>
+                                <p class="text-xs font-black uppercase tracking-widest text-white">Take Payment</p>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 glass-card rounded-[2.5rem] overflow-hidden">
+                        <div class="p-8 border-b border-white/5 flex items-center justify-between gap-4">
+                            <h3 class="text-lg font-black text-white">Recent Parking Activity</h3>
+                            <a th:href="@{/parking}" class="text-primary text-[10px] font-black uppercase tracking-widest hover:brightness-125 shrink-0">View All</a>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left min-w-[640px]">
+                                <thead>
+                                    <tr class="text-slate-500 text-[10px] font-black uppercase tracking-widest">
+                                        <th class="px-6 lg:px-8 py-5">Plate Number</th>
+                                        <th class="px-6 lg:px-8 py-5">Slot</th>
+                                        <th class="px-6 lg:px-8 py-5">Time</th>
+                                        <th class="px-6 lg:px-8 py-5">Status</th>
+                                        <th class="px-6 lg:px-8 py-5">Payment</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm font-bold text-slate-300 divide-y divide-white/5">
+                                    <tr th:if="${#lists.isEmpty(recentParking)}">
+                                        <td class="px-6 lg:px-8 py-8 text-slate-500 font-medium" colspan="5">No parking activity yet. Start with a new entry.</td>
+                                    </tr>
+                                    <tr th:each="record : ${recentParking}" class="hover:bg-white/[0.02] transition-colors">
+                                        <td class="px-6 lg:px-8 py-6 text-white font-black" th:text="${record.vehicle.licensePlate}">—</td>
+                                        <td class="px-6 lg:px-8 py-6" th:text="${record.slot != null ? record.slot.slotNumber : '—'}">—</td>
+                                        <td class="px-6 lg:px-8 py-6 opacity-60" th:text="${record.entryTime != null ? #temporals.format(record.entryTime, 'h:mm a') : '—'}">—</td>
+                                        <td class="px-6 lg:px-8 py-6">
+                                            <span th:if="${record.active}" class="status-pill status-active">Active</span>
+                                            <span th:if="${!record.active}" class="status-pill status-exited">Exited</span>
+                                        </td>
+                                        <td class="px-6 lg:px-8 py-6">
+                                            <span th:if="${record.paid}" class="status-pill status-paid">Paid</span>
+                                            <span th:if="${!record.paid}" class="status-pill status-unpaid">Pending</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="glass-card rounded-[2.5rem] p-8">
+                        <h3 class="text-lg font-black text-white mb-6">Slot Snapshot</h3>
+                        <div class="space-y-5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-slate-400">Available Now</span>
+                                <span class="text-white font-black" th:text="${slotSummary.available}">0</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-slate-400">Occupied Now</span>
+                                <span class="text-white font-black" th:text="${slotSummary.occupied}">0</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-slate-400">Reserved</span>
+                                <span class="text-white font-black" th:text="${slotSummary.reserved}">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-[2.5rem] p-8">
+                        <h3 class="text-lg font-black text-white mb-6">My Summary Today</h3>
+                        <div class="space-y-5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-slate-400">Entries</span>
+                                <span class="text-white font-black" th:text="${userEntriesToday}">0</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-slate-400">Exits</span>
+                                <span class="text-white font-black" th:text="${userExitsToday}">0</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-slate-400">Wallet Balance</span>
+                                <span class="text-primary font-black">Rs. <span th:text="${#numbers.formatDecimal(walletBalance, 1, 2)}">0.00</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-[2.5rem] p-8">
+                        <h3 class="text-lg font-black text-white mb-6">Assistant Note</h3>
+                        <div class="rounded-2xl bg-primary/5 border border-primary/10 p-6">
+                            <div class="flex items-start gap-4">
+                                <span class="material-symbols-outlined text-primary shrink-0">support_agent</span>
+                                <div>
+                                    <h4 class="text-xs font-black text-white uppercase tracking-wider">Operational Tip</h4>
+                                    <p class="text-[11px] text-slate-500 font-medium mt-1 leading-relaxed space-y-2">
+                                        <span th:if="${activeReservation != null}" class="block">
+                                            You have an active reservation<span th:text="${activeReservation.slot != null ? ' for slot ' + activeReservation.slot.slotNumber : ''}"></span>.
+                                            Arrive within your window or manage it under Reservation.
+                                        </span>
+                                        <span th:if="${#lists.size(pendingPayments) > 0}" class="block">
+                                            You have <span th:text="${#lists.size(pendingPayments)}"></span> pending payment(s). Open Active Parking or Payments to settle before exit.
+                                        </span>
+                                        <span th:if="${activeReservation == null and #lists.isEmpty(pendingPayments)}" class="block">
+                                            All clear — no pending payments or active reservations on your account right now.
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="h-16 border-t border-white/5 bg-background-dark/30 premium-blur flex items-center justify-between px-6 lg:px-10 shrink-0 gap-4">
+                <p class="text-[10px] font-bold text-slate-600 uppercase tracking-[0.3em]">© 2026 Parkiyo. All Rights Reserved.</p>
+                <div class="flex flex-wrap gap-4 lg:gap-8 justify-end">
+                    <span class="text-[10px] font-black text-primary uppercase tracking-widest">User Console</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic" th:text="${#temporals.format(T(java.time.LocalDate).now(), 'EEEE, MMM d')}">Today</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <div id="notifBackdrop" class="fixed inset-0 z-40 hidden bg-black/40" onclick="closeNotif()"></div>
+    <div id="notifPanel" class="fixed top-0 right-0 h-full w-full max-w-md z-50 flex flex-col translate-x-full transition-transform duration-300 ease-in-out"
+         style="background:rgba(2,6,23,0.97);border-left:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(24px);">
+        <div class="flex items-center justify-between px-6 py-5 border-b border-white/5">
+            <div>
+                <h3 class="text-base font-black text-white">Notifications</h3>
+                <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-0.5"><span id="notifUnreadLabel" th:text="${notificationUnreadCount} + ' unread'">0 unread</span></p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="markAllRead()" class="text-[10px] font-black uppercase tracking-widest text-primary hover:brightness-125 transition-all">Mark all read</button>
+                <button type="button" onclick="closeNotif()" class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all ml-2" aria-label="Close">
+                    <span class="material-symbols-outlined text-slate-400 text-lg">close</span>
+                </button>
             </div>
         </div>
-        <div class="card rounded-2xl p-5 lg:col-span-2">
-            <div class="flex items-center justify-between">
-                <h2 class="text-sm font-black uppercase tracking-widest text-slate-400">Recent Parking Activity</h2>
-                <a class="text-xs font-black text-blue-300" th:href="@{/parking}">View All</a>
-            </div>
-            <div class="mt-4 overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead>
-                    <tr class="text-[10px] uppercase tracking-widest text-slate-500">
-                        <th class="py-2 pr-3">Plate</th>
-                        <th class="py-2 pr-3">Slot</th>
-                        <th class="py-2 pr-3">Entry Time</th>
-                        <th class="py-2 pr-3">Status</th>
-                    </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/5 text-sm">
-                    <tr th:if="${#lists.isEmpty(recentParking)}">
-                        <td class="py-4 text-slate-500" colspan="4">No parking records yet.</td>
-                    </tr>
-                    <tr th:each="record : ${recentParking}">
-                        <td class="py-3 pr-3 font-bold" th:text="${record.vehicle.licensePlate}">ABC-1234</td>
-                        <td class="py-3 pr-3" th:text="${record.slot.slotNumber}">A-01</td>
-                        <td class="py-3 pr-3 text-slate-300" th:text="${#temporals.format(record.entryTime, 'yyyy-MM-dd HH:mm')}">-</td>
-                        <td class="py-3 pr-3">
-                            <span class="px-2 py-1 rounded-lg text-xs font-black border"
-                                  th:classappend="${record.active} ? ' bg-emerald-500/15 text-emerald-300 border-emerald-500/30' : ' bg-slate-500/15 text-slate-300 border-slate-500/30'"
-                                  th:text="${record.active ? 'ACTIVE' : 'COMPLETED'}">ACTIVE</span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="flex border-b border-white/5 px-6">
+            <button type="button" onclick="switchTab('all')" id="tabAll" class="pb-3 pt-3 text-xs font-black uppercase tracking-widest text-white border-b-2 border-primary mr-5">All</button>
+            <button type="button" onclick="switchTab('unread')" id="tabUnread" class="pb-3 pt-3 text-xs font-black uppercase tracking-widest text-slate-500 border-b-2 border-transparent hover:text-white transition-all mr-5">Unread</button>
+            <button type="button" onclick="switchTab('system')" id="tabSystem" class="pb-3 pt-3 text-xs font-black uppercase tracking-widest text-slate-500 border-b-2 border-transparent hover:text-white transition-all">System</button>
         </div>
-    </section>
+        <div class="flex-1 overflow-y-auto py-3" id="notifList">
+            <div th:if="${#lists.isEmpty(dashboardNotifications)}" class="px-6 py-12 text-center text-slate-500 text-sm font-bold">
+                No notifications yet.
+            </div>
+            <th:block th:each="n : ${dashboardNotifications}">
+                <div class="notif-item px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4"
+                     th:classappend="${n.read} ? ' read opacity-60' : ' unread'"
+                     th:attr="data-read=${n.read},data-ntype=${n.type.name()}">
+                    <div class="shrink-0 mt-0.5" th:switch="${n.type.name()}">
+                        <div th:case="'PAYMENT'" class="h-10 w-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-emerald-400 text-lg">payments</span>
+                        </div>
+                        <div th:case="'SYSTEM'" class="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-lg">system_update</span>
+                        </div>
+                        <div th:case="'RESERVATION'" class="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-amber-400 text-lg">event_available</span>
+                        </div>
+                        <div th:case="'ENTRY'" class="h-10 w-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-sky-400 text-lg">login</span>
+                        </div>
+                        <div th:case="'EXIT'" class="h-10 w-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-rose-400 text-lg">logout</span>
+                        </div>
+                        <div th:case="*" class="h-10 w-10 rounded-xl bg-slate-700/30 border border-white/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-slate-400 text-lg">notifications</span>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-2">
+                            <p class="text-sm font-black text-white leading-tight" th:text="${n.title}">Title</p>
+                            <span th:if="${!n.read}" class="h-2 w-2 bg-primary rounded-full shrink-0 mt-1.5 notif-dot"></span>
+                        </div>
+                        <p class="text-xs text-slate-400 font-bold mt-1" th:text="${n.message}">Message</p>
+                        <p class="text-[10px] text-slate-600 font-bold mt-2" th:text="${n.createdAt != null ? #temporals.format(n.createdAt, 'MMM d, HH:mm') : ''}">—</p>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+        <div class="px-6 py-4 border-t border-white/5">
+            <a th:href="@{/notifications}" class="flex items-center justify-center gap-2 text-primary text-xs font-black hover:brightness-125 transition-all">
+                <span class="material-symbols-outlined text-sm">open_in_new</span> View all notifications
+            </a>
+        </div>
+    </div>
 
-    <section class="card rounded-2xl p-5">
-        <h2 class="text-sm font-black uppercase tracking-widest text-slate-400">Active Reservation</h2>
-        <div th:if="${activeReservation == null}" class="text-sm text-slate-500 mt-2">No active reservation.</div>
-        <div th:if="${activeReservation != null}" class="mt-3 flex flex-wrap gap-6 text-sm">
-            <p><span class="text-slate-400">Reference:</span> <span class="font-bold" th:text="${activeReservation.reservationCode}">REF</span></p>
-            <p><span class="text-slate-400">Slot:</span> <span class="font-bold" th:text="${activeReservation.slot.slotNumber}">A-01</span></p>
-            <p><span class="text-slate-400">Start:</span> <span class="font-bold" th:text="${#temporals.format(activeReservation.startTime, 'yyyy-MM-dd HH:mm')}">-</span></p>
-            <p><span class="text-slate-400">End:</span> <span class="font-bold" th:text="${#temporals.format(activeReservation.endTime, 'yyyy-MM-dd HH:mm')}">-</span></p>
-        </div>
-    </section>
-</main>
+    <script>
+        function openNotif() {
+            document.getElementById('notifPanel').classList.remove('translate-x-full');
+            document.getElementById('notifBackdrop').classList.remove('hidden');
+        }
+        function closeNotif() {
+            document.getElementById('notifPanel').classList.add('translate-x-full');
+            document.getElementById('notifBackdrop').classList.add('hidden');
+        }
+        function markAllRead() {
+            document.querySelectorAll('.notif-dot').forEach(function (d) { d.remove(); });
+            document.querySelectorAll('.notif-item.unread').forEach(function (el) {
+                el.classList.remove('unread');
+                el.classList.add('read', 'opacity-60');
+                el.setAttribute('data-read', 'true');
+            });
+            var lbl = document.getElementById('notifUnreadLabel');
+            if (lbl) lbl.textContent = '0 unread';
+        }
+        function switchTab(tab) {
+            ['all', 'unread', 'system'].forEach(function (t) {
+                var btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (!btn) return;
+                btn.classList.remove('text-white', 'border-primary');
+                btn.classList.add('text-slate-500', 'border-transparent');
+            });
+            var active = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+            if (active) {
+                active.classList.add('text-white', 'border-primary');
+                active.classList.remove('text-slate-500', 'border-transparent');
+            }
+            document.querySelectorAll('.notif-item').forEach(function (el) {
+                if (tab === 'all') {
+                    el.style.display = '';
+                } else if (tab === 'unread') {
+                    el.style.display = el.getAttribute('data-read') === 'false' ? '' : 'none';
+                } else if (tab === 'system') {
+                    el.style.display = el.getAttribute('data-ntype') === 'SYSTEM' ? '' : 'none';
+                }
+            });
+        }
+    </script>
+
 </body>
 </html>

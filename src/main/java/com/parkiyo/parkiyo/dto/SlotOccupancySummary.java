@@ -13,5 +13,7 @@ public class SlotOccupancySummary {
     private int total;
     private int occupied;
     private int available;
+    /** Slots in RESERVED status */
+    private int reserved;
     private double occupancyRate;
 }

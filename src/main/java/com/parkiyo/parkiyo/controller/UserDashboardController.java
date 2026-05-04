@@ -1,5 +1,6 @@
 package com.parkiyo.parkiyo.controller;
 
+import com.parkiyo.parkiyo.model.Notification;
 import com.parkiyo.parkiyo.service.DashboardService;
 import com.parkiyo.parkiyo.service.NotificationService;
 import com.parkiyo.parkiyo.service.UserService;
@@ -10,6 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
 
 @Controller
 @PreAuthorize("isAuthenticated()")
@@ -26,11 +29,17 @@ public class UserDashboardController {
     public String userDashboard(Authentication auth, Model model) {
         String email = auth.getName();
         model.addAttribute("currentUser", userService.getUserByEmail(email));
-        model.addAttribute("recentParking", dashboardService.getUserRecentParking(email, 5));
+        model.addAttribute("recentParking", dashboardService.getUserRecentParking(email, 10));
         model.addAttribute("activeReservation", dashboardService.getUserActiveReservation(email));
         model.addAttribute("slotSummary", dashboardService.getSlotOccupancySummary());
         model.addAttribute("walletBalance", walletService.getBalance(email));
         model.addAttribute("pendingPayments", dashboardService.getUserPendingPayments(email));
+        model.addAttribute("userEntriesToday", dashboardService.countUserEntriesToday(email));
+        model.addAttribute("userExitsToday", dashboardService.countUserExitsToday(email));
+        model.addAttribute("userParkingTouchToday", dashboardService.countUserParkingTouchToday(email));
+        List<Notification> notifs = notificationService.getUserNotifications(email);
+        model.addAttribute("dashboardNotifications", notifs.size() > 12 ? notifs.subList(0, 12) : notifs);
+        model.addAttribute("notificationUnreadCount", notificationService.getUnreadCount(email));
         return "dashboard/dashboard-user";
     }
 
