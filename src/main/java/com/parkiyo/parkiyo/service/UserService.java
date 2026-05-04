@@ -181,6 +181,7 @@ public class UserService {
         user.setLastName(request.getLastName());
         user.setPhone(request.getPhone());
         user.setStatus(UserStatus.ACTIVE);
+        user.setEmailVerified(true);
 
         if (request.getRole() != null && !request.getRole().toString().isBlank()) {
             try {
