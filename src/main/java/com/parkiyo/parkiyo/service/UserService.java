@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,8 +38,6 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -183,12 +180,9 @@ public class UserService {
         user.setStatus(UserStatus.ACTIVE);
         user.setEmailVerified(true);
 
-        if (request.getRole() != null && !request.getRole().toString().isBlank()) {
-            try {
-                user.setRole(Role.valueOf(request.getRole().toString().trim().toUpperCase()));
-            } catch (IllegalArgumentException e) {
-                throw new BadRequestException("Invalid role: " + request.getRole());
-            }
+        // FIX: request.getRole() is already a Role enum — no need to parse it as a string
+        if (request.getRole() != null) {
+            user.setRole(request.getRole());
         } else {
             user.setRole(Role.USER);
         }
@@ -216,9 +210,9 @@ public class UserService {
         user.setPhone(request.getPhone());
 
         // Safe Role Setting
-        if (request.getRole() != null && !request.getRole().toString().isBlank()) {
+        if (request.getRole() != null && !request.getRole().isBlank()) {
             try {
-                user.setRole(Role.valueOf(request.getRole().toString().trim().toUpperCase()));
+                user.setRole(Role.valueOf(request.getRole().trim().toUpperCase()));
             } catch (IllegalArgumentException e) {
                 throw new BadRequestException("Invalid role: " + request.getRole());
             }
