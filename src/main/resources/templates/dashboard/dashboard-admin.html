@@ -63,8 +63,9 @@
             <a th:href="@{/admin/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
                 <span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a th:href="@{/admin/slots}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
-                <span class="material-symbols-outlined shrink-0">grid_view</span><span class="nav-label text-sm">Parking Slots</span>
+            <a th:href="@{/admin/slots/overview}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">grid_view</span>
+                <span class="nav-label text-sm">Parking Slots</span>
             </a>
             <a th:href="@{/admin/vehicles}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
                 <span class="material-symbols-outlined shrink-0">directions_car</span><span class="nav-label text-sm">Vehicles</span>
@@ -97,32 +98,48 @@
 
     <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
         <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur">
-            <div>
-                <h2 class="text-xl font-black text-white">Admin System Overview</h2>
-                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Parkiyo Control Center</p>
+            <div class="flex items-center gap-4">
+                <div>
+                    <h2 class="text-xl font-black text-white">Admin System Overview</h2>
+                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Parkiyo Control Center</p>
+                </div>
             </div>
             <div class="flex items-center gap-6">
+                <!-- Search -->
                 <div class="hidden xl:flex items-center h-12 w-80 rounded-2xl px-4 search-glass">
                     <span class="material-symbols-outlined text-slate-500">search</span>
                     <input type="text" placeholder="Search plate, slot, user..." class="bg-transparent border-none focus:ring-0 w-full text-sm text-white placeholder:text-slate-500 px-3">
                 </div>
+
+                <!-- Revenue -->
                 <div class="hidden md:flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2">
                     <span class="material-symbols-outlined text-emerald-400 text-base">account_balance_wallet</span>
-                    <span class="text-[11px] font-black uppercase tracking-[0.16em] text-emerald-400">$45.8K</span>
+                    <span class="text-[11px] font-black uppercase tracking-[0.16em] text-emerald-400">Rs. <span id="stat-total-revenue" th:text="${stats.totalRevenue}">0</span></span>
                 </div>
-                <div class="relative">
-                    <span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-white transition-colors" onclick="openNotif()">notifications</span>
-                    <span class="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full ring-4 ring-background-dark"></span>
+
+                <!-- Notifications -->
+                <div class="relative cursor-pointer" onclick="openNotif()">
+                    <span class="material-symbols-outlined text-slate-400 hover:text-white transition-colors">notifications</span>
+                    <span id="stat-unread-count-dot" class="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full ring-4 ring-background-dark"></span>
                 </div>
+
                 <div class="h-8 w-[1px] bg-white/10"></div>
-                <div class="flex items-center gap-4">
+
+                <div class="flex items-center gap-3">
                     <div class="text-right">
-                        <p class="text-xs font-black text-white uppercase tracking-widest">Alex Johnson</p>
-                        <p class="text-[10px] text-primary font-bold uppercase tracking-tighter">Admin</p>
+                        <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Admin'"></p>
+                        <p class="text-[10px] text-primary font-bold uppercase tracking-tighter" th:text="${currentUser?.role} ?: 'ADMIN'"></p>
                     </div>
-                    <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
-                        <div class="h-full w-full rounded-squircle bg-background-dark flex items-center justify-center overflow-hidden">
-                            <span class="material-symbols-outlined text-white/50">person</span>
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-blue-400 p-[2px] shrink-0">
+                        <div class="h-full w-full rounded-full overflow-hidden flex items-center justify-center bg-[#1e2535]">
+                            <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
+                                 th:src="@{${currentUser.profilePicturePath}}"
+                                 class="h-full w-full object-cover rounded-full"
+                                 alt="Profile"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+                            <span th:class="${currentUser != null and currentUser.profilePicturePath != null} ? 'material-symbols-outlined text-white/70 text-2xl items-center justify-center h-full w-full hidden' : 'material-symbols-outlined text-white/70 text-2xl flex items-center justify-center h-full w-full'">
+                                person
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -134,26 +151,24 @@
                 <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
                     <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/[0.02] group-hover:text-primary/5 transition-all">check_circle</span>
                     <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Available Slots</p>
-                    <h3 class="text-3xl font-black text-white">42 <span class="text-sm text-slate-500 font-bold">/ 100</span></h3>
-                    <div class="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-primary w-[42%]"></div></div>
+                    <h3 id="stat-available-slots" class="text-3xl font-black text-white" th:text="${stats.availableSlots}">42</h3>
+                    <p class="text-slate-500 text-sm font-bold mt-1">of <span id="stat-total-slots" th:text="${stats.totalSlots}">100</span> total</p>
                 </div>
                 <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
                     <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/[0.02] group-hover:text-primary/5 transition-all">payments</span>
                     <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Daily Revenue</p>
-                    <h3 class="text-3xl font-black text-white">$1,240.50</h3>
-                    <p class="text-emerald-500 text-[10px] font-bold mt-2 flex items-center gap-1"><span class="material-symbols-outlined text-xs">trending_up</span> +12% from yesterday</p>
+                    <h3 class="text-3xl font-black text-white">Rs. <span id="stat-daily-revenue" th:text="${stats.totalRevenue}">0</span></h3>
                 </div>
                 <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
                     <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/[0.02] group-hover:text-primary/5 transition-all">directions_car</span>
                     <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Active Sessions</p>
-                    <h3 class="text-3xl font-black text-white">58</h3>
-                    <p class="text-slate-500 text-[10px] font-bold mt-2 tracking-wide">92% occupancy rate</p>
+                    <h3 id="stat-active-records" class="text-3xl font-black text-white" th:text="${stats.activeRecords}">0</h3>
+                    <p class="text-slate-500 text-[10px] font-bold mt-2 tracking-wide"><span id="stat-occupancy-rate" th:text="${#numbers.formatDecimal(slotSummary.occupancyRate, 1, 1)}">0</span>% occupancy rate</p>
                 </div>
                 <div class="glass-card p-8 rounded-3xl relative overflow-hidden group">
                     <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/[0.02] group-hover:text-primary/5 transition-all">group</span>
                     <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Active Users</p>
-                    <h3 class="text-3xl font-black text-primary">18</h3>
-                    <p class="text-slate-500 text-[10px] font-bold mt-2 tracking-wide text-white/40">4 admins · 14 users</p>
+                    <h3 id="stat-total-users" class="text-3xl font-black text-primary" th:text="${stats.totalUsers}">0</h3>
                 </div>
             </div>
 
@@ -171,17 +186,21 @@
                             </tr>
                             </thead>
                             <tbody class="text-sm font-bold text-slate-300 divide-y divide-white/5">
-                            <tr class="hover:bg-white/[0.02] transition-colors">
-                                <td class="px-8 py-6 text-white font-black">ABC-1234</td><td class="px-8 py-6">A-12</td><td class="px-8 py-6 opacity-60">10:45 AM</td>
-                                <td class="px-8 py-6"><span class="status-pill status-active">Active</span></td><td class="px-8 py-6"><span class="status-pill status-unpaid">Pending</span></td>
+                            <tr th:each="record : ${recentEntries}" class="hover:bg-white/[0.02] transition-colors">
+                                <td class="px-8 py-6 text-white font-black" th:text="${record.vehicle.licensePlate}">-</td>
+                                <td class="px-8 py-6" th:text="${record.slot.slotNumber}">-</td>
+                                <td class="px-8 py-6 opacity-60" th:text="${#temporals.format(record.entryTime, 'hh:mm a')}">-</td>
+                                <td class="px-8 py-6">
+                                    <span th:if="${record.active}" class="status-pill status-active">Active</span>
+                                    <span th:unless="${record.active}" class="status-pill status-exited">Exited</span>
+                                </td>
+                                <td class="px-8 py-6">
+                                    <span th:if="${record.payment == null}" class="status-pill status-unpaid">Pending</span>
+                                    <span th:unless="${record.payment == null}" class="status-pill status-paid">Settled</span>
+                                </td>
                             </tr>
-                            <tr class="hover:bg-white/[0.02] transition-colors">
-                                <td class="px-8 py-6 text-white font-black">XYZ-8899</td><td class="px-8 py-6">B-04</td><td class="px-8 py-6 opacity-60">09:15 AM</td>
-                                <td class="px-8 py-6"><span class="status-pill status-exited">Exited</span></td><td class="px-8 py-6"><span class="status-pill status-paid">Settled</span></td>
-                            </tr>
-                            <tr class="hover:bg-white/[0.02] transition-colors">
-                                <td class="px-8 py-6 text-white font-black">KLM-9012</td><td class="px-8 py-6">C-09</td><td class="px-8 py-6 opacity-60">11:05 AM</td>
-                                <td class="px-8 py-6"><span class="status-pill status-active">Active</span></td><td class="px-8 py-6"><span class="status-pill status-paid">Settled</span></td>
+                            <tr th:if="${#lists.isEmpty(recentEntries)}">
+                                <td colspan="5" class="px-8 py-10 text-center text-slate-500 text-sm">No parking records yet.</td>
                             </tr>
                             </tbody>
                         </table>
@@ -192,12 +211,13 @@
                     <h3 class="text-lg font-black text-white mb-8">Traffic Density</h3>
                     <div class="flex-1 space-y-8">
                         <div>
-                            <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2"><span>Morning Peak</span><span class="text-white">85%</span></div>
-                            <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-primary rounded-full" style="width: 85%"></div></div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2"><span>Evening Peak</span><span class="text-white">76%</span></div>
-                            <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-primary rounded-full" style="width: 76%"></div></div>
+                            <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+                                <span>Current Occupancy</span>
+                                <span class="text-white"><span id="stat-occupancy-rate-display" th:text="${#numbers.formatDecimal(slotSummary.occupancyRate, 1, 1)}">0</span>%</span>
+                            </div>
+                            <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                                <div id="stat-occupancy-bar" class="h-full bg-primary rounded-full" th:style="'width: ' + ${slotSummary.occupancyRate} + '%'"></div>
+                            </div>
                         </div>
                         <div class="mt-8 p-6 rounded-2xl bg-primary/5 border border-primary/10">
                             <div class="flex items-start gap-4">
@@ -216,18 +236,18 @@
                 <div class="glass-card rounded-[2.5rem] p-8">
                     <h3 class="text-lg font-black text-white mb-6">User Summary</h3>
                     <div class="space-y-5">
-                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Active Users</span><span class="status-pill status-active">18</span></div>
-                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Disabled Users</span><span class="status-pill status-exited">3</span></div>
-                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Admins</span><span class="text-white font-black">4</span></div>
-                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Users</span><span class="text-white font-black">17</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Total Users</span><span class="status-pill status-active" id="stat-total-users-2" th:text="${stats.totalUsers}">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Total Slots</span><span class="text-white font-black" id="stat-total-slots-2" th:text="${stats.totalSlots}">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Available Slots</span><span class="status-pill status-available" id="stat-available-slots-2" th:text="${stats.availableSlots}">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Occupied Slots</span><span class="status-pill status-occupied" id="stat-occupied-slots" th:text="${stats.occupiedSlots}">0</span></div>
                     </div>
                 </div>
                 <div class="glass-card rounded-[2.5rem] p-8">
                     <h3 class="text-lg font-black text-white mb-6">Slot Status</h3>
                     <div class="space-y-5">
-                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Available</span><span class="status-pill status-available">42</span></div>
-                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Occupied</span><span class="status-pill status-occupied">58</span></div>
-                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Reserved</span><span class="text-white font-black">12</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Available</span><span class="status-pill status-available" id="stat-slot-available" th:text="${slotSummary.available}">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Occupied</span><span class="status-pill status-occupied" id="stat-slot-occupied" th:text="${slotSummary.occupied}">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-slate-400">Total Slots</span><span class="text-white font-black" id="stat-slot-total" th:text="${slotSummary.total}">0</span></div>
                     </div>
                 </div>
                 <div class="glass-card rounded-[2.5rem] p-8">
@@ -259,7 +279,9 @@
     <div class="flex items-center justify-between px-6 py-5 border-b border-white/5">
         <div>
             <h3 class="text-base font-black text-white">Notifications</h3>
-            <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-0.5">3 unread</p>
+            <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-0.5">
+                <span id="stat-unread-count" th:text="${adminUnreadCount}">0</span> unread
+            </p>
         </div>
         <div class="flex items-center gap-2">
             <button onclick="markAllRead()" class="text-[10px] font-black uppercase tracking-widest text-primary hover:brightness-125 transition-all">Mark all read</button>
@@ -274,52 +296,36 @@
         <button onclick="switchTab('system')" id="tabSystem" class="pb-3 pt-3 text-xs font-black uppercase tracking-widest text-slate-500 border-b-2 border-transparent hover:text-white transition-all">System</button>
     </div>
     <div class="flex-1 overflow-y-auto py-3" id="notifList">
-        <div class="notif-item unread px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4" data-type="unread">
-            <div class="h-10 w-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-rose-400 text-lg">error</span></div>
-            <div class="flex-1">
-                <div class="flex items-start justify-between gap-2"><p class="text-sm font-black text-white leading-tight">Slot B-12 offline</p><span class="h-2 w-2 bg-primary rounded-full shrink-0 mt-1.5 notif-dot"></span></div>
-                <p class="text-xs text-slate-400 font-bold mt-1">Sensor fault detected on slot B-12. Maintenance required.</p>
-                <p class="text-[10px] text-slate-600 font-bold mt-2">2 min ago</p>
-            </div>
+        <div th:if="${#lists.isEmpty(adminNotifications)}" class="px-6 py-8 text-sm text-slate-500">
+            No notifications available.
         </div>
-        <div class="notif-item unread px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4" data-type="unread">
-            <div class="h-10 w-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-emerald-400 text-lg">payments</span></div>
-            <div class="flex-1">
-                <div class="flex items-start justify-between gap-2"><p class="text-sm font-black text-white leading-tight">Payment received</p><span class="h-2 w-2 bg-primary rounded-full shrink-0 mt-1.5 notif-dot"></span></div>
-                <p class="text-xs text-slate-400 font-bold mt-1">$16.50 collected from XYZ-8899 via Parkiyo Wallet.</p>
-                <p class="text-[10px] text-slate-600 font-bold mt-2">14 min ago</p>
+        <div th:each="n : ${adminNotifications}"
+             class="notif-item px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4"
+             th:classappend="${n.read} ? ' read opacity-60' : ' unread'"
+             th:attr="data-type=${!n.read} ? 'unread' : (${n.type.name() == 'SYSTEM'} ? 'system' : 'all')">
+            <div class="h-10 w-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+                 th:classappend="${n.type.name() == 'SYSTEM'} ? ' bg-primary/10 border border-primary/20' :
+                                 (${n.type.name() == 'PAYMENT'} ? ' bg-emerald-500/10 border border-emerald-500/20' :
+                                 (${n.type.name() == 'ENTRY' or n.type.name() == 'EXIT'} ? ' bg-amber-500/10 border border-amber-500/20' :
+                                 ' bg-violet-500/10 border border-violet-500/20'))">
+                <span class="material-symbols-outlined text-lg"
+                      th:classappend="${n.type.name() == 'SYSTEM'} ? ' text-primary' :
+                                      (${n.type.name() == 'PAYMENT'} ? ' text-emerald-400' :
+                                      (${n.type.name() == 'ENTRY' or n.type.name() == 'EXIT'} ? ' text-amber-400' :
+                                      ' text-violet-400'))"
+                      th:text="${n.type.name() == 'SYSTEM'} ? 'system_update' :
+                               (${n.type.name() == 'PAYMENT'} ? 'payments' :
+                               (${n.type.name() == 'ENTRY'} ? 'login' :
+                               (${n.type.name() == 'EXIT'} ? 'logout' : 'notifications')))">notifications</span>
             </div>
-        </div>
-        <div class="notif-item unread px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4" data-type="unread">
-            <div class="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-amber-400 text-lg">local_parking</span></div>
             <div class="flex-1">
-                <div class="flex items-start justify-between gap-2"><p class="text-sm font-black text-white leading-tight">Occupancy at 92%</p><span class="h-2 w-2 bg-primary rounded-full shrink-0 mt-1.5 notif-dot"></span></div>
-                <p class="text-xs text-slate-400 font-bold mt-1">Only 8 slots remaining across all zones. Consider opening overflow.</p>
-                <p class="text-[10px] text-slate-600 font-bold mt-2">31 min ago</p>
-            </div>
-        </div>
-        <div class="notif-item read px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4 opacity-60" data-type="system">
-            <div class="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-primary text-lg">system_update</span></div>
-            <div class="flex-1">
-                <p class="text-sm font-black text-white leading-tight">System update scheduled</p>
-                <p class="text-xs text-slate-400 font-bold mt-1">Maintenance window: 2:00–3:00 AM on 12 Mar 2026. Brief downtime expected.</p>
-                <p class="text-[10px] text-slate-600 font-bold mt-2">2 hours ago</p>
-            </div>
-        </div>
-        <div class="notif-item read px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4 opacity-60" data-type="system">
-            <div class="h-10 w-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-violet-400 text-lg">person_add</span></div>
-            <div class="flex-1">
-                <p class="text-sm font-black text-white leading-tight">New user registered</p>
-                <p class="text-xs text-slate-400 font-bold mt-1">Saman Kumara joined as Operator. Awaiting role assignment.</p>
-                <p class="text-[10px] text-slate-600 font-bold mt-2">Yesterday</p>
-            </div>
-        </div>
-        <div class="notif-item read px-6 py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.025] transition-all flex gap-4 opacity-60" data-type="unread">
-            <div class="h-10 w-10 rounded-xl bg-slate-700/30 border border-white/10 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-slate-400 text-lg">receipt_long</span></div>
-            <div class="flex-1">
-                <p class="text-sm font-black text-white leading-tight">Daily report ready</p>
-                <p class="text-xs text-slate-400 font-bold mt-1">9 Mar 2026 revenue report has been generated.</p>
-                <p class="text-[10px] text-slate-600 font-bold mt-2">Yesterday</p>
+                <div class="flex items-start justify-between gap-2">
+                    <p class="text-sm font-black text-white leading-tight" th:text="${n.title}">Notification</p>
+                    <span th:unless="${n.read}" class="h-2 w-2 bg-primary rounded-full shrink-0 mt-1.5 notif-dot"></span>
+                </div>
+                <p class="text-xs text-slate-400 font-bold mt-1" th:text="${n.message}">Notification details</p>
+                <p class="text-[10px] text-slate-600 font-bold mt-2"
+                   th:text="${n.createdAt != null ? #temporals.format(n.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">-</p>
             </div>
         </div>
     </div>
@@ -361,6 +367,54 @@
             else if (tab === 'system') { el.style.display = el.dataset.type === 'system' ? '' : 'none'; }
         });
     }
+</script>
+
+<script>
+    function updateDashboard() {
+        fetch('/api/dashboard/stats', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(res => { if (!res.ok) return; return res.json(); })
+        .then(data => {
+            if (!data) return;
+
+            setText('stat-available-slots', data.availableSlots);
+            setText('stat-available-slots-2', data.availableSlots);
+            setText('stat-total-slots', data.totalSlots);
+            setText('stat-total-slots-2', data.totalSlots);
+            setText('stat-occupied-slots', data.occupiedSlots);
+            setText('stat-active-records', data.activeRecords);
+            setText('stat-total-users', data.totalUsers);
+            setText('stat-total-users-2', data.totalUsers);
+            setText('stat-occupancy-rate', data.occupancyRate);
+            setText('stat-occupancy-rate-display', data.occupancyRate);
+            setText('stat-daily-revenue', data.totalRevenue);
+            setText('stat-total-revenue', data.totalRevenue);
+            setText('stat-unread-count', data.unreadNotifications);
+            setText('stat-slot-available', data.availableSlots);
+            setText('stat-slot-occupied', data.occupiedSlots);
+            setText('stat-slot-total', data.totalSlots);
+
+            // Update occupancy bar width
+            const bar = document.getElementById('stat-occupancy-bar');
+            if (bar) bar.style.width = data.occupancyRate + '%';
+
+            // Flash live indicator
+            const indicator = document.getElementById('live-indicator');
+            if (indicator) {
+                indicator.classList.add('opacity-100');
+                setTimeout(() => indicator.classList.remove('opacity-100'), 1500);
+            }
+        })
+        .catch(() => {});
+    }
+
+    function setText(id, value) {
+        const el = document.getElementById(id);
+        if (el && value !== undefined && value !== null) el.textContent = value;
+    }
+
+    setInterval(updateDashboard, 30000);
 </script>
 
 </body>

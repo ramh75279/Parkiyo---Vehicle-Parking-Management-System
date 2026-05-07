@@ -268,21 +268,28 @@
 
     <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
         <!-- TOPBAR -->
-        <header
-                class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
             <div>
                 <h2 class="text-xl font-black text-white">Vehicle Entry</h2>
-                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Register a vehicle
-                    entering the facility</p>
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Register a vehicle entering the facility</p>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="text-right hidden xl:block">
-                    <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${adminName != null ? adminName : 'Maria Santos'}">Maria Santos</p>
-                    <p class="text-[10px] text-primary font-bold uppercase tracking-tighter">Admin</p>
+
+            <!-- Profile: name + avatar grouped together -->
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Admin'"></p>
+                    <p class="text-[10px] text-primary font-bold uppercase tracking-tighter" th:text="${currentUser?.role} ?: 'ADMIN'"></p>
                 </div>
-                <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-emerald-400 to-primary p-[2px]">
-                    <div class="h-full w-full rounded-squircle bg-background-dark flex items-center justify-center">
-                        <span class="material-symbols-outlined text-white/50">person</span>
+                <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-blue-400 p-[2px] shrink-0">
+                    <div class="h-full w-full rounded-full overflow-hidden flex items-center justify-center bg-[#1e2535]">
+                        <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
+                             th:src="@{${currentUser.profilePicturePath}}"
+                             class="h-full w-full object-cover rounded-full"
+                             alt="Profile"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+                        <span th:class="${currentUser != null and currentUser.profilePicturePath != null} ? 'material-symbols-outlined text-white/70 text-2xl items-center justify-center h-full w-full hidden' : 'material-symbols-outlined text-white/70 text-2xl flex items-center justify-center h-full w-full'">
+                    person
+                </span>
                     </div>
                 </div>
             </div>
@@ -296,14 +303,14 @@
                     <div class="glass-card p-5 rounded-2xl flex items-center gap-3">
                         <span class="h-2.5 w-2.5 rounded-full bg-emerald-400 shrink-0"></span>
                         <div>
-                            <p class="text-xl font-black text-emerald-400" th:text="${availableSlots != null ? availableSlots : '42'}">42</p>
+                            <p class="text-xl font-black text-emerald-400" th:text="${availableSlots != null ? availableSlots.size() : '42'}">42</p>
                             <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Available Now</p>
                         </div>
                     </div>
                     <div class="glass-card p-5 rounded-2xl flex items-center gap-3">
                         <span class="h-2.5 w-2.5 rounded-full bg-rose-400 shrink-0"></span>
                         <div>
-                            <p class="text-xl font-black text-rose-400" th:text="${occupiedSlots != null ? occupiedSlots : '51'}">51</p>
+                            <p class="text-xl font-black text-rose-400" th:text="${slotOverview != null ? slotOverview['occupied'] : '51'}">51</p>
                             <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Occupied</p>
                         </div>
                     </div>
@@ -316,6 +323,11 @@
                     </div>
                 </div>
 
+                <!-- Form Wrapper -->
+                <form id="entryForm" th:action="@{/admin/entry}" th:object="${entryRequest}" method="post">
+                <input type="hidden" id="hiddenPlate" th:field="*{licensePlate}" />
+                <input type="hidden" id="hiddenSlotId" th:field="*{slotId}" />
+
                 <!-- Step 1: Plate lookup -->
                 <div class="glass-card rounded-[2.5rem] p-8" id="step1">
                     <h3 class="text-base font-black text-white mb-2">Step 1 — Enter Plate Number</h3>
@@ -325,10 +337,10 @@
                         <input id="plateField" type="text" placeholder="e.g. ABC-1234"
                                class="text-center pt-3 plate-input bg-white/5 backdrop-blur-md border border-white/20 text-lg justify-center rounded-3xl"
                                oninput="this.value=this.value.toUpperCase()"
-                               onkeydown="if(event.key==='Enter')lookupPlate()" />
+                               onkeydown="if(event.key==='Enter'){event.preventDefault(); lookupPlate();}" />
                     </div>
                     <div class="flex gap-3">
-                        <button onclick="lookupPlate()"
+                        <button type="button" onclick="lookupPlate()"
                                 class="flex-1 flex items-center justify-center gap-2 bg-primary text-white font-black py-3.5 rounded-2xl hover:bg-primary/80 transition-all text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(31,104,249,0.25)]">
                             <span class="material-symbols-outlined text-lg">search</span> Look Up
                         </button>
@@ -367,51 +379,14 @@
                     <p class="text-[11px] text-slate-500 font-bold mb-4">Select an available slot or let the system
                         auto-assign.</p>
                     <div class="grid grid-cols-5 gap-2 mb-4" id="slotGrid">
-                        <div class="slot-chip selected" onclick="selectSlot(this,'A-02')">
-                            <p class="code">A-02</p>
-                            <p class="zone">Zone A</p>
-                        </div>
-                        <div class="slot-chip" onclick="selectSlot(this,'A-05')">
-                            <p class="code">A-05</p>
-                            <p class="zone">Zone A</p>
-                        </div>
-                        <div class="slot-chip" onclick="selectSlot(this,'A-07')">
-                            <p class="code">A-07</p>
-                            <p class="zone">Zone A</p>
-                        </div>
-                        <div class="slot-chip" onclick="selectSlot(this,'A-10')">
-                            <p class="code">A-10</p>
-                            <p class="zone">Zone A</p>
-                        </div>
-                        <div class="slot-chip" onclick="selectSlot(this,'B-01')">
-                            <p class="code">B-01</p>
-                            <p class="zone">Zone B</p>
-                        </div>
-                        <div class="slot-chip" onclick="selectSlot(this,'B-02')">
-                            <p class="code">B-02</p>
-                            <p class="zone">Zone B</p>
-                        </div>
-                        <div class="slot-chip" onclick="selectSlot(this,'B-05')">
-                            <p class="code">B-05</p>
-                            <p class="zone">Zone B</p>
-                        </div>
-                        <div class="slot-chip" onclick="selectSlot(this,'B-06')">
-                            <p class="code">B-06</p>
-                            <p class="zone">Zone B</p>
-                        </div>
-                        <div class="slot-chip" onclick="selectSlot(this,'B-08')">
-                            <p class="code">B-08</p>
-                            <p class="zone">Zone B</p>
-                        </div>
-                        <div class="slot-chip" onclick="selectSlot(this,'D-01')">
-                            <p class="code">D-01</p>
-                            <p class="zone">Zone D</p>
+                        <div th:each="slot : ${availableSlots}" class="slot-chip" th:onclick="'selectSlot(this, ' + ${slot.id} + ', \'' + ${slot.slotNumber} + '\')'">
+                            <p class="code" th:text="${slot.slotNumber}">A-02</p>
+                            <p class="zone" th:text="${slot.zone}">Zone A</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 mb-6 text-xs font-bold text-slate-500">
                         <span class="material-symbols-outlined text-primary text-base">info</span>
-                        Selected: <span class="text-white font-black" id="selectedSlotLabel">A-02 (Zone A · Ground
-                                Floor)</span>
+                        Selected: <span class="text-white font-black" id="selectedSlotLabel">None</span>
                     </div>
 
                     <!-- Notes -->
@@ -422,7 +397,7 @@
                     </div>
 
                     <!-- Confirm -->
-                    <button onclick="confirmEntry()"
+                    <button type="button" onclick="confirmEntry()"
                             class="w-full flex items-center justify-center gap-3 bg-primary text-white font-black py-4 rounded-2xl hover:bg-primary/80 transition-all text-base shadow-[0_0_25px_rgba(31,104,249,0.3)]">
                         <span class="material-symbols-outlined text-xl">login</span> Confirm Entry
                     </button>
@@ -455,7 +430,7 @@
                             </div>
                             <div class="p-4 rounded-2xl bg-black/20 border border-white/5">
                                 <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">Operator</p>
-                                <p class="text-white font-black" th:text="${adminName != null ? adminName : 'Maria Santos'}">Maria Santos</p>
+                                <p class="text-white font-black" th:text="${currentUser?.fullName} ?: 'Admin'">Admin</p>
                             </div>
                             <div class="p-4 rounded-2xl bg-black/20 border border-white/5">
                                 <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider mb-1">Session ID</p>
@@ -486,7 +461,8 @@
     }
     setInterval(updateClock, 1000); updateClock();
 
-    let selectedSlot = 'A-02';
+    let selectedSlotId = null;
+    let selectedSlot = null;
 
     function lookupPlate() {
         const val = document.getElementById('plateField').value.trim();
@@ -496,22 +472,23 @@
         document.getElementById('vehicleCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    function selectSlot(el, code) {
+    function selectSlot(el, id, code) {
         document.querySelectorAll('.slot-chip').forEach(c => c.classList.remove('selected'));
         el.classList.add('selected');
+        selectedSlotId = id;
         selectedSlot = code;
-        document.getElementById('selectedSlotLabel').textContent = `${code} (Zone ${code.charAt(0)} · ${code.charAt(0) === 'D' ? 'Rooftop' : code.charAt(0) === 'C' ? 'Level 2' : code.charAt(0) === 'B' ? 'Level 1' : 'Ground Floor'})`;
+        document.getElementById('hiddenSlotId').value = id;
+        document.getElementById('selectedSlotLabel').textContent = code;
     }
 
     function confirmEntry() {
-        const plate = document.getElementById('plateField').value.trim() || 'ABC-1234';
-        document.getElementById('vehicleCard').classList.add('hidden');
-        document.getElementById('successCard').classList.remove('hidden');
-        document.getElementById('confirmedSlot').textContent = selectedSlot;
-        document.getElementById('confirmedPlate').textContent = plate;
-        const now = new Date();
-        document.getElementById('entryTime').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-        document.getElementById('successCard').scrollIntoView({ behavior: 'smooth' });
+        const plate = document.getElementById('plateField').value.trim();
+        if (!plate || !selectedSlotId) {
+            alert('Please enter a plate number and select a slot.');
+            return;
+        }
+        document.getElementById('hiddenPlate').value = plate;
+        document.getElementById('entryForm').submit();
     }
 
     function resetForm() {

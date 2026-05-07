@@ -79,9 +79,22 @@
                 <a th:href="@{/admin/payments/export}" class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
                     <span class="material-symbols-outlined text-lg">download</span> Export
                 </a>
-                <div class="h-10 w-10 rounded-[14px] bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
-                    <div class="h-full w-full rounded-[14px] bg-background-dark flex items-center justify-center">
-                        <span class="material-symbols-outlined text-white/50">person</span>
+                <div class="flex items-center gap-3">
+                    <div class="text-right">
+                        <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Admin'"></p>
+                        <p class="text-[10px] text-primary font-bold uppercase tracking-tighter" th:text="${currentUser?.role} ?: 'ADMIN'"></p>
+                    </div>
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-blue-400 p-[2px] shrink-0">
+                        <div class="h-full w-full rounded-full overflow-hidden flex items-center justify-center bg-[#1e2535]">
+                            <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
+                                 th:src="@{${currentUser.profilePicturePath}}"
+                                 class="h-full w-full object-cover rounded-full"
+                                 alt="Profile"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+                            <span th:class="${currentUser != null and currentUser.profilePicturePath != null} ? 'material-symbols-outlined text-white/70 text-2xl items-center justify-center h-full w-full hidden' : 'material-symbols-outlined text-white/70 text-2xl flex items-center justify-center h-full w-full'">
+                    person
+                </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -93,7 +106,7 @@
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div class="glass-card p-6 rounded-3xl">
                     <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Total Paid</p>
-                    <h3 class="text-3xl font-black text-emerald-400">$842.50</h3>
+                    <h3 class="text-3xl font-black text-emerald-400" th:text="'$' + ${totalRevenue}">$842.50</h3>
                     <p class="text-[10px] text-slate-500 font-bold mt-1">All time</p>
                 </div>
                 <div class="glass-card p-6 rounded-3xl">
@@ -127,27 +140,24 @@
             </div>
 
             <!-- Filters -->
-            <div class="glass-card rounded-[2rem] p-5 mb-6 flex flex-wrap gap-4 items-center">
+            <form action="/admin/payments" method="get" class="glass-card rounded-[2rem] p-5 mb-6 flex flex-wrap gap-4 items-center">
                 <div class="flex-1 min-w-[180px] relative">
                     <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg">search</span>
                     <input type="text" placeholder="Search by plate or transaction ID…" class="bg-white/5 border border-white/20 input-glass rounded-2xl px-4 h-12 w-full pl-10" />
                 </div>
-                <input type="date" class="input-glass px-4 h-12 rounded-2xl" value="2026-03-01" />
-                <input type="date" class="input-glass px-4 h-12 rounded-2xl" value="2026-03-10" />
-                <select class="input-glass rounded-2xl px-4 h-12">
-                    <option>All Statuses</option>
-                    <option>Paid</option>
-                    <option>Pending</option>
-                    <option>Refunded</option>
-                    <option>Failed</option>
+                <input type="date" name="dateFrom" class="input-glass px-4 h-12 rounded-2xl" th:value="${param.dateFrom}" />
+                <input type="date" name="dateTo" class="input-glass px-4 h-12 rounded-2xl" th:value="${param.dateTo}" />
+                <select name="status" class="input-glass rounded-2xl px-4 h-12">
+                    <option value="">All Statuses</option>
+                    <option value="SUCCESS" th:selected="${param.status != null and param.status[0] == 'SUCCESS'}">Paid</option>
+                    <option value="PENDING" th:selected="${param.status != null and param.status[0] == 'PENDING'}">Pending</option>
+                    <option value="REFUNDED" th:selected="${param.status != null and param.status[0] == 'REFUNDED'}">Refunded</option>
+                    <option value="FAILED" th:selected="${param.status != null and param.status[0] == 'FAILED'}">Failed</option>
                 </select>
-                <select class="input-glass rounded-2xl px-4 h-12">
-                    <option>All Methods</option>
-                    <option>Wallet</option>
-                    <option>Card</option>
-                    <option>Cash</option>
-                </select>
-            </div>
+                <button type="submit" class="bg-primary/20 border border-primary/30 text-primary font-black px-4 h-12 rounded-2xl hover:bg-primary/30 transition-all text-xs uppercase tracking-widest">
+                    Filter
+                </button>
+            </form>
 
             <!-- Transaction table -->
             <div class="glass-card rounded-[2.5rem] overflow-hidden">
@@ -170,65 +180,33 @@
                         </tr>
                         </thead>
                         <tbody class="text-sm font-bold text-slate-300 divide-y divide-white/5">
-                        <tr class="txn-row" onclick="window.location.href='/admin/receipts/1'">
-                            <td class="px-8 py-5 font-mono text-xs text-slate-400">TXN-88291047</td>
-                            <td class="px-8 py-5 opacity-70 text-xs">10 Mar 2026</td>
-                            <td class="px-8 py-5"><span class="text-white font-black tracking-wider bg-white/5 px-2.5 py-1 rounded-lg text-xs">XYZ-8899</span></td>
-                            <td class="px-8 py-5 opacity-70">Reservation</td>
-                            <td class="px-8 py-5 opacity-70 flex items-center gap-1.5 text-xs"><span class="material-symbols-outlined text-emerald-400 text-sm">account_balance_wallet</span>Wallet</td>
-                            <td class="px-8 py-5 text-emerald-400 font-black">$16.50</td>
-                            <td class="px-8 py-5"><span class="status-pill pill-paid">Paid</span></td>
-                            <td class="px-8 py-5" onclick="event.stopPropagation()"><a th:href="@{/admin/receipts/1}" class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all"><span class="material-symbols-outlined text-sm text-slate-400">receipt_long</span></a></td>
-                        </tr>
-                        <tr class="txn-row" onclick="window.location.href='/admin/receipts/2'">
-                            <td class="px-8 py-5 font-mono text-xs text-slate-400">TXN-88290031</td>
-                            <td class="px-8 py-5 opacity-70 text-xs">09 Mar 2026</td>
-                            <td class="px-8 py-5"><span class="text-white font-black tracking-wider bg-white/5 px-2.5 py-1 rounded-lg text-xs">ABC-1234</span></td>
-                            <td class="px-8 py-5 opacity-70">Walk-in</td>
-                            <td class="px-8 py-5 opacity-70 flex items-center gap-1.5 text-xs"><span class="material-symbols-outlined text-primary text-sm">credit_card</span>Card</td>
-                            <td class="px-8 py-5 text-emerald-400 font-black">$18.75</td>
-                            <td class="px-8 py-5"><span class="status-pill pill-paid">Paid</span></td>
-                            <td class="px-8 py-5" onclick="event.stopPropagation()"><a th:href="@{/admin/receipts/2}" class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all"><span class="material-symbols-outlined text-sm text-slate-400">receipt_long</span></a></td>
-                        </tr>
-                        <tr class="txn-row" onclick="window.location.href='/admin/receipts/3'">
-                            <td class="px-8 py-5 font-mono text-xs text-slate-400">TXN-88288714</td>
-                            <td class="px-8 py-5 opacity-70 text-xs">08 Mar 2026</td>
-                            <td class="px-8 py-5"><span class="text-white font-black tracking-wider bg-white/5 px-2.5 py-1 rounded-lg text-xs">GHI-7721</span></td>
-                            <td class="px-8 py-5 opacity-70">Walk-in</td>
-                            <td class="px-8 py-5 opacity-70 flex items-center gap-1.5 text-xs"><span class="material-symbols-outlined text-emerald-400 text-sm">account_balance_wallet</span>Wallet</td>
-                            <td class="px-8 py-5 text-emerald-400 font-black">$13.75</td>
-                            <td class="px-8 py-5"><span class="status-pill pill-paid">Paid</span></td>
-                            <td class="px-8 py-5" onclick="event.stopPropagation()"><a th:href="@{/admin/receipts/3}" class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all"><span class="material-symbols-outlined text-sm text-slate-400">receipt_long</span></a></td>
-                        </tr>
-                        <tr class="txn-row">
-                            <td class="px-8 py-5 font-mono text-xs text-slate-400">TXN-88286200</td>
-                            <td class="px-8 py-5 opacity-70 text-xs">07 Mar 2026</td>
-                            <td class="px-8 py-5"><span class="text-white font-black tracking-wider bg-white/5 px-2.5 py-1 rounded-lg text-xs">MNO-3310</span></td>
-                            <td class="px-8 py-5 opacity-70">Reservation</td>
-                            <td class="px-8 py-5 opacity-70 flex items-center gap-1.5 text-xs"><span class="material-symbols-outlined text-emerald-400 text-sm">account_balance_wallet</span>Wallet</td>
-                            <td class="px-8 py-5 text-amber-400 font-black">$22.00</td>
-                            <td class="px-8 py-5"><span class="status-pill pill-pending">Pending</span></td>
-                            <td class="px-8 py-5"><span class="h-8 w-8 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center opacity-30"><span class="material-symbols-outlined text-sm text-slate-600">receipt_long</span></span></td>
-                        </tr>
-                        <tr class="txn-row" onclick="window.location.href='/admin/receipts/5'">
-                            <td class="px-8 py-5 font-mono text-xs text-slate-400">TXN-88281044</td>
-                            <td class="px-8 py-5 opacity-70 text-xs">05 Mar 2026</td>
-                            <td class="px-8 py-5"><span class="text-white font-black tracking-wider bg-white/5 px-2.5 py-1 rounded-lg text-xs">TRK-5502</span></td>
-                            <td class="px-8 py-5 opacity-70">Walk-in</td>
-                            <td class="px-8 py-5 opacity-70 flex items-center gap-1.5 text-xs"><span class="material-symbols-outlined text-amber-400 text-sm">payments</span>Cash</td>
-                            <td class="px-8 py-5 text-slate-400 font-black line-through">$14.75</td>
-                            <td class="px-8 py-5"><span class="status-pill pill-refunded">Refunded</span></td>
-                            <td class="px-8 py-5" onclick="event.stopPropagation()"><a th:href="@{/admin/receipts/5}" class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all"><span class="material-symbols-outlined text-sm text-slate-400">receipt_long</span></a></td>
-                        </tr>
-                        <tr class="txn-row">
-                            <td class="px-8 py-5 font-mono text-xs text-slate-400">TXN-88278912</td>
-                            <td class="px-8 py-5 opacity-70 text-xs">04 Mar 2026</td>
-                            <td class="px-8 py-5"><span class="text-white font-black tracking-wider bg-white/5 px-2.5 py-1 rounded-lg text-xs">PQR-6641</span></td>
-                            <td class="px-8 py-5 opacity-70">Reservation</td>
-                            <td class="px-8 py-5 opacity-70 flex items-center gap-1.5 text-xs"><span class="material-symbols-outlined text-primary text-sm">credit_card</span>Card</td>
-                            <td class="px-8 py-5 text-rose-400 font-black">$9.00</td>
-                            <td class="px-8 py-5"><span class="status-pill pill-failed">Failed</span></td>
-                            <td class="px-8 py-5"><span class="h-8 w-8 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center opacity-30"><span class="material-symbols-outlined text-sm text-slate-600">receipt_long</span></span></td>
+                        <tr th:each="payment : ${payments}" class="txn-row cursor-default" th:onclick="'window.location.href=\'/admin/receipts/' + ${payment.id} + '\''">
+                            <td class="px-8 py-5 font-mono text-xs text-slate-400" th:text="${payment.transactionCode}">TXN-88291047</td>
+                            <td class="px-8 py-5 opacity-70 text-xs" th:text="${#temporals.format(payment.createdAt, 'dd MMM yyyy')}">10 Mar 2026</td>
+                            <td class="px-8 py-5"><span class="text-white font-black tracking-wider bg-white/5 px-2.5 py-1 rounded-lg text-xs" th:text="${payment.reservation != null ? payment.reservation.vehicle.licensePlate : payment.parkingRecord.vehicle.licensePlate}">XYZ-8899</span></td>
+                            <td class="px-8 py-5 opacity-70" th:text="${payment.reservation != null ? 'Reservation' : 'Walk-in'}">Reservation</td>
+                            <td class="px-8 py-5 opacity-70 flex items-center gap-1.5 text-xs">
+                                <span th:if="${payment.paymentMethod == 'Parkiyo Wallet'}" class="material-symbols-outlined text-emerald-400 text-sm">account_balance_wallet</span>
+                                <span th:if="${payment.paymentMethod == 'Card'}" class="material-symbols-outlined text-primary text-sm">credit_card</span>
+                                <span th:if="${payment.paymentMethod == 'Cash'}" class="material-symbols-outlined text-amber-400 text-sm">payments</span>
+                                <span th:text="${payment.paymentMethod ?: '-'}">Wallet</span>
+                            </td>
+                            <td class="px-8 py-5 text-emerald-400 font-black" th:text="'$' + ${payment.amount}">$16.50</td>
+                            <td class="px-8 py-5">
+                                <span th:if="${payment.status.name() == 'SUCCESS'}" class="status-pill pill-paid">Paid</span>
+                                <span th:if="${payment.status.name() == 'PENDING'}" class="status-pill pill-pending">Pending</span>
+                                <span th:if="${payment.status.name() == 'REFUNDED'}" class="status-pill pill-refunded">Refunded</span>
+                                <span th:if="${payment.status.name() == 'FAILED'}" class="status-pill pill-failed">Failed</span>
+                            </td>
+                            <td class="px-8 py-5" onclick="event.stopPropagation()">
+                                <a th:if="${payment.status.name() == 'SUCCESS'}" th:href="@{/admin/receipts/{id}(id=${payment.id})}" class="h-8 w-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all mb-1"><span class="material-symbols-outlined text-sm text-slate-400">receipt_long</span></a>
+                                <span th:unless="${payment.status.name() == 'SUCCESS'}" class="h-8 w-8 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-center opacity-30 mb-1"><span class="material-symbols-outlined text-sm text-slate-600">receipt_long</span></span>
+                                <form th:if="${payment.status.name() == 'SUCCESS'}" th:action="@{/admin/payments/{id}/refund(id=${payment.id})}" method="post" class="inline">
+                                    <button type="submit" class="h-8 px-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 transition-all font-black text-[10px] uppercase tracking-widest" onclick="return confirm('Refund this payment?');">
+                                        Refund
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                         </tbody>
                     </table>

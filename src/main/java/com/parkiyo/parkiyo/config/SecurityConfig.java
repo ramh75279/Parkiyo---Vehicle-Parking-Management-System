@@ -1,70 +1,108 @@
 package com.parkiyo.parkiyo.config;
 
+import com.parkiyo.parkiyo.service.AuthService;
+import com.parkiyo.parkiyo.service.AuditLogService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity   // enables @PreAuthorize on your controllers
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    // ─── Public pages (no login required) ────────────────────────────────────
-    private static final String[] PUBLIC_URLS = {
-            "/",
-            "/home",
-            "/features",
-            "/solutions",
-            "/analytics",
-            "/faq",
-            "/privacy",
-            "/login",
-            "/register",
-            "/forgot-password",
-            "/access-denied",
-            "/css/**",
-            "/js/**",
-            "/images/**",
-            "/webjars/**"
-    };
+    private final AuthService authService;
+    private final AuditLogService auditLogService;
+    private final PasswordEncoder passwordEncoder;
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(authService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .authenticationProvider(authenticationProvider())
+
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                )
+
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(PUBLIC_URLS).permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/home", "/features", "/solutions", "/analytics",
+                                "/faq", "/privacy",
+                                "/sign-in", "/perform-login", "/login",
+                                "/register", "/forgot-password", "/reset-password",
+                                "/verify-email",
+                                "/access-denied",
+                                "/uploads/**", "/css/**", "/js/**", "/images/**", "/webjars/**"
+                        ).permitAll()
+
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/assistant/**").hasAnyRole("ADMIN", "ASSISTANT")
+
                         .anyRequest().authenticated()
                 )
+
                 .formLogin(form -> form
-                        .loginPage("/login")               // your custom login page
-                        .loginProcessingUrl("/login")      // Spring handles POST /login
-                        .defaultSuccessUrl("/dashboard", true)
-                        .failureUrl("/login?error=true")
+                        .loginPage("/sign-in")
+                        .loginProcessingUrl("/perform-login")
+                        .usernameParameter("email")
+                        .passwordParameter("password")
+                        .successHandler((request, response, authentication) -> {
+                            String username = authentication.getName();
+                            authService.markSuccessfulLogin(username);
+
+                            auditLogService.logAction(
+                                    "LOGIN",
+                                    username,
+                                    "Authentication",
+                                    null,
+                                    "User logged in successfully",
+                                    null,
+                                    request.getRemoteAddr(),
+                                    request.getHeader("User-Agent")
+                            );
+                            response.sendRedirect(request.getContextPath() + "/dashboard");
+                        })
+                        .failureUrl("/sign-in?error=true")
                         .permitAll()
                 )
+
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout=true")
+                        .logoutUrl("/perform-logout")
+                        .logoutSuccessUrl("/sign-in?logout=true")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
+
+                .sessionManagement(session -> session
+                        .maximumSessions(1)
+                        .expiredUrl("/sign-in?expired=true")
+                )
+
                 .exceptionHandling(ex -> ex
                         .accessDeniedPage("/access-denied")
+                )
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.sameOrigin())
                 );
 
         return http.build();
-    }
-
-    // BCrypt password encoder — use this everywhere you save/check passwords
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }

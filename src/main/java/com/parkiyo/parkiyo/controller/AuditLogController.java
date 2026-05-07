@@ -1,6 +1,6 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.service.AuditLogService;
+import com.parkiyo.parkiyo.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -24,13 +24,13 @@ public class AuditLogController {
                            Model model) {
         model.addAttribute("logs", auditLogService.getLogs(action, user, dateFrom, dateTo));
         model.addAttribute("actions", auditLogService.getAllActionTypes());
-        return "auditlog";
+        return "admin/auditlog";
     }
 
     // GET /admin/audit/{id}
     @GetMapping("/{id}")
     public String auditLogDetails(@PathVariable Long id, Model model) {
         model.addAttribute("log", auditLogService.getLogById(id));
-        return "auditlogdeatils";
+        return "admin/auditlogdeatils";
     }
 }

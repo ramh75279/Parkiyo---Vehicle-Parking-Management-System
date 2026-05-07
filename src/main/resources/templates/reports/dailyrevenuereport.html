@@ -76,7 +76,13 @@
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <a th:href="@{/admin/reports/daily/export}" class="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-400 font-black px-5 py-2.5 rounded-xl hover:bg-amber-500/20 transition-all text-xs uppercase tracking-widest">
+                <form action="/admin/reports/daily-revenue" method="get" class="flex items-center gap-3">
+                    <input type="date" name="date" class="h-10 px-4 rounded-xl text-sm font-bold" th:value="${reportDate}" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color-scheme:dark;color:rgba(148,163,184,0.85);" />
+                    <button type="submit" class="bg-primary/20 border border-primary/30 text-primary font-black px-4 py-2 rounded-xl hover:bg-primary/30 transition-all text-xs uppercase tracking-widest">
+                        Filter
+                    </button>
+                </form>
+                <a th:href="@{/admin/reports/export(type='daily-revenue', format='csv', date=${reportDate})}" class="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-400 font-black px-5 py-2.5 rounded-xl hover:bg-amber-500/20 transition-all text-xs uppercase tracking-widest">
                     <span class="material-symbols-outlined text-lg">download</span> Export
                 </a>
                 <div class="flex items-center gap-4">

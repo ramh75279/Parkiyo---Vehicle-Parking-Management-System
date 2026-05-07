@@ -1,6 +1,7 @@
 package com.parkiyo.parkiyo.model;
 
 import com.parkiyo.parkiyo.enums.SlotStatus;
+import com.parkiyo.parkiyo.enums.VehicleCategory;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -8,11 +9,16 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "parking_slots")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ParkingSlot {
 
     @Id
@@ -23,6 +29,7 @@ public class ParkingSlot {
     private String slotNumber;
 
     private String zone;
+    private String floor;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -31,15 +38,28 @@ public class ParkingSlot {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal hourlyRate = BigDecimal.ZERO;
 
-    @OneToMany(mappedBy = "slot", fetch = FetchType.LAZY)
-    private List<ParkingRecord> parkingRecords;
+    @Enumerated(EnumType.STRING)
+    private VehicleCategory preferredVehicleCategory;
+
+    @Column(length = 255)
+    private String description;
+
+    @OneToMany(mappedBy = "parkingSlot", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ParkingRecord> parkingRecords = new ArrayList<>();
 
     @OneToMany(mappedBy = "slot", fetch = FetchType.LAZY)
-    private List<Reservation> reservations;
+    private List<Reservation> reservations = new ArrayList<>();
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @Column(name = "last_occupied_time")
+    private LocalDateTime lastOccupiedTime;
+
+    public boolean isAvailable() {
+        return status == SlotStatus.AVAILABLE;
+    }
 }

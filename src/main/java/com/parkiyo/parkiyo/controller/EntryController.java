@@ -1,9 +1,9 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.dto.EntryRequest;
-import com.parkiyo.service.EntryService;
-import com.parkiyo.service.SlotService;
-import com.parkiyo.service.VehicleService;
+import com.parkiyo.parkiyo.dto.EntryRequest;
+import com.parkiyo.parkiyo.service.EntryService;
+import com.parkiyo.parkiyo.service.SlotService;
+import com.parkiyo.parkiyo.service.VehicleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,7 +30,7 @@ public class EntryController {
         model.addAttribute("availableSlots", slotService.getAvailableSlots());
         model.addAttribute("userVehicles", vehicleService.getVehiclesByUser(auth.getName()));
         model.addAttribute("entryRequest", new EntryRequest());
-        return "entry";
+        return "parking/entry";
     }
 
     // POST /entry
@@ -56,9 +56,10 @@ public class EntryController {
     @PreAuthorize("hasRole('ADMIN')")
     public String adminEntryPage(Model model) {
         model.addAttribute("availableSlots", slotService.getAvailableSlots());
+        model.addAttribute("slotOverview", slotService.getSlotOverview());
         model.addAttribute("recentEntries", entryService.getRecentEntries(20));
         model.addAttribute("entryRequest", new EntryRequest());
-        return "entry-admin";
+        return "parking/entry-admin";
     }
 
     // POST /admin/entry

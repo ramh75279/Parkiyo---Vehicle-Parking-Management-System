@@ -1,13 +1,19 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.dto.CreateUserRequest;
-import com.parkiyo.dto.EditUserRequest;
-import com.parkiyo.service.UserService;
+import com.parkiyo.parkiyo.dto.CreateUserRequest;
+import com.parkiyo.parkiyo.dto.EditUserRequest;
+import com.parkiyo.parkiyo.enums.Role;
+import com.parkiyo.parkiyo.enums.UserStatus;
+import com.parkiyo.parkiyo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -19,33 +25,56 @@ public class UserManagementController {
 
     private final UserService userService;
 
-    // GET /admin/users
+    // GET /admin/users - List Users (FIXED)
     @GetMapping
     public String userList(@RequestParam(required = false) String search,
                            @RequestParam(required = false) String role,
                            @RequestParam(required = false) String status,
+                           @RequestParam(defaultValue = "0") int page,
+                           @RequestParam(defaultValue = "20") int size,
                            Model model) {
-        model.addAttribute("users", userService.getAllUsers(search, role, status));
-        model.addAttribute("totalUsers", userService.getTotalUserCount());
-        model.addAttribute("activeUsers", userService.getActiveUserCount());
-        return "usermanagement";
+
+        Pageable pageable = PageRequest.of(page, size);
+        var usersPage = userService.getAllUsersPaginated(pageable, search, role, status);
+
+        model.addAttribute("users", usersPage.getContent());
+        model.addAttribute("totalUsers", userService.getTotalUsers());
+        model.addAttribute("activeUsers", userService.countActiveUsers());
+        model.addAttribute("adminUsers", userService.countAdmins());
+        model.addAttribute("usersOnPage", usersPage.getNumberOfElements());
+        model.addAttribute("currentPage", usersPage.getNumber());
+        model.addAttribute("totalPages", usersPage.getTotalPages());
+        model.addAttribute("hasPrevious", usersPage.hasPrevious());
+        model.addAttribute("hasNext", usersPage.hasNext());
+        model.addAttribute("search", search);
+        model.addAttribute("role", role);
+        model.addAttribute("status", status);
+        model.addAttribute("size", size);
+
+        return "admin/usermanagement";
     }
 
     // GET /admin/users/create
     @GetMapping("/create")
     public String createUserPage(Model model) {
         model.addAttribute("createUserRequest", new CreateUserRequest());
-        return "createuser";
+        model.addAttribute("allRoles", Role.values());
+        return "admin/createuser";
     }
 
     // POST /admin/users/create
     @PostMapping("/create")
     public String createUser(@Valid @ModelAttribute CreateUserRequest request,
+                             BindingResult result,
                              RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("error",
+                    result.getFieldError() != null ? result.getFieldError().getDefaultMessage() : "Validation error");
+            return "redirect:/admin/users/create";
+        }
         try {
             userService.createUser(request);
-            redirectAttributes.addFlashAttribute("success",
-                    "User " + request.getEmail() + " created.");
+            redirectAttributes.addFlashAttribute("success", "User " + request.getEmail() + " created successfully.");
             return "redirect:/admin/users";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -57,17 +86,25 @@ public class UserManagementController {
     @GetMapping("/{id}/edit")
     public String editUserPage(@PathVariable Long id, Model model) {
         model.addAttribute("user", userService.getUserById(id));
-        return "edituser";
+        model.addAttribute("allRoles", Role.values());
+        model.addAttribute("allStatuses", UserStatus.values());
+        return "admin/edituser";
     }
 
     // POST /admin/users/{id}/update
     @PostMapping("/{id}/update")
     public String updateUser(@PathVariable Long id,
                              @Valid @ModelAttribute EditUserRequest request,
+                             BindingResult result,
                              RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("error",
+                    result.getFieldError() != null ? result.getFieldError().getDefaultMessage() : "Validation error");
+            return "redirect:/admin/users/" + id + "/edit";
+        }
         try {
             userService.updateUser(id, request);
-            redirectAttributes.addFlashAttribute("success", "User updated.");
+            redirectAttributes.addFlashAttribute("success", "User updated successfully.");
             return "redirect:/admin/users";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -92,10 +129,22 @@ public class UserManagementController {
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             userService.deleteUser(id);
-            redirectAttributes.addFlashAttribute("success", "User deleted.");
+            redirectAttributes.addFlashAttribute("success", "User deleted successfully.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/admin/users";
+    }
+
+    // POST /admin/users/{id}/reset-password
+    @PostMapping("/{id}/reset-password")
+    public String resetUserPassword(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            userService.sendPasswordResetForUser(id);
+            redirectAttributes.addFlashAttribute("success", "Password reset link sent.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/users/" + id + "/edit";
     }
 }

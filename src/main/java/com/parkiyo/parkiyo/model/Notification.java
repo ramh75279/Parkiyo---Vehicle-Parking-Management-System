@@ -1,6 +1,6 @@
 package com.parkiyo.parkiyo.model;
 
-import com.parkiyo.enums.NotificationType;
+import com.parkiyo.parkiyo.enums.NotificationType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -33,7 +33,8 @@ public class Notification {
     // Optional deep-link inside the app
     private String actionUrl;
 
-    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Builder.Default
+    @Column(name = "is_read", nullable = false, columnDefinition = "boolean default false")
     private boolean read = false;
 
     private LocalDateTime readAt;

@@ -101,18 +101,19 @@
         <div class="flex-1 overflow-y-auto p-10">
             <div class="max-w-3xl mx-auto space-y-8">
 
-                <!-- Slot identity -->
+                <form id="addSlotForm" th:action="@{/admin/slots/create}" th:object="${slotRequest}" method="post">
+                    <!-- Slot identity -->
                 <div class="glass-card rounded-[2.5rem] p-8">
                     <h3 class="text-base font-black text-white mb-6">Slot Identity</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label class="field-label">Slot Code <span class="text-rose-400">*</span></label>
-                            <input type="text" id="slotCode" name="slotCode" oninput="updatePreview()" placeholder="e.g. A-25" class="input-glass px-4 h-12 rounded-2xl uppercase tracking-widest bg-white/5" />
+                            <input type="text" id="slotCode" th:field="*{slotNumber}" oninput="updatePreview()" placeholder="e.g. A-25" class="input-glass px-4 h-12 rounded-2xl uppercase tracking-widest bg-white/5" />
                             <p class="text-[10px] text-slate-500 font-bold mt-2">Format: Zone letter + hyphen + number (e.g. A-25, B-04)</p>
                         </div>
                         <div>
                             <label class="field-label">Zone <span class="text-rose-400">*</span></label>
-                            <select name="zone" class="input-glass px-4 h-12 rounded-2xl" onchange="updatePreview()">
+                            <select th:field="*{zone}" class="input-glass px-4 h-12 rounded-2xl" onchange="updatePreview()">
                                 <option value="">Select zone…</option>
                                 <option selected>Zone A — Ground Floor</option>
                                 <option>Zone B — Level 1</option>
@@ -166,7 +167,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label class="field-label">Hourly Rate ($)</label>
-                            <input type="number" name="hourlyRate" placeholder="e.g. 5.50" step="0.50" class="input-glass px-4 h-12 rounded-2xl bg-white/10" />
+                            <input type="number" th:field="*{hourlyRate}" placeholder="e.g. 5.50" step="0.50" class="input-glass px-4 h-12 rounded-2xl bg-white/10" />
                         </div>
                         <div>
                             <label class="field-label">Daily Max Rate ($)</label>
@@ -219,10 +220,11 @@
                 <!-- Actions -->
                 <div class="flex items-center justify-end gap-4 pb-4">
                     <a th:href="@{/admin/slots}" class="px-8 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-black text-sm hover:bg-white/10 transition-all">Cancel</a>
-                    <button onclick="submitSlot()" class="px-8 py-3.5 rounded-2xl bg-primary text-white font-black text-sm hover:bg-primary/80 transition-all shadow-[0_0_20px_rgba(31,104,249,0.3)] flex items-center gap-2">
+                    <button type="submit" class="px-8 py-3.5 rounded-2xl bg-primary text-white font-black text-sm hover:bg-primary/80 transition-all shadow-[0_0_20px_rgba(31,104,249,0.3)] flex items-center gap-2">
                         <span class="material-symbols-outlined text-lg">add_circle</span> Create Slot
                     </button>
                 </div>
+                </form>
 
             </div>
         </div>
@@ -275,10 +277,7 @@
     }
 
     function submitSlot() {
-        // Form submits via th:action on a real form — this triggers it programmatically
-        // In Spring Boot, wrap the content in a <form th:action="@{/admin/slots/create}" method="post">
-        // and replace this with form.submit()
-        window.location.href = '/admin/slots';
+        document.getElementById('addSlotForm').submit();
     }
 </script>
 </body>

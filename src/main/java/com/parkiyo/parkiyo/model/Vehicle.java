@@ -7,11 +7,16 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "vehicles")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Vehicle {
 
     @Id
@@ -28,16 +33,18 @@ public class Vehicle {
     private String make;
     private String model;
     private String color;
+
+    @Column(name = "manufacture_year")
     private Integer year;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;  // null if quick-registered without a user account
+    private User user;   // Can be null for quick/visitor registration
 
-    @OneToMany(mappedBy = "vehicle", fetch = FetchType.LAZY)
-    private List<ParkingRecord> parkingRecords;
+    @OneToMany(mappedBy = "vehicle", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ParkingRecord> parkingRecords = new ArrayList<>();
 
-    @Column(nullable = false, columnDefinition = "boolean default true")
+    @Column(nullable = false)
     private boolean active = true;
 
     @CreationTimestamp
@@ -45,4 +52,16 @@ public class Vehicle {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    // ==================== HELPER METHODS ====================
+
+    public String getFullName() {
+        if (make == null && model == null) return licensePlate;
+        return (make != null ? make : "") + " " +
+                (model != null ? model : "") + " (" + licensePlate + ")";
+    }
+
+    public boolean isRegisteredToUser() {
+        return user != null;
+    }
 }

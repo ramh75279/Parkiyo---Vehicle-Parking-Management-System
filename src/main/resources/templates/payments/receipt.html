@@ -269,22 +269,26 @@
                 <div>
                     <h2 class="text-xl font-black text-white">Receipt</h2>
                     <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1"
-                       th:text="${receipt.transactionId}">TXN-88291047</p>
+                       th:text="${receipt != null ? receipt.transactionId : 'N/A'}">TXN-88291047</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
+                <div th:if="${success}" class="mr-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">check_circle</span>
+                    <span th:text="${success}"></span>
+                </div>
                 <button onclick="window.print()"
                         class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
                     <span class="material-symbols-outlined text-lg">print</span> Print
                 </button>
-                <button
-                        class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
+                <a th:if="${receipt != null and receipt.payment != null}" th:href="@{/receipts/{id}/pdf(id=${receipt.payment.id})}"
+                   class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
                     <span class="material-symbols-outlined text-lg">download</span> PDF
-                </button>
-                <button
-                        class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
+                </a>
+                <a th:if="${receipt != null and receipt.payment != null}" th:href="@{/receipts/{id}/email(id=${receipt.payment.id})}"
+                   class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
                     <span class="material-symbols-outlined text-lg">email</span> Email
-                </button>
+                </a>
                 <div class="h-10 w-10 rounded-[14px] bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
                     <div class="h-full w-full rounded-[14px] bg-background-dark flex items-center justify-center">
                         <span class="material-symbols-outlined text-white/50">person</span>
@@ -312,7 +316,7 @@
                             </div>
                             <div class="text-right">
                                 <p class="text-[9px] text-blue-200/50 font-black uppercase tracking-widest">Receipt</p>
-                                <p class="text-white font-black font-mono text-sm" th:text="${receipt.transactionId}">TXN-88291047</p>
+                                <p class="text-white font-black font-mono text-sm" th:text="${receipt != null ? receipt.transactionId : 'N/A'}">TXN-88291047</p>
                             </div>
                         </div>
                         <div
@@ -320,7 +324,7 @@
                             <div>
                                 <p class="text-[9px] text-blue-200/50 font-black uppercase tracking-widest mb-0.5">
                                     Payment Date</p>
-                                <p class="text-white font-black text-sm" th:text="${receipt.paymentDate}">10 Mar 2026 · 02:13 PM</p>
+                                <p class="text-white font-black text-sm" th:text="${receipt != null ? receipt.paymentDate : 'N/A'}">10 Mar 2026 · 02:13 PM</p>
                             </div>
                             <div
                                     class="flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 px-3 py-1.5 rounded-lg">
@@ -340,8 +344,8 @@
                                 <span class="material-symbols-outlined text-primary text-lg">person</span>
                             </div>
                             <div>
-                                <p class="text-sm font-black text-slate-800" th:text="${receipt.customerName}">Nimal Silva</p>
-                                <p class="text-[10px] text-slate-400 font-bold" th:text="${receipt.customerEmail}">nimal.silva@email.com</p>
+                                <p class="text-sm font-black text-slate-800" th:text="${receipt != null ? receipt.customerName : 'N/A'}">Nimal Silva</p>
+                                <p class="text-[10px] text-slate-400 font-bold" th:text="${receipt != null ? receipt.customerEmail : 'N/A'}">nimal.silva@email.com</p>
                             </div>
                         </div>
 
@@ -349,15 +353,15 @@
                         <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Parking Details</p>
                         <div class="mb-4">
                             <div class="receipt-row"><span class="lbl">Vehicle</span><span
-                                    class="val font-black tracking-widest" th:text="${receipt.plate}">XYZ-8899</span></div>
-                            <div class="receipt-row"><span class="lbl">Make / Model</span><span class="val" th:text="${receipt.vehicleModel}">Nissan Axio</span></div>
+                                    class="val font-black tracking-widest" th:text="${receipt != null ? receipt.plate : 'N/A'}">XYZ-8899</span></div>
+                            <div class="receipt-row"><span class="lbl">Make / Model</span><span class="val" th:text="${receipt != null ? receipt.vehicleModel : 'N/A'}">Nissan Axio</span></div>
                             <div class="receipt-row"><span class="lbl">Slot</span><span
-                                    class="val text-blue-600 font-black" th:text="${receipt.slotCode + ' · ' + receipt.zone}">C-03 · Zone C</span></div>
-                            <div class="receipt-row"><span class="lbl">Type</span><span class="val" th:text="${receipt.sessionType}">Advance Reservation</span></div>
-                            <div class="receipt-row"><span class="lbl">Date</span><span class="val" th:text="${receipt.date}">11 Mar 2026</span></div>
-                            <div class="receipt-row"><span class="lbl">Arrival</span><span class="val" th:text="${receipt.arrival}">09:00 AM</span></div>
-                            <div class="receipt-row"><span class="lbl">Departure</span><span class="val" th:text="${receipt.departure}">12:00 PM</span></div>
-                            <div class="receipt-row"><span class="lbl">Duration</span><span class="val" th:text="${receipt.duration}">3 hours</span></div>
+                                    class="val text-blue-600 font-black" th:text="${receipt != null ? (receipt.slotCode + ' · ' + receipt.zone) : 'N/A'}">C-03 · Zone C</span></div>
+                            <div class="receipt-row"><span class="lbl">Type</span><span class="val" th:text="${receipt != null ? receipt.sessionType : 'N/A'}">Advance Reservation</span></div>
+                            <div class="receipt-row"><span class="lbl">Date</span><span class="val" th:text="${receipt != null ? receipt.date : 'N/A'}">11 Mar 2026</span></div>
+                            <div class="receipt-row"><span class="lbl">Arrival</span><span class="val" th:text="${receipt != null ? receipt.arrival : 'N/A'}">09:00 AM</span></div>
+                            <div class="receipt-row"><span class="lbl">Departure</span><span class="val" th:text="${receipt != null ? receipt.departure : 'N/A'}">12:00 PM</span></div>
+                            <div class="receipt-row"><span class="lbl">Duration</span><span class="val" th:text="${receipt != null ? receipt.duration : 'N/A'}">3 hours</span></div>
                         </div>
 
                         <!-- Tear -->
@@ -365,11 +369,11 @@
 
                         <!-- Billing -->
                         <div class="mt-4 mb-2">
-                            <div class="receipt-row"><span class="lbl" th:text="'Subtotal (' + ${receipt.billingBreakdown} + ')'">Subtotal (3h × $5.50)</span><span
-                                    class="val" th:text="'$' + ${receipt.subtotal}">$16.50</span></div>
+                            <div class="receipt-row"><span class="lbl" th:text="'Subtotal (' + (${receipt != null ? receipt.billingBreakdown : 'N/A'}) + ')'">Subtotal (3h × $5.50)</span><span
+                                    class="val" th:text="'$' + (${receipt != null ? receipt.subtotal : 0})">$16.50</span></div>
                             <div class="receipt-row"><span class="lbl">Discount</span><span
-                                    class="val text-emerald-600" th:text="${receipt.discount != null ? receipt.discount : '—'}">—</span></div>
-                            <div class="receipt-row"><span class="lbl">Tax (0%)</span><span class="val" th:text="'$' + ${receipt.tax}">$0.00</span></div>
+                                    class="val text-emerald-600" th:text="${receipt != null and receipt.discount != null ? receipt.discount : '—'}">—</span></div>
+                            <div class="receipt-row"><span class="lbl">Tax (0%)</span><span class="val" th:text="'$' + (${receipt != null ? receipt.tax : 0})">$0.00</span></div>
                         </div>
 
                         <!-- Total box -->
@@ -377,13 +381,13 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Paid</p>
-                                    <p class="text-3xl font-black text-slate-900 mt-0.5" th:text="'$' + ${receipt.total}">$16.50</p>
+                                    <p class="text-3xl font-black text-slate-900 mt-0.5" th:text="'$' + (${receipt != null ? receipt.total : 0})">$16.50</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Method</p>
                                     <div class="flex items-center gap-1.5 mt-0.5">
                                         <span class="material-symbols-outlined text-emerald-600 text-sm">account_balance_wallet</span>
-                                        <p class="text-sm font-black text-slate-700" th:text="${receipt.paymentMethod}">Parkiyo Wallet</p>
+                                        <p class="text-sm font-black text-slate-700" th:text="${receipt != null ? receipt.paymentMethod : 'N/A'}">Parkiyo Wallet</p>
                                     </div>
                                 </div>
                             </div>
@@ -413,7 +417,7 @@
                                 <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Verify Receipt</p>
                                 <p class="text-[9px] text-slate-400 font-bold leading-relaxed">Scan QR to verify
                                     this receipt at parkiyo.com/verify</p>
-                                <p class="text-[9px] font-mono text-slate-300 mt-1" th:text="${receipt.transactionId}">TXN-88291047</p>
+                                <p class="text-[9px] font-mono text-slate-300 mt-1" th:text="${receipt != null ? receipt.transactionId : 'N/A'}">TXN-88291047</p>
                             </div>
                         </div>
 

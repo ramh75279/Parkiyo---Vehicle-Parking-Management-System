@@ -1,76 +1,57 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.dto.ExitRequest;
-import com.parkiyo.service.ExitService;
-import com.parkiyo.service.ParkingService;
-import jakarta.validation.Valid;
+import com.parkiyo.parkiyo.dto.ExitRequest;
+import com.parkiyo.parkiyo.model.ParkingRecord;
+import com.parkiyo.parkiyo.service.ExitService;
+import com.parkiyo.parkiyo.service.ParkingService;
+import com.parkiyo.parkiyo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/exit")
+@PreAuthorize("isAuthenticated()")
 public class ExitController {
 
     private final ExitService exitService;
     private final ParkingService parkingService;
+    private final UserService userService;
 
-    // ─── USER ────────────────────────────────────────────────────────────────
-
-    // GET /exit
-    @GetMapping("/exit")
-    @PreAuthorize("isAuthenticated()")
-    public String userExitPage(Authentication auth, Model model) {
-        model.addAttribute("activeRecords", parkingService.getActiveRecordsByUser(auth.getName()));
+    @GetMapping
+    public String exitPage(Authentication auth, Model model) {
+        String email = auth.getName();
+        model.addAttribute("activeRecords", parkingService.getActiveRecordsByUser(email));
         model.addAttribute("exitRequest", new ExitRequest());
-        return "exitvehicle";
+        model.addAttribute("currentUser", userService.getUserByEmail(email));
+        return "parking/exitvehicle";
     }
 
-    // POST /exit
-    @PostMapping("/exit")
-    @PreAuthorize("isAuthenticated()")
-    public String processUserExit(@Valid @ModelAttribute ExitRequest request,
-                                  Authentication auth,
-                                  RedirectAttributes redirectAttributes) {
+    @PostMapping("/process")
+    public String processExit(@ModelAttribute ExitRequest request,
+                                Authentication auth,
+                                RedirectAttributes redirectAttributes) {
         try {
-            Long recordId = exitService.processExit(request, auth.getName());
-            redirectAttributes.addFlashAttribute("success", "Exit recorded. Proceed to payment.");
-            return "redirect:/payments/pending/" + recordId;
+            if (request.getParkingRecordId() != null) {
+                ParkingRecord record = parkingService.getActiveRecordForExit(request.getParkingRecordId(), auth.getName());
+                if (record.getVehicle() != null && record.getVehicle().getLicensePlate() != null) {
+                    request.setLicensePlate(record.getVehicle().getLicensePlate());
+                }
+            }
+            exitService.processExit(request, auth.getName());
+            redirectAttributes.addFlashAttribute("success", "Vehicle exited successfully!");
+            return "redirect:/parking?success=true";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/exit";
-        }
-    }
-
-    // ─── ADMIN ───────────────────────────────────────────────────────────────
-
-    // GET /admin/exit
-    @GetMapping("/admin/exit")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String adminExitPage(Model model) {
-        model.addAttribute("activeRecords", parkingService.getAllActiveRecords());
-        model.addAttribute("recentExits", exitService.getRecentExits(20));
-        model.addAttribute("exitRequest", new ExitRequest());
-        return "exitvehicle-admin";
-    }
-
-    // POST /admin/exit
-    @PostMapping("/admin/exit")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String processAdminExit(@Valid @ModelAttribute ExitRequest request,
-                                   Authentication auth,
-                                   RedirectAttributes redirectAttributes) {
-        try {
-            exitService.processExit(request, auth.getName());
-            redirectAttributes.addFlashAttribute("success", "Exit processed successfully.");
-            return "redirect:/admin/exit";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/admin/exit";
         }
     }
 }

@@ -72,24 +72,7 @@
 </head>
 <body class="bg-background-dark text-slate-100 font-display antialiased min-h-screen flex flex-col bg-subtle-radial">
 
-<header class="sticky top-0 z-50 w-full border-b border-white/5 bg-background-dark/75 premium-blur">
-    <div class="container mx-auto flex h-20 items-center justify-between px-6 lg:px-12">
-        <a th:href="@{/home}" class="flex items-center gap-4">
-            <div class="flex h-11 w-11 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_20px_rgba(31,104,249,0.4)]">
-                <span class="material-symbols-outlined font-bold">local_parking</span>
-            </div>
-            <span class="text-2xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
-        </a>
-        <nav class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <a class="hover:text-primary transition-colors" th:href="@{/home}">Home</a>
-            <a class="hover:text-primary transition-colors" th:href="@{/features}">Features</a>
-            <a class="hover:text-primary transition-colors" th:href="@{/solutions}">Solutions</a>
-            <a class="hover:text-primary transition-colors" th:href="@{/analytics}">Analytics</a>
-            <a class="hover:text-primary transition-colors" th:href="@{/faq}">Support</a>
-        </nav>
-        <a th:href="@{/register}" class="bg-primary text-white text-sm font-bold px-7 py-3 rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/30">Register</a>
-    </div>
-</header>
+<div th:replace="~{common/fragments :: authNavbar('home', '/register', 'Register')}"></div>
 
 <main class="flex-grow flex items-center justify-center py-16 px-6">
     <div class="w-full max-w-5xl">
@@ -106,7 +89,7 @@
                         <p class="text-slate-400 font-medium">Sign in to your Parkiyo account to continue.</p>
                     </div>
 
-                    <form id="loginForm" th:action="@{/login}" method="post" novalidate class="space-y-5">
+                    <form id="loginForm" th:action="@{/perform-login}" method="post" novalidate class="space-y-5">
                         <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
                         <div id="formMsg" class="hidden px-4 py-4 rounded-2xl text-[13px] font-bold flex items-start gap-3">

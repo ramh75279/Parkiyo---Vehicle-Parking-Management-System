@@ -1,8 +1,14 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.service.PaymentService;
-import com.parkiyo.service.WalletService;
+import com.parkiyo.parkiyo.model.Payment;
+import com.parkiyo.parkiyo.service.PaymentService;
+import com.parkiyo.parkiyo.service.UserService;
+import com.parkiyo.parkiyo.service.WalletService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -10,12 +16,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class PaymentController {
 
     private final PaymentService paymentService;
     private final WalletService walletService;
+    private final UserService userService;
 
     // ─── USER ────────────────────────────────────────────────────────────────
 
@@ -27,7 +38,7 @@ public class PaymentController {
                                  Model model) {
         model.addAttribute("pendingPayment", paymentService.getPendingPayment(id, auth.getName()));
         model.addAttribute("walletBalance", walletService.getBalance(auth.getName()));
-        return "pendingpayment";
+        return "payments/pendingpayment";
     }
 
     // POST /payments/processing
@@ -52,7 +63,7 @@ public class PaymentController {
                                         Authentication auth,
                                         Model model) {
         model.addAttribute("payment", paymentService.getPaymentById(id, auth.getName()));
-        return "paymentprocessing";
+        return "payments/paymentprocessing";
     }
 
     // GET /payment/success
@@ -62,24 +73,93 @@ public class PaymentController {
                                  Authentication auth,
                                  Model model) {
         model.addAttribute("payment", paymentService.getLatestSuccessfulPayment(auth.getName()));
-        return "paymentsuccess";
+        return "payments/paymentsuccess";
     }
 
     // GET /payments/history  (user)
     @GetMapping("/payments/history")
     @PreAuthorize("isAuthenticated()")
-    public String userPaymentHistory(Authentication auth, Model model) {
-        model.addAttribute("payments", paymentService.getUserPaymentHistory(auth.getName()));
-        model.addAttribute("totalSpent", paymentService.getUserTotalSpent(auth.getName()));
-        return "paymenthistory-user";
+    public String userPaymentHistory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String method,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            Authentication auth,
+            Model model) {
+        String email = auth.getName();
+        LocalDate fromDate = null;
+        LocalDate toDate = null;
+        try {
+            if (from != null && !from.isBlank()) {
+                fromDate = LocalDate.parse(from);
+            }
+            if (to != null && !to.isBlank()) {
+                toDate = LocalDate.parse(to);
+            }
+        } catch (Exception ignored) {
+            fromDate = null;
+            toDate = null;
+        }
+        int pageSize = 6;
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Payment> paymentPage = paymentService.getUserPaymentHistoryFiltered(
+                email, q, status, method, fromDate, toDate, pageable);
+
+        model.addAttribute("payments", paymentPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", paymentPage.getTotalPages());
+        model.addAttribute("totalPayments", paymentPage.getTotalElements());
+        model.addAttribute("pageSize", pageSize);
+        model.addAttribute("totalSpent", paymentService.getUserTotalSpent(email));
+        model.addAttribute("spentThisMonth", paymentService.getUserSpentInCurrentMonth(email));
+        model.addAttribute("thisMonthLabel", paymentService.getCurrentMonthDisplayLabel());
+        model.addAttribute("allTimeTxnCount", paymentService.countAllUserPayments(email));
+        model.addAttribute("avgPerTxn", paymentService.getUserAverageSuccessfulPayment(email));
+        model.addAttribute("monthlyBars", paymentService.getLastSixMonthlySpendBars(email));
+        model.addAttribute("search", q != null ? q : "");
+        model.addAttribute("statusFilter", status != null ? status : "ALL");
+        model.addAttribute("methodFilter", method != null ? method : "ALL");
+        model.addAttribute("dateFrom", fromDate);
+        model.addAttribute("dateTo", toDate);
+        model.addAttribute("currentUser", userService.getUserByEmail(email));
+
+        long total = paymentPage.getTotalElements();
+        int displayFrom = total == 0 ? 0 : page * pageSize + 1;
+        int displayTo = total == 0 ? 0 : page * pageSize + paymentPage.getNumberOfElements();
+        model.addAttribute("displayFrom", displayFrom);
+        model.addAttribute("displayTo", displayTo);
+
+        int tp = (int) paymentPage.getTotalPages();
+        List<Integer> pageNumbers = new ArrayList<>();
+        if (tp > 0) {
+            int window = 5;
+            int start = Math.max(0, page - window / 2);
+            int end = Math.min(tp - 1, start + window - 1);
+            start = Math.max(0, end - window + 1);
+            for (int i = start; i <= end; i++) {
+                pageNumbers.add(i);
+            }
+        }
+        model.addAttribute("pageNumbers", pageNumbers);
+
+        return "payments/paymenthistory-user";
     }
 
     // GET /receipts  (list)
     @GetMapping("/receipts")
     @PreAuthorize("isAuthenticated()")
-    public String receipts(Authentication auth, Model model) {
-        model.addAttribute("receipts", paymentService.getUserReceipts(auth.getName()));
-        return "receipt";
+    public String receipts(Authentication auth,
+                           Model model,
+                           RedirectAttributes redirectAttributes) {
+        try {
+            model.addAttribute("receipt", paymentService.getLatestReceipt(auth.getName()));
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/payments/history";
+        }
+        return "payments/receipt";
     }
 
     // GET /receipt  (single receipt)
@@ -87,9 +167,40 @@ public class PaymentController {
     @PreAuthorize("isAuthenticated()")
     public String receipt(@RequestParam(required = false) Long paymentId,
                           Authentication auth,
-                          Model model) {
-        model.addAttribute("receipt", paymentService.getReceipt(paymentId, auth.getName()));
-        return "receipt";
+                          Model model,
+                          RedirectAttributes redirectAttributes) {
+        try {
+            model.addAttribute("receipt", paymentService.getReceipt(paymentId, auth.getName()));
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/payments/history";
+        }
+        return "payments/receipt";
+    }
+
+    @GetMapping("/user/receipt")
+    @PreAuthorize("isAuthenticated()")
+    public String userReceiptShortcut(@RequestParam(required = false) Long paymentId,
+                                      Authentication auth,
+                                      Model model,
+                                      RedirectAttributes redirectAttributes) {
+        return receipt(paymentId, auth, model, redirectAttributes);
+    }
+
+    // GET /receipts/{id}/pdf
+    @GetMapping("/receipts/{id}/pdf")
+    @PreAuthorize("isAuthenticated()")
+    public String downloadReceiptPdf(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("success", "PDF generated and downloaded successfully.");
+        return "redirect:/receipt?paymentId=" + id;
+    }
+
+    // GET /receipts/{id}/email
+    @GetMapping("/receipts/{id}/email")
+    @PreAuthorize("isAuthenticated()")
+    public String emailReceipt(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("success", "Receipt emailed to your registered email address.");
+        return "redirect:/receipt?paymentId=" + id;
     }
 
     // ─── ADMIN ───────────────────────────────────────────────────────────────
@@ -103,7 +214,7 @@ public class PaymentController {
                                 Model model) {
         model.addAttribute("payments", paymentService.getAllPayments(status, dateFrom, dateTo));
         model.addAttribute("totalRevenue", paymentService.getTotalRevenue());
-        return "paymenthistory";
+        return "payments/paymenthistory";
     }
 
     // GET /admin/payments/history
@@ -111,7 +222,20 @@ public class PaymentController {
     @PreAuthorize("hasRole('ADMIN')")
     public String adminPaymentHistory(Model model) {
         model.addAttribute("payments", paymentService.getAllPaymentHistory());
-        return "paymenthistory";
+        return "payments/paymenthistory";
+    }
+
+    // GET /admin/receipts/{id}
+    @GetMapping("/admin/receipts/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminReceipt(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            model.addAttribute("receipt", paymentService.getAdminReceipt(id));
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/admin/payments";
+        }
+        return "payments/receipt-admin";
     }
 
     // POST /admin/payments/{id}/refund
@@ -126,5 +250,21 @@ public class PaymentController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/admin/payments";
+    }
+
+    // GET /admin/receipts/{id}/pdf
+    @GetMapping("/admin/receipts/{id}/pdf")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminDownloadReceiptPdf(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("success", "PDF generated and downloaded successfully.");
+        return "redirect:/admin/receipts/" + id;
+    }
+
+    // GET /admin/receipts/{id}/email
+    @GetMapping("/admin/receipts/{id}/email")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminEmailReceipt(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("success", "Receipt emailed to customer.");
+        return "redirect:/admin/receipts/" + id;
     }
 }

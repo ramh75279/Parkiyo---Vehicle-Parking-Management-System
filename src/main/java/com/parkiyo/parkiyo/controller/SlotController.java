@@ -1,8 +1,8 @@
 package com.parkiyo.parkiyo.controller;
 
-import com.parkiyo.dto.SlotRequest;
-import com.parkiyo.dto.BatchSlotRequest;
-import com.parkiyo.service.SlotService;
+import com.parkiyo.parkiyo.dto.SlotRequest;
+import com.parkiyo.parkiyo.dto.BatchSlotRequest;
+import com.parkiyo.parkiyo.service.SlotService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,10 +23,25 @@ public class SlotController {
     @GetMapping
     public String slotList(@RequestParam(required = false) String status,
                            @RequestParam(required = false) String zone,
+                           @RequestParam(required = false) String search,
                            Model model) {
-        model.addAttribute("slots", slotService.getSlots(status, zone));
+        var slots = slotService.getSlots(status, zone);
+
+        // Apply search filter if provided
+        if (search != null && !search.isBlank()) {
+            String q = search.toLowerCase();
+            slots = slots.stream()
+                    .filter(s -> (s.getSlotNumber() != null && s.getSlotNumber().toLowerCase().contains(q))
+                            || (s.getZone() != null && s.getZone().toLowerCase().contains(q)))
+                    .toList();
+        }
+
+        model.addAttribute("slots", slots);
         model.addAttribute("zones", slotService.getAllZones());
-        return "slot-list";
+        model.addAttribute("search", search);
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("selectedZone", zone);
+        return "slots/slot-list";
     }
 
     // GET /admin/slots/overview
@@ -34,7 +49,8 @@ public class SlotController {
     public String slotOverview(Model model) {
         model.addAttribute("overview", slotService.getSlotOverview());
         model.addAttribute("zones", slotService.getZoneSummaries());
-        return "slot-overview";
+        model.addAttribute("slots", slotService.getSlots(null, null));
+        return "slots/slot-overview";
     }
 
     // GET /admin/slots/add
@@ -42,7 +58,7 @@ public class SlotController {
     public String addSlotPage(Model model) {
         model.addAttribute("slotRequest", new SlotRequest());
         model.addAttribute("zones", slotService.getAllZones());
-        return "add-slot";
+        return "slots/add-slot";
     }
 
     // POST /admin/slots/create
@@ -64,7 +80,7 @@ public class SlotController {
     public String editSlotPage(@PathVariable Long id, Model model) {
         model.addAttribute("slot", slotService.getSlotById(id));
         model.addAttribute("zones", slotService.getAllZones());
-        return "edit-slot";
+        return "slots/edit-slot";
     }
 
     // POST /admin/slots/update
@@ -99,7 +115,7 @@ public class SlotController {
     public String batchSlotPage(Model model) {
         model.addAttribute("batchRequest", new BatchSlotRequest());
         model.addAttribute("zones", slotService.getAllZones());
-        return "batchslot-generate";
+        return "slots/batchslot-generate";
     }
 
     // POST /admin/slots/batch
@@ -121,6 +137,6 @@ public class SlotController {
     public String slotUsageHistory(@PathVariable Long id, Model model) {
         model.addAttribute("slot", slotService.getSlotById(id));
         model.addAttribute("history", slotService.getSlotUsageHistory(id));
-        return "slot-usage-history";
+        return "slots/slot-usage-history";
     }
 }

@@ -267,21 +267,27 @@
     </aside>
 
     <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
-        <header
-                class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
             <div>
                 <h2 class="text-xl font-black text-white">Vehicle Exit</h2>
-                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Process departure
-                    & collect payment</p>
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Process departure & collect payment</p>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="text-right hidden xl:block">
-                    <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${adminName != null ? adminName : 'Maria Santos'}">Maria Santos</p>
-                    <p class="text-[10px] text-primary font-bold uppercase tracking-tighter">Admin</p>
+
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Admin'"></p>
+                    <p class="text-[10px] text-primary font-bold uppercase tracking-tighter" th:text="${currentUser?.role} ?: 'ADMIN'"></p>
                 </div>
-                <div class="h-10 w-10 rounded-[14px] bg-gradient-to-tr from-emerald-400 to-primary p-[2px]">
-                    <div class="h-full w-full rounded-[14px] bg-background-dark flex items-center justify-center">
-                        <span class="material-symbols-outlined text-white/50">person</span>
+                <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-blue-400 p-[2px] shrink-0">
+                    <div class="h-full w-full rounded-full overflow-hidden flex items-center justify-center bg-[#1e2535]">
+                        <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
+                             th:src="@{${currentUser.profilePicturePath}}"
+                             class="h-full w-full object-cover rounded-full"
+                             alt="Profile"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+                        <span th:class="${currentUser != null and currentUser.profilePicturePath != null} ? 'material-symbols-outlined text-white/70 text-2xl items-center justify-center h-full w-full hidden' : 'material-symbols-outlined text-white/70 text-2xl flex items-center justify-center h-full w-full'">
+                    person
+                </span>
                     </div>
                 </div>
             </div>
@@ -290,16 +296,20 @@
         <div class="flex-1 overflow-y-auto p-10">
             <div class="max-w-2xl mx-auto space-y-8">
 
+                <!-- Form Wrapper -->
+                <form id="exitForm" th:action="@{/admin/exit}" th:object="${exitRequest}" method="post">
+
                 <!-- Step 1: Plate lookup -->
                 <div class="glass-card rounded-[2.5rem] p-8" id="step1">
                     <h3 class="text-base font-black text-white mb-2">Step 1 — Enter Plate Number</h3>
                     <p class="text-[11px] text-slate-500 font-bold mb-6">Look up the vehicle that is departing the
                         facility.</p>
-                    <input id="plateField" type="text" placeholder="e.g. ABC-1234"
-                           class="pt-3 rounded-3xl plate-input mb-4" oninput="this.value=this.value.toUpperCase()"
-                           onkeydown="if(event.key==='Enter')lookupPlate()" />
+                    <select id="plateSelect" th:field="*{parkingRecordId}" class="pt-3 rounded-3xl plate-input mb-4" onchange="lookupPlate()">
+                        <option value="">-- SELECT ACTIVE VEHICLE --</option>
+                        <option th:each="record : ${activeRecords}" th:value="${record.id}" th:text="${record.vehicle.licensePlate}"></option>
+                    </select>
                     <div class="flex gap-3">
-                        <button onclick="lookupPlate()"
+                        <button type="button" onclick="lookupPlate()"
                                 class="flex-1 flex items-center justify-center gap-2 bg-rose-500 text-white font-black py-3.5 rounded-2xl hover:bg-rose-600 transition-all text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(239,68,68,0.2)]">
                             <span class="material-symbols-outlined text-lg">search</span> Look Up
                         </button>
@@ -321,8 +331,8 @@
                             <span class="material-symbols-outlined text-primary">directions_car</span>
                         </div>
                         <div class="flex-1">
-                            <p class="text-xl font-black text-white tracking-widest">ABC-1234</p>
-                            <p class="text-slate-400 text-xs font-bold">Toyota Prius · Silver · Kamal Perera</p>
+                            <p class="text-xl font-black text-white tracking-widest" id="summaryPlate">ABC-1234</p>
+                            <p class="text-slate-400 text-xs font-bold">Toyota Prius · Silver</p>
                         </div>
                         <div class="text-right">
                             <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Slot</p>
@@ -383,11 +393,12 @@
                         </div>
                     </div>
 
-                    <button onclick="confirmExit()"
+                    <button type="button" onclick="confirmExit()"
                             class="w-full flex items-center justify-center gap-3 bg-rose-500 text-white font-black py-4 rounded-2xl hover:bg-rose-600 transition-all text-base shadow-[0_0_25px_rgba(239,68,68,0.25)]">
-                        <span class="material-symbols-outlined text-xl">logout</span> Confirm Exit & Collect $12.65
+                        <span class="material-symbols-outlined text-xl">logout</span> Confirm Exit & Collect Payment
                     </button>
                 </div>
+                </form>
 
                 <!-- Success state -->
                 <div id="successCard" class="hidden">
@@ -446,8 +457,10 @@
     let selectedPayEl = document.querySelector('.pay-method.selected');
 
     function lookupPlate() {
-        const val = document.getElementById('plateField').value.trim();
-        if (!val) return;
+        const select = document.getElementById('plateSelect');
+        if (!select.value) return;
+        const text = select.options[select.selectedIndex].text;
+        document.getElementById('summaryPlate').textContent = text;
         const now = new Date();
         document.getElementById('exitTimeDisplay').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         document.getElementById('sessionCard').classList.remove('hidden');
@@ -460,19 +473,19 @@
     }
 
     function confirmExit() {
-        document.getElementById('sessionCard').classList.add('hidden');
-        document.getElementById('successCard').classList.remove('hidden');
-        const now = new Date();
-        document.getElementById('exitTimestamp').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-        document.getElementById('successCard').scrollIntoView({ behavior: 'smooth' });
+        if (!document.getElementById('plateSelect').value) {
+            alert('Please select a vehicle.');
+            return;
+        }
+        document.getElementById('exitForm').submit();
     }
 
     function resetForm() {
-        document.getElementById('plateField').value = '';
+        document.getElementById('plateSelect').value = '';
         document.getElementById('sessionCard').classList.add('hidden');
         document.getElementById('successCard').classList.add('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        document.getElementById('plateField').focus();
+        document.getElementById('plateSelect').focus();
     }
 </script>
 </body>

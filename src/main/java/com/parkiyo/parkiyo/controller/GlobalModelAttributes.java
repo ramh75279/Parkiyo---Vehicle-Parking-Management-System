@@ -1,0 +1,34 @@
+package com.parkiyo.parkiyo.controller;
+
+import com.parkiyo.parkiyo.model.User;
+import com.parkiyo.parkiyo.service.UserService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ModelAttribute;
+
+@Slf4j
+@ControllerAdvice
+@RequiredArgsConstructor
+public class GlobalModelAttributes {
+
+    private final UserService userService;
+
+    @ModelAttribute("currentUser")
+    public User currentUser(Authentication authentication) {
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+            return null;
+        }
+
+        try {
+            return userService.getUserByEmail(authentication.getName());
+        } catch (Exception e) {
+            log.warn("Failed to load currentUser for: {}", authentication.getName());
+            return null;
+        }
+    }
+}

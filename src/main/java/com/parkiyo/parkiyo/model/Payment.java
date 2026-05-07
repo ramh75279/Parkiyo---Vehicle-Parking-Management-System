@@ -1,6 +1,6 @@
 package com.parkiyo.parkiyo.model;
 
-import com.parkiyo.enums.PaymentStatus;
+import com.parkiyo.parkiyo.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -11,19 +11,22 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payments")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // e.g. TXN-88291047
     @Column(nullable = false, unique = true)
     private String transactionCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -37,17 +40,20 @@ public class Payment {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
-    // Payment method — e.g. "Parkiyo Wallet", "Cash"
     @Column(nullable = false)
     private String paymentMethod;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private PaymentStatus status;
+    private PaymentStatus status = PaymentStatus.PENDING;
 
     private LocalDateTime paidAt;
+
     private LocalDateTime refundedAt;
     private String refundReason;
+
+    @Column(name = "paid_by", length = 150)
+    private String paidBy;           // Operator who took cash payment
 
     @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Receipt receipt;
@@ -57,4 +63,18 @@ public class Payment {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    // ==================== HELPER METHODS ====================
+
+    public boolean isSuccessful() {
+        return status == PaymentStatus.SUCCESS;
+    }
+
+    public boolean isPending() {
+        return status == PaymentStatus.PENDING;
+    }
+
+    public boolean isRefunded() {
+        return refundedAt != null;
+    }
 }

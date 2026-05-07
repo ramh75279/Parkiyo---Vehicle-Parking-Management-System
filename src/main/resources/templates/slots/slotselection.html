@@ -258,8 +258,7 @@
                 </a>
                 <div>
                     <h2 class="text-xl font-black text-white">Select a Slot</h2>
-                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1"
-                       th:text="${reservation.plate + ' · ' + reservation.date + ' · ' + reservation.arrival + ' – ' + reservation.departure}">XYZ-8899 · 11 Mar 2026 · 09:00 – 12:00</p>
+                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Make a new reservation</p>
                 </div>
             </div>
             <div class="h-10 w-10 rounded-[14px] bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
@@ -276,11 +275,11 @@
 
                 <!-- Zone tabs + legend -->
                 <div class="px-8 pt-6 pb-4 flex items-center justify-between gap-4 flex-wrap shrink-0">
-                    <div class="flex gap-1 bg-white/[0.03] border border-white/5 rounded-xl p-1">
-                        <button class="zone-tab active" onclick="setZone(this,'A')">Zone A</button>
-                        <button class="zone-tab" onclick="setZone(this,'B')">Zone B</button>
-                        <button class="zone-tab" onclick="setZone(this,'C')">Zone C</button>
-                        <button class="zone-tab" onclick="setZone(this,'D')">Zone D</button>
+                    <div class="flex gap-1 bg-white/[0.03] border border-white/5 rounded-xl p-1" id="zoneTabsContainer">
+                        <button th:each="z, iterStat : ${zones}" 
+                                th:class="${iterStat.first} ? 'zone-tab active' : 'zone-tab'" 
+                                th:onclick="'setZone(this, \\'' + ${z} + '\\')'"
+                                th:text="'Zone ' + ${z}"></button>
                     </div>
                     <div class="flex items-center gap-5 flex-wrap">
                         <span class="flex items-center gap-2 text-xs font-bold text-emerald-400"><span
@@ -316,34 +315,36 @@
             </div>
 
             <!-- Confirm panel -->
-            <div class="w-72 border-l border-white/5 flex flex-col bg-background-dark/40 premium-blur shrink-0 p-6">
+            <form id="reservationForm" th:action="@{/reservations/create}" method="post" class="w-72 border-l border-white/5 flex flex-col bg-background-dark/40 premium-blur shrink-0 p-6">
                 <h3 class="text-sm font-black text-white mb-5">Reservation Summary</h3>
 
-                <div class="space-y-3 mb-6 text-xs">
-                    <div class="flex justify-between"><span class="text-slate-500 font-bold">Vehicle</span><span
-                            class="text-white font-black" th:text="${reservation.plate}">XYZ-8899</span></div>
-                    <div class="flex justify-between"><span class="text-slate-500 font-bold">Date</span><span
-                            class="text-white font-black" th:text="${reservation.date}">11 Mar 2026</span></div>
-                    <div class="flex justify-between"><span class="text-slate-500 font-bold">Arrival</span><span
-                            class="text-white font-black" th:text="${reservation.arrival}">09:00 AM</span></div>
-                    <div class="flex justify-between"><span class="text-slate-500 font-bold">Departure</span><span
-                            class="text-white font-black" th:text="${reservation.departure}">12:00 PM</span></div>
-                    <div class="flex justify-between"><span class="text-slate-500 font-bold">Duration</span><span
-                            class="text-white font-black" th:text="${reservation.duration}">3 hours</span></div>
-                    <div class="flex justify-between border-t border-white/5 pt-3"><span
+                <input type="hidden" name="slotId" id="selectedSlotId" />
+
+                <div class="space-y-4 mb-6 text-xs">
+                    <div>
+                        <label class="text-slate-500 font-bold mb-1 block uppercase tracking-widest text-[9px]">Vehicle</label>
+                        <select name="vehicleId" class="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-white font-bold" required>
+                            <option value="">-- Select --</option>
+                            <option th:each="v : ${userVehicles}" th:value="${v.id}" th:text="${v.licensePlate}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-slate-500 font-bold mb-1 block uppercase tracking-widest text-[9px]">Arrival</label>
+                        <input type="datetime-local" name="startTime" class="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-white font-bold" required />
+                    </div>
+                    <div>
+                        <label class="text-slate-500 font-bold mb-1 block uppercase tracking-widest text-[9px]">Departure</label>
+                        <input type="datetime-local" name="endTime" class="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-white font-bold" required />
+                    </div>
+                    
+                    <div class="flex justify-between border-t border-white/5 pt-4 mt-4"><span
                             class="text-slate-500 font-bold">Slot</span><span class="text-primary font-black"
                                                                               id="selectedSlotLabel">—</span></div>
                     <div class="flex justify-between"><span class="text-slate-500 font-bold">Zone</span><span
                             class="text-slate-300 font-black" id="selectedZoneLabel">—</span></div>
                 </div>
 
-                <div class="p-4 rounded-2xl bg-primary/5 border border-primary/15 mb-6">
-                    <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Estimated Fee</p>
-                    <p class="text-2xl font-black text-white" th:text="'$' + ${reservation.estimatedFee}">$16.50</p>
-                    <p class="text-[9px] text-slate-500 font-bold mt-1" th:text="${reservation.duration + ' × $' + reservation.hourlyRate + '/hr'}">3h × $5.50/hr</p>
-                </div>
-
-                <button id="confirmBtn" onclick="confirmSlot()" disabled
+                <button id="confirmBtn" type="button" onclick="confirmSlot()" disabled
                         class="w-full flex items-center justify-center gap-2 bg-primary/30 text-white/40 font-black py-3.5 rounded-2xl text-sm cursor-not-allowed transition-all"
                         style="pointer-events:none">
                     <span class="material-symbols-outlined text-lg">check_circle</span> Confirm Slot
@@ -356,7 +357,7 @@
                        class="w-full text-slate-500 font-bold text-xs hover:text-slate-300 transition-all py-2 block text-center">←
                         Back to Reservations</a>
                 </div>
-            </div>
+            </form>
         </div>
     </main>
 </div>
@@ -370,46 +371,47 @@
     </div>
 </div>
 
-<script>
-    const zones = {
-        A: {
-            label: 'Zone A — Ground Floor', sub: '25 slots · 14 available during your time window', rate: 'Standard · $5.50/hr',
-            slots: [
-                { code: 'A-01', s: 'available' }, { code: 'A-02', s: 'occupied' }, { code: 'A-03', s: 'available' }, { code: 'A-04', s: 'occupied' },
-                { code: 'A-05', s: 'available' }, { code: 'A-06', s: 'reserved' }, { code: 'A-07', s: 'available' }, { code: 'A-08', s: 'occupied' },
-                { code: 'A-09', s: 'occupied' }, { code: 'A-10', s: 'available' }, { code: 'A-11', s: 'available' }, { code: 'A-12', s: 'occupied' },
-                { code: 'A-13', s: 'available' }, { code: 'A-14', s: 'available' }, { code: 'A-15', s: 'reserved' }, { code: 'A-16', s: 'available' },
-                { code: 'A-17', s: 'available' }, { code: 'A-18', s: 'occupied' }, { code: 'A-19', s: 'available' }, { code: 'A-20', s: 'available' },
-            ]
-        },
-        B: {
-            label: 'Zone B — Level 1', sub: '30 slots · 18 available during your time window', rate: 'Standard · $5.50/hr',
-            slots: [
-                { code: 'B-01', s: 'available' }, { code: 'B-02', s: 'available' }, { code: 'B-03', s: 'occupied' }, { code: 'B-04', s: 'available' },
-                { code: 'B-05', s: 'available' }, { code: 'B-06', s: 'reserved' }, { code: 'B-07', s: 'available' }, { code: 'B-08', s: 'occupied' },
-                { code: 'B-09', s: 'available' }, { code: 'B-10', s: 'available' }, { code: 'B-11', s: 'occupied' }, { code: 'B-12', s: 'available' },
-                { code: 'B-13', s: 'available' }, { code: 'B-14', s: 'reserved' }, { code: 'B-15', s: 'available' },
-            ]
-        },
-        C: {
-            label: 'Zone C — Level 2', sub: '25 slots · 12 available during your time window', rate: 'Standard · $5.50/hr',
-            slots: [
-                { code: 'C-01', s: 'available' }, { code: 'C-02', s: 'occupied' }, { code: 'C-03', s: 'available' }, { code: 'C-04', s: 'available' },
-                { code: 'C-05', s: 'reserved' }, { code: 'C-06', s: 'available' }, { code: 'C-07', s: 'occupied' }, { code: 'C-08', s: 'available' },
-                { code: 'C-09', s: 'occupied' }, { code: 'C-10', s: 'available' }, { code: 'C-11', s: 'available' }, { code: 'C-12', s: 'reserved' },
-            ]
-        },
-        D: {
-            label: 'Zone D — Rooftop', sub: '20 slots · 17 available during your time window', rate: 'Standard · $5.50/hr',
-            slots: [
-                { code: 'D-01', s: 'available' }, { code: 'D-02', s: 'available' }, { code: 'D-03', s: 'available' }, { code: 'D-04', s: 'occupied' },
-                { code: 'D-05', s: 'available' }, { code: 'D-06', s: 'available' }, { code: 'D-07', s: 'available' }, { code: 'D-08', s: 'available' },
-                { code: 'D-09', s: 'available' }, { code: 'D-10', s: 'occupied' }, { code: 'D-11', s: 'available' }, { code: 'D-12', s: 'available' },
-            ]
-        },
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const availableSlotsList = /*[[${availableSlots}]]*/ [];
+    const allZonesList = /*[[${zones}]]*/ ['A', 'B', 'C', 'D'];
+    /*]]>*/
+
+    const zoneMetadata = {
+        A: { label: 'Zone A — Ground Floor', rate: 'Standard · $5.50/hr' },
+        B: { label: 'Zone B — Level 1', rate: 'Standard · $5.50/hr' },
+        C: { label: 'Zone C — Level 2', rate: 'Standard · $5.50/hr' },
+        D: { label: 'Zone D — Rooftop', rate: 'Standard · $5.50/hr' }
     };
 
-    let currentZone = 'A';
+    const zones = {};
+    if (allZonesList) {
+        allZonesList.forEach(z => {
+            zones[z] = {
+                label: zoneMetadata[z] ? zoneMetadata[z].label : 'Zone ' + z,
+                sub: 'Available slots: 0',
+                rate: zoneMetadata[z] ? zoneMetadata[z].rate : 'Standard',
+                slots: []
+            };
+        });
+    }
+
+    if (availableSlotsList) {
+        availableSlotsList.forEach(s => {
+            const zName = s.zone || 'A';
+            if (!zones[zName]) {
+                zones[zName] = { label: 'Zone ' + zName, sub: 'Available', rate: 'Standard', slots: [] };
+            }
+            zones[zName].slots.push({ id: s.id, code: s.slotNumber, s: 'available' });
+        });
+        
+        // Update subtext
+        Object.keys(zones).forEach(z => {
+            zones[z].sub = `Available slots: ${zones[z].slots.length}`;
+        });
+    }
+
+    let currentZone = allZonesList && allZonesList.length > 0 ? allZonesList[0] : 'A';
     let selectedSlot = null;
 
     const iconMap = { available: 'check', occupied: 'directions_car', reserved: 'event_busy' };
@@ -431,20 +433,21 @@
             <span class="slot-code">${slot.code}</span>
             <div class="slot-tooltip text-white">${tip}</div>`;
             if (slot.s === 'available') {
-                cell.onclick = () => selectSlot(cell, slot.code, z);
+                cell.onclick = () => selectSlot(cell, slot.id, slot.code, z);
             }
             grid.appendChild(cell);
         });
     }
 
-    function selectSlot(el, code, zone) {
+    function selectSlot(el, id, code, zone) {
         document.querySelectorAll('.slot-cell.selected').forEach(c => {
             c.classList.remove('selected');
             c.classList.add('available');
         });
         el.classList.remove('available');
         el.classList.add('selected');
-        selectedSlot = code;
+        selectedSlot = id;
+        document.getElementById('selectedSlotId').value = id;
         document.getElementById('selectedSlotLabel').textContent = code;
         document.getElementById('selectedZoneLabel').textContent = `Zone ${zone}`;
         const btn = document.getElementById('confirmBtn');
@@ -468,11 +471,21 @@
 
     function confirmSlot() {
         if (!selectedSlot) return;
+        
+        // Basic frontend validation for required fields
+        const form = document.getElementById('reservationForm');
+        if (!form.vehicleId.value || !form.startTime.value || !form.endTime.value) {
+            alert('Please select a vehicle, arrival, and departure time.');
+            return;
+        }
+
         document.getElementById('successToast').classList.remove('hidden');
-        setTimeout(() => window.location.href = '/reservations/pending-payment', 1800);
+        setTimeout(() => form.submit(), 800);
     }
 
-    renderZone('A');
+    if (currentZone) {
+        renderZone(currentZone);
+    }
 </script>
 </body>
 

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Parkiyo | Receipt</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet" />
+    <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+            rel="stylesheet" />
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#1f68f9", "background-dark": "#020617" }, fontFamily: { display: ["Public Sans", "sans-serif"] } } } }</script>
+    <style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: #020617;
+        }
+
+        .premium-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .bg-subtle-radial {
+            background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-container {
+            width: 80px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(2, 6, 23, 0.6);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .sidebar-container:hover {
+            width: 280px;
+            background: rgba(2, 6, 23, 0.95);
+        }
+
+        .nav-label {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            margin-left: 1rem;
+        }
+
+        .sidebar-container:hover .nav-label {
+            opacity: 1;
+        }
+
+        /* Receipt paper */
+        .receipt-paper {
+            background: #f8fafc;
+            border-radius: 20px;
+            overflow: hidden;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .receipt-paper *:not(.material-symbols-outlined) {
+            font-family: 'Public Sans', sans-serif;
+        }
+
+        .receipt-header {
+            background: linear-gradient(135deg, #1e3a6e 0%, #1f68f9 100%);
+            padding: 28px 28px 24px;
+        }
+
+        .receipt-body {
+            background: #f8fafc;
+            padding: 24px 28px;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .receipt-row:last-child {
+            border-bottom: none;
+        }
+
+        .receipt-row .lbl {
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+        }
+
+        .receipt-row .val {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: #0f172a;
+            text-align: right;
+        }
+
+        .tear {
+            height: 1px;
+            background: repeating-linear-gradient(90deg, transparent, transparent 8px, #cbd5e1 8px, #cbd5e1 16px);
+            position: relative;
+            margin: 0 -4px;
+        }
+
+        .tear::before,
+        .tear::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            width: 20px;
+            height: 20px;
+            background: #f8fafc;
+            border-radius: 50%;
+        }
+
+        .tear::before {
+            left: -14px;
+        }
+
+        .tear::after {
+            right: -14px;
+        }
+
+        .receipt-total {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 14px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .receipt-paper,
+            .receipt-paper * {
+                visibility: visible;
+            }
+
+            .receipt-paper {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                box-shadow: none;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            display: none;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 24px;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        a { cursor: pointer; }
+    </style>
+</head>
+
+<body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+<div class="flex flex-1 overflow-hidden">
+
+    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50 no-print">
+        <div class="px-5 py-6 mb-4 flex items-center">
+            <div
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+                <span class="material-symbols-outlined font-bold
