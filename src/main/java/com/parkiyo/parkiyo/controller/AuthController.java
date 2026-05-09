@@ -106,20 +106,6 @@ public class AuthController {
         return "redirect:/sign-in";
     }
 
-    @PostMapping("/resend-verification")
-    public String resendVerification(@RequestParam String email,
-                                     RedirectAttributes redirectAttributes) {
-        try {
-            authService.resendVerificationEmail(email);
-            redirectAttributes.addFlashAttribute("success",
-                    "If the account exists and is not verified, a verification email has been sent.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error",
-                    "Could not send verification email right now. Please try again in a moment.");
-        }
-        return "redirect:/sign-in";
-    }
-
     @PostMapping("/reset-password")
     public String resetPassword(@Valid @ModelAttribute PasswordResetRequest request,
                                 BindingResult result,

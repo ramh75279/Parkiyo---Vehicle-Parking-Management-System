@@ -48,9 +48,6 @@ public class AuthService implements UserDetailsService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    @Value("${parkiyo.security.require-email-verification:true}")
-    private boolean requireEmailVerification;
-
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
@@ -60,7 +57,7 @@ public class AuthService implements UserDetailsService {
             throw new UsernameNotFoundException("Account is " + user.getStatus().name().toLowerCase());
         }
 
-        if (requireEmailVerification && !user.isEmailVerified()) {
+        if (!user.isEmailVerified()) {
             throw new UsernameNotFoundException("Email not verified. Please check your inbox.");
         }
 
@@ -144,22 +141,6 @@ public class AuthService implements UserDetailsService {
         userRepository.save(user);
 
         return "success";
-    }
-
-    @Transactional
-    public void resendVerificationEmail(String email) {
-        userRepository.findByEmail(email).ifPresent(user -> {
-            if (user.isEmailVerified()) {
-                return;
-            }
-            String token = user.getEmailVerificationToken();
-            if (token == null || token.isBlank()) {
-                token = UUID.randomUUID().toString().replace("-", "");
-                user.setEmailVerificationToken(token);
-                userRepository.save(user);
-            }
-            sendVerificationEmail(user.getEmail(), token);
-        });
     }
 
     @Transactional
