@@ -13,6 +13,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -28,6 +31,8 @@ public class SecurityConfig {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(authService);
         authProvider.setPasswordEncoder(passwordEncoder);
+        // Allow us to surface specific auth failures (e.g., email not verified) on the login screen.
+        authProvider.setHideUserNotFoundExceptions(false);
         return authProvider;
     }
 
@@ -79,7 +84,20 @@ public class SecurityConfig {
                             );
                             response.sendRedirect(request.getContextPath() + "/dashboard");
                         })
-                        .failureUrl("/sign-in?error=true")
+                        .failureHandler((request, response, exception) -> {
+                            String msg = "Invalid email or password.";
+                            if (exception != null && exception.getMessage() != null) {
+                                String raw = exception.getMessage();
+                                String lower = raw.toLowerCase();
+                                if (lower.contains("email not verified")) {
+                                    msg = "Email not verified. Please check your inbox (and spam) for the verification link.";
+                                } else if (lower.contains("account is")) {
+                                    msg = raw;
+                                }
+                            }
+                            String encoded = URLEncoder.encode(msg, StandardCharsets.UTF_8);
+                            response.sendRedirect(request.getContextPath() + "/sign-in?error=true&message=" + encoded);
+                        })
                         .permitAll()
                 )
 

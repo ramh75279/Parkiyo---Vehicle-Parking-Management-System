@@ -24,9 +24,14 @@ public class AuthController {
 
     @GetMapping("/sign-in")
     public String signInPage(@RequestParam(value = "error", required = false) String error,
+                             @RequestParam(value = "message", required = false) String message,
                              @RequestParam(value = "logout", required = false) String logout,
                              Model model) {
-        if (error != null) model.addAttribute("error", "Invalid email or password.");
+        if (error != null) {
+            model.addAttribute("error", (message != null && !message.isBlank())
+                    ? message
+                    : "Invalid email or password.");
+        }
         if (logout != null) model.addAttribute("success", "You have been logged out.");
         return "auth/login";
     }

@@ -121,6 +121,9 @@ public class AuthService implements UserDetailsService {
             mailSender.send(message);
         } catch (Exception e) {
             log.warn("Failed to send verification email to {}: {}", email, e.getMessage());
+            // This method is called from a @Transactional register() method. Throwing here causes a rollback,
+            // which prevents creating an account the user can never log into.
+            throw new RuntimeException("We couldn't send the verification email. Please try again in a moment.");
         }
     }
 
