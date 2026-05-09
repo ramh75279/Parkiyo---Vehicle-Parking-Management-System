@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/admin")
@@ -22,9 +23,13 @@ public class AdminDashboardController {
     private final NotificationService notificationService;
 
     @GetMapping("/dashboard")
-    public String adminDashboard(Model model, Authentication auth) {
+    public String adminDashboard(
+            @RequestParam(required = false) String q,
+            Model model,
+            Authentication auth) {
         model.addAttribute("stats", dashboardService.getAdminDashboardStats());
-        model.addAttribute("recentEntries", dashboardService.getRecentEntries(10));
+        model.addAttribute("liveOpsRows", dashboardService.getAdminLiveOperationsRows(q));
+        model.addAttribute("searchQuery", q != null ? q : "");
         model.addAttribute("recentPayments", dashboardService.getRecentPayments(5));
         model.addAttribute("slotSummary", dashboardService.getSlotOccupancySummary());
         model.addAttribute("adminNotifications", dashboardService.getAdminRecentNotifications(12));

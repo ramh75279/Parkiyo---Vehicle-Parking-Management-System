@@ -2,6 +2,7 @@ package com.parkiyo.parkiyo.repository;
 
 import com.parkiyo.parkiyo.model.Vehicle;
 import com.parkiyo.parkiyo.enums.VehicleCategory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -38,4 +39,11 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
             + "LEFT JOIN FETCH u.wallet "
             + "WHERE v.id = :id")
     Optional<Vehicle> findByIdWithUserAndWallet(@Param("id") Long id);
+
+    /** No parking session yet (newly added vehicles show here until first entry). */
+    @Query("SELECT DISTINCT v FROM Vehicle v "
+            + "LEFT JOIN FETCH v.user "
+            + "WHERE NOT EXISTS (SELECT 1 FROM ParkingRecord pr WHERE pr.vehicle.id = v.id) "
+            + "ORDER BY v.createdAt DESC")
+    List<Vehicle> findWithoutParkingHistory(Pageable pageable);
 }

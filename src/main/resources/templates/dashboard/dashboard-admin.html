@@ -34,6 +34,7 @@
         .status-exited { background: rgba(244,63,94,0.1); color: #fb7185; border: 1px solid rgba(244,63,94,0.2); }
         .status-paid { background: rgba(31,104,249,0.1); color: #60a5fa; border: 1px solid rgba(31,104,249,0.2); }
         .status-unpaid { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+        .status-registered { background: rgba(139,92,246,0.12); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.25); }
         .status-available { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
         .status-occupied { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
         .search-glass { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
@@ -105,12 +106,6 @@
                 </div>
             </div>
             <div class="flex items-center gap-6">
-                <!-- Search -->
-                <div class="hidden xl:flex items-center h-12 w-80 rounded-2xl px-4 search-glass">
-                    <span class="material-symbols-outlined text-slate-500">search</span>
-                    <input type="text" placeholder="Search plate, slot, user..." class="bg-transparent border-none focus:ring-0 w-full text-sm text-white placeholder:text-slate-500 px-3">
-                </div>
-
                 <!-- Revenue -->
                 <div class="hidden md:flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2">
                     <span class="material-symbols-outlined text-emerald-400 text-base">account_balance_wallet</span>
@@ -174,33 +169,90 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
                 <div class="lg:col-span-2 glass-card rounded-[2.5rem] overflow-hidden">
-                    <div class="p-8 border-b border-white/5 flex items-center justify-between">
-                        <h3 class="text-lg font-black text-white">Live Operations</h3>
-                        <a th:href="@{/admin/parking}" class="text-primary text-[10px] font-black uppercase tracking-widest hover:brightness-125">View All</a>
+                    <div class="p-8 border-b border-white/5 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between xl:gap-6">
+                        <div class="flex items-center justify-between gap-4 shrink-0 xl:justify-start">
+                            <h3 class="text-lg font-black text-white">Live Operations</h3>
+                            <a th:href="@{/admin/parking}" class="text-primary text-[10px] font-black uppercase tracking-widest hover:brightness-125 xl:hidden">View All</a>
+                        </div>
+                        <form method="get" th:action="@{/admin/dashboard}" id="live-ops-filter-form"
+                              class="flex w-full min-w-0 flex-1 items-center gap-2 h-11 rounded-2xl px-4 search-glass xl:max-w-2xl">
+                            <span class="material-symbols-outlined text-slate-500 shrink-0 text-xl">search</span>
+                            <input type="search" name="q" id="live-ops-search" autocomplete="off"
+                                   th:value="${searchQuery}"
+                                   placeholder="Search plate, slot, user name, email, status…"
+                                   aria-label="Search live operations table"
+                                   class="bg-transparent border-none focus:ring-0 flex-1 min-w-0 text-sm text-white placeholder:text-slate-500 px-2">
+                            <button type="submit" class="inline-flex shrink-0 rounded-lg bg-primary/90 hover:bg-primary px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-white items-center justify-center">
+                                Search
+                            </button>
+                        </form>
+                        <a th:href="@{/admin/parking}" class="text-primary text-[10px] font-black uppercase tracking-widest hover:brightness-125 shrink-0 text-right hidden xl:block">View All</a>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
                             <thead>
                             <tr class="text-slate-500 text-[10px] font-black uppercase tracking-widest">
-                                <th class="px-8 py-5">Vehicle ID</th><th class="px-8 py-5">Bay</th><th class="px-8 py-5">Entry</th><th class="px-8 py-5">Status</th><th class="px-8 py-5">Payment</th>
+                                <th class="px-8 py-5">Vehicle ID</th>
+                                <th class="px-8 py-5">Bay</th>
+                                <th class="px-8 py-5">User</th>
+                                <th class="px-8 py-5">Entry</th>
+                                <th class="px-8 py-5">Status</th>
+                                <th class="px-8 py-5">Payment</th>
                             </tr>
                             </thead>
-                            <tbody class="text-sm font-bold text-slate-300 divide-y divide-white/5">
-                            <tr th:each="record : ${recentEntries}" class="hover:bg-white/[0.02] transition-colors">
-                                <td class="px-8 py-6 text-white font-black" th:text="${record.vehicle.licensePlate}">-</td>
-                                <td class="px-8 py-6" th:text="${record.slot.slotNumber}">-</td>
-                                <td class="px-8 py-6 opacity-60" th:text="${#temporals.format(record.entryTime, 'hh:mm a')}">-</td>
-                                <td class="px-8 py-6">
-                                    <span th:if="${record.active}" class="status-pill status-active">Active</span>
-                                    <span th:unless="${record.active}" class="status-pill status-exited">Exited</span>
-                                </td>
-                                <td class="px-8 py-6">
-                                    <span th:if="${record.payment == null}" class="status-pill status-unpaid">Pending</span>
-                                    <span th:unless="${record.payment == null}" class="status-pill status-paid">Settled</span>
-                                </td>
+                            <tbody id="live-ops-tbody" class="text-sm font-bold text-slate-300 divide-y divide-white/5">
+                            <tr th:each="row : ${liveOpsRows}"
+                                class="live-ops-row hover:bg-white/[0.02] transition-colors"
+                                th:classappend="${row.registeredOnly} ? ' bg-violet-500/[0.04]'">
+                                <th:block th:if="${row.registeredOnly}"
+                                          th:with="v=${row.vehicle},
+                                                   vo=${v.user},
+                                                   vLabel=${vo != null ? vo.firstName + ' ' + vo.lastName : '—'},
+                                                   vEmail=${vo != null ? vo.email : ''}">
+                                    <td class="px-8 py-6 text-white font-black" th:text="${v.licensePlate}">-</td>
+                                    <td class="px-8 py-6 text-slate-500">—</td>
+                                    <td class="px-8 py-6 max-w-[12rem]">
+                                        <span class="text-white/90 text-xs block truncate" th:text="${vLabel}">—</span>
+                                        <span class="text-slate-500 text-[10px] font-bold block truncate" th:if="${vo != null}" th:text="${vEmail}"></span>
+                                        <span class="text-slate-600 text-[10px]" th:if="${vo == null}">Not assigned</span>
+                                    </td>
+                                    <td class="px-8 py-6 opacity-60 text-slate-500">—</td>
+                                    <td class="px-8 py-6">
+                                        <span class="status-pill status-registered">Registered</span>
+                                        <span class="block text-[9px] text-slate-600 font-bold mt-1 uppercase tracking-tighter">Awaiting first entry</span>
+                                    </td>
+                                    <td class="px-8 py-6 text-slate-600">—</td>
+                                </th:block>
+                                <th:block th:unless="${row.registeredOnly}"
+                                          th:with="record=${row.parkingRecord},
+                                                   owner=${record.user != null ? record.user : record.vehicle.user},
+                                                   plate=${record.vehicle.licensePlate},
+                                                   bay=${record.slot != null ? record.slot.slotNumber : '-'},
+                                                   userLabel=${owner != null ? owner.firstName + ' ' + owner.lastName : '—'},
+                                                   userEmail=${owner != null ? owner.email : ''}">
+                                    <td class="px-8 py-6 text-white font-black" th:text="${plate}">-</td>
+                                    <td class="px-8 py-6" th:text="${bay}">-</td>
+                                    <td class="px-8 py-6 max-w-[12rem]">
+                                        <span class="text-white/90 text-xs block truncate" th:text="${userLabel}">—</span>
+                                        <span class="text-slate-500 text-[10px] font-bold block truncate" th:if="${owner != null}" th:text="${userEmail}"></span>
+                                        <span class="text-slate-600 text-[10px]" th:if="${owner == null}">Guest / walk-in</span>
+                                    </td>
+                                    <td class="px-8 py-6 opacity-60" th:text="${#temporals.format(record.entryTime, 'hh:mm a')}">-</td>
+                                    <td class="px-8 py-6">
+                                        <span th:if="${record.active}" class="status-pill status-active">Active</span>
+                                        <span th:unless="${record.active}" class="status-pill status-exited">Exited</span>
+                                    </td>
+                                    <td class="px-8 py-6">
+                                        <span th:if="${record.payment == null}" class="status-pill status-unpaid">Pending</span>
+                                        <span th:unless="${record.payment == null}" class="status-pill status-paid">Settled</span>
+                                    </td>
+                                </th:block>
                             </tr>
-                            <tr th:if="${#lists.isEmpty(recentEntries)}">
-                                <td colspan="5" class="px-8 py-10 text-center text-slate-500 text-sm">No parking records yet.</td>
+                            <tr th:if="${#lists.isEmpty(liveOpsRows)}">
+                                <td colspan="6" class="px-8 py-10 text-center text-slate-500 text-sm">No vehicles or parking sessions yet.</td>
+                            </tr>
+                            <tr id="live-ops-no-match" style="display: none;">
+                                <td colspan="6" class="px-8 py-10 text-center text-slate-500 text-sm">No rows match your search.</td>
                             </tr>
                             </tbody>
                         </table>
@@ -415,6 +467,62 @@
     }
 
     setInterval(updateDashboard, 30000);
+</script>
+
+<script>
+    (function () {
+        function compactAlphaNum(s) {
+            return String(s || '').toLowerCase().replace(/[^a-z0-9@._]/g, '');
+        }
+
+        function rowText(row) {
+            var cells = row.querySelectorAll('td');
+            var out = [];
+            for (var i = 0; i < cells.length; i++) {
+                out.push(cells[i].innerText || cells[i].textContent || '');
+            }
+            return out.join(' ').toLowerCase();
+        }
+
+        function matches(hay, qRaw) {
+            var q = String(qRaw || '').trim();
+            if (!q) return true;
+            var ql = q.toLowerCase();
+            if (hay.indexOf(ql) !== -1) return true;
+            var hq = compactAlphaNum(hay);
+            var qq = compactAlphaNum(q);
+            return qq.length > 0 && hq.indexOf(qq) !== -1;
+        }
+
+        function applyLiveOpsFilter() {
+            var input = document.getElementById('live-ops-search');
+            var tbody = document.getElementById('live-ops-tbody');
+            var noMatch = document.getElementById('live-ops-no-match');
+            if (!tbody) return;
+            var q = input ? String(input.value || '').trim() : '';
+            var rows = tbody.querySelectorAll('tr.live-ops-row');
+            var vis = 0;
+            for (var i = 0; i < rows.length; i++) {
+                var ok = matches(rowText(rows[i]), q);
+                rows[i].style.display = ok ? 'table-row' : 'none';
+                if (ok) vis++;
+            }
+            if (noMatch) {
+                noMatch.style.display = (q.length > 0 && rows.length > 0 && vis === 0) ? 'table-row' : 'none';
+            }
+        }
+
+        window.parkiyoApplyLiveOpsFilter = applyLiveOpsFilter;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var input = document.getElementById('live-ops-search');
+            if (input) {
+                input.addEventListener('input', applyLiveOpsFilter);
+                input.addEventListener('search', applyLiveOpsFilter);
+            }
+            applyLiveOpsFilter();
+        });
+    })();
 </script>
 
 </body>

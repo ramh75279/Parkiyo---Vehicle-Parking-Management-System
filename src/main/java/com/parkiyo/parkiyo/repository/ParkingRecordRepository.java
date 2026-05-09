@@ -1,6 +1,7 @@
 package com.parkiyo.parkiyo.repository;
 
 import com.parkiyo.parkiyo.model.ParkingRecord;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,8 +24,15 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
             "WHERE pr.exitTime IS NOT NULL AND DATE(pr.exitTime) = CURRENT_DATE")
     BigDecimal calculateTodayRevenue();
 
-    @Query("SELECT pr FROM ParkingRecord pr ORDER BY pr.entryTime DESC")
-    List<ParkingRecord> findTopRecentEntries(@Param("limit") int limit);  // Use Pageable in service for better LIMIT
+    /** Loads associations for admin dashboard / Live Ops (works with open-in-view disabled). */
+    @Query("SELECT DISTINCT pr FROM ParkingRecord pr "
+            + "JOIN FETCH pr.vehicle v "
+            + "LEFT JOIN FETCH pr.parkingSlot "
+            + "LEFT JOIN FETCH pr.user "
+            + "LEFT JOIN FETCH v.user "
+            + "LEFT JOIN FETCH pr.payment "
+            + "ORDER BY pr.entryTime DESC")
+    List<ParkingRecord> findRecentEntriesForDashboard(Pageable pageable);
 
     @Query("SELECT pr FROM ParkingRecord pr ORDER BY pr.createdAt DESC")
     List<ParkingRecord> findTop20ByOrderByCreatedAtDesc();
