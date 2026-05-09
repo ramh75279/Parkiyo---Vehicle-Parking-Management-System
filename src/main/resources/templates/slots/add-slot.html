@@ -61,11 +61,17 @@
             <a th:href="@{/admin/dashboard}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">dashboard</span><span class="nav-label text-sm">Dashboard</span></a>
             <a th:href="@{/admin/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle Entry</span></a>
             <a th:href="@{/admin/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span></a>
-            <a th:href="@{/admin/vehicles}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">directions_car</span><span class="nav-label text-sm">Vehicles</span></a>
             <a th:href="@{/admin/slots}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span class="material-symbols-outlined shrink-0">grid_view</span><span class="nav-label text-sm">Parking Slots</span></a>
+            <a th:href="@{/admin/vehicles}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">directions_car</span><span class="nav-label text-sm">Vehicles</span></a>
             <a th:href="@{/admin/users}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">group</span><span class="nav-label text-sm">Users</span></a>
             <a th:href="@{/admin/payments}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">payments</span><span class="nav-label text-sm">Payments</span></a>
             <a th:href="@{/admin/reports}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">bar_chart</span><span class="nav-label text-sm">Reports</span></a>
+            <a th:href="@{/admin/notifications}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
+                <span class="material-symbols-outlined shrink-0">notifications</span><span class="nav-label text-sm">Notifications</span>
+            </a>
+            <a th:href="@{/admin/system-status}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
+                <span class="material-symbols-outlined shrink-0">monitor_heart</span><span class="nav-label text-sm">System Status</span>
+            </a>
             <a th:href="@{/admin/settings}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">settings</span><span class="nav-label text-sm">Settings</span></a>
         </nav>
         <div class="p-4 border-t border-white/5">
@@ -102,6 +108,7 @@
             <div class="max-w-3xl mx-auto space-y-8">
 
                 <form id="addSlotForm" th:action="@{/admin/slots/create}" th:object="${slotRequest}" method="post">
+                    <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     <!-- Slot identity -->
                 <div class="glass-card rounded-[2.5rem] p-8">
                     <h3 class="text-base font-black text-white mb-6">Slot Identity</h3>
@@ -115,19 +122,22 @@
                             <label class="field-label">Zone <span class="text-rose-400">*</span></label>
                             <select th:field="*{zone}" class="input-glass px-4 h-12 rounded-2xl" onchange="updatePreview()">
                                 <option value="">Select zone…</option>
-                                <option selected>Zone A — Ground Floor</option>
-                                <option>Zone B — Level 1</option>
-                                <option>Zone C — Level 2</option>
-                                <option>Zone D — Rooftop</option>
+                                <option th:each="z : ${zones}" th:value="${z}" th:text="${z}"></option>
+                                <th:block th:if="${zones == null or #lists.isEmpty(zones)}">
+                                    <option value="Zone A — Ground Floor">Zone A — Ground Floor</option>
+                                    <option value="Zone B — Level 1">Zone B — Level 1</option>
+                                    <option value="Zone C — Level 2">Zone C — Level 2</option>
+                                    <option value="Zone D — Rooftop">Zone D — Rooftop</option>
+                                </th:block>
                             </select>
                         </div>
                         <div>
                             <label class="field-label">Floor / Level</label>
-                            <select name="floor" class="input-glass px-4 h-12 rounded-2xl">
-                                <option>Ground Floor</option>
-                                <option>Level 1</option>
-                                <option>Level 2</option>
-                                <option>Rooftop</option>
+                            <select th:field="*{floor}" class="input-glass px-4 h-12 rounded-2xl">
+                                <option value="Ground Floor">Ground Floor</option>
+                                <option value="Level 1">Level 1</option>
+                                <option value="Level 2">Level 2</option>
+                                <option value="Rooftop">Rooftop</option>
                             </select>
                         </div>
                         <div>
@@ -175,7 +185,7 @@
                         </div>
                         <div class="sm:col-span-2">
                             <label class="field-label">Notes</label>
-                            <textarea name="notes" rows="2" placeholder="Any special notes about this slot (optional)…" class="input-glass rounded-2xl px-4 py-3 resize-none"></textarea>
+                            <textarea th:field="*{description}" rows="2" placeholder="Any special notes about this slot (optional)…" class="input-glass rounded-2xl px-4 py-3 resize-none"></textarea>
                         </div>
                     </div>
                     <div class="mt-6 flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/5">
@@ -187,7 +197,6 @@
                             <span id="activeThumb" class="absolute top-1 right-1 h-5 w-5 rounded-full bg-white shadow transition-all"></span>
                         </button>
                     </div>
-                    <input type="hidden" id="activeStatus" name="activeStatus" value="true" />
                 </div>
 
                 <!-- Live preview -->
@@ -249,15 +258,12 @@
         active = !active;
         const btn = document.getElementById('activeToggle');
         const thumb = document.getElementById('activeThumb');
-        const status = document.getElementById('activeStatus');
         if (active) {
             btn.classList.add('bg-primary'); btn.classList.remove('bg-white/10');
             thumb.style.right = '4px'; thumb.style.left = 'auto';
-            status.value = 'true';
         } else {
             btn.classList.remove('bg-primary'); btn.classList.add('bg-white/10');
             thumb.style.left = '4px'; thumb.style.right = 'auto';
-            status.value = 'false';
         }
     }
 
@@ -267,12 +273,32 @@
     }
 
     function saveSlot() {
-        const slotCode = document.getElementById('slotCode').value.trim();
+        const form = document.getElementById('addSlotForm');
+        const slotInput = document.getElementById('slotCode');
+        const zoneSel = form.querySelector('select[name="zone"]');
+        const slotCode = slotInput.value.trim();
+        const zone = zoneSel && zoneSel.value ? zoneSel.value.trim() : '';
+
+        let ok = true;
         if (!slotCode) {
-            document.getElementById('slotCode').style.borderColor = 'rgba(244,63,94,0.6)';
-            document.getElementById('slotCode').style.boxShadow = '0 0 0 3px rgba(244,63,94,0.12)';
-            return;
+            slotInput.style.borderColor = 'rgba(244,63,94,0.6)';
+            slotInput.style.boxShadow = '0 0 0 3px rgba(244,63,94,0.12)';
+            ok = false;
+        } else {
+            slotInput.style.borderColor = '';
+            slotInput.style.boxShadow = '';
         }
+        if (!zone) {
+            if (zoneSel) {
+                zoneSel.style.borderColor = 'rgba(244,63,94,0.6)';
+                zoneSel.style.boxShadow = '0 0 0 3px rgba(244,63,94,0.12)';
+            }
+            ok = false;
+        } else if (zoneSel) {
+            zoneSel.style.borderColor = '';
+            zoneSel.style.boxShadow = '';
+        }
+        if (!ok) return;
         submitSlot();
     }
 
