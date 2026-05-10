@@ -39,12 +39,17 @@ public class VehicleController {
     @GetMapping
     public String vehicleList(@RequestParam(required = false) String search,
                               @RequestParam(required = false) String category,
+                              @RequestParam(required = false) String status,
                               Model model) {
 
         List<Vehicle> vehicles = vehicleService.getAllVehicles(search, category);
+        List<Map<String, Object>> vehicleRows = vehicles.stream().map(this::toVehicleRow).toList();
+        if (status != null && !status.isBlank()) {
+            vehicleRows = vehicleRows.stream().filter(v -> matchesStatus(v, status)).toList();
+        }
 
         // Fixed: Convert to DTO/row inside the service transaction or force initialize
-        model.addAttribute("vehicles", vehicles.stream().map(this::toVehicleRow).toList());
+        model.addAttribute("vehicles", vehicleRows);
         model.addAttribute("categories", vehicleService.getAllCategories());
         model.addAttribute("stats", buildVehicleStats(vehicles));
         model.addAttribute("currentPage", 1);
@@ -58,43 +63,121 @@ public class VehicleController {
 
     private Map<String, Object> toVehicleRow(Vehicle vehicle) {
         Map<String, Object> row = new HashMap<>();
+
         row.put("id", vehicle.getId());
         row.put("plate", vehicle.getLicensePlate());
 
-        // FIXED: Safe access to User with null check
         String ownerName = "Guest";
         if (vehicle.getUser() != null) {
             try {
-                ownerName = vehicle.getUser().getFirstName() + " " +
-                        (vehicle.getUser().getLastName() != null ? vehicle.getUser().getLastName() : "");
+            ownerName = vehicle.getUser().getFirstName() + " " +
+                (vehicle.getUser().getLastName() != null
+                    ? vehicle.getUser().getLastName()
+                    : "");
             } catch (Exception e) {
-                ownerName = "User #" + vehicle.getUser().getId();
+            ownerName = "User #" + vehicle.getUser().getId();
             }
         }
+
         row.put("ownerName", ownerName.trim());
 
-        row.put("category", vehicle.getCategory() != null ? formatCategory(vehicle.getCategory().name()) : "-");
+        row.put("category",
+            vehicle.getCategory() != null
+                ? formatCategory(vehicle.getCategory().name())
+                : "-");
+
         row.put("makeModel", buildMakeModel(vehicle.getMake(), vehicle.getModel()));
-        row.put("color", vehicle.getColor() != null && !vehicle.getColor().isBlank() ? vehicle.getColor() : "-");
+
+        row.put("color",
+            vehicle.getColor() != null && !vehicle.getColor().isBlank()
+                ? vehicle.getColor()
+                : "-");
+
         row.put("colorHex", colorToHex(vehicle.getColor()));
-        row.put("status", vehicle.isActive() ? "Active" : "Blocked");
-        row.put("registeredOn", vehicle.getCreatedAt() != null
-                ? vehicle.getCreatedAt().toLocalDate().format(DateTimeFormatter.ISO_DATE)
+
+        row.put("status", vehicle.isActive() ? "Active" : "Inactive");
+
+        row.put("parkingStatus",
+            vehicleService.isVehicleCurrentlyParked(vehicle.getId())
+                ? "Parked"
+                : "Not Parked");
+
+        row.put("registeredOn",
+            vehicle.getCreatedAt() != null
+                ? vehicle.getCreatedAt().toLocalDate()
+                .format(DateTimeFormatter.ISO_DATE)
                 : "-");
 
         return row;
     }
 
-    private Map<String, Object> buildVehicleStats(List<Vehicle> vehicles) {
-        long activeCount = vehicles.stream().filter(Vehicle::isActive).count();
-        long blockedCount = vehicles.size() - activeCount;
+        private boolean matchesStatus(Map<String, Object> row, String status) {
+        if (status == null || status.isBlank()) {
+            return true;
+        }
+        String requested = status.trim().toLowerCase(Locale.ROOT);
+        String rowStatus = String.valueOf(row.getOrDefault("status", "")).toLowerCase(Locale.ROOT);
+        String rowParkingStatus = String.valueOf(row.getOrDefault("parkingStatus", "")).toLowerCase(Locale.ROOT);
+        return rowStatus.equals(requested) || rowParkingStatus.equals(requested);
+        }
 
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("total", vehicles.size());
-        stats.put("parked", 0);
-        stats.put("active", activeCount);
-        stats.put("blocked", blockedCount);
-        return stats;
+    @GetMapping("/export")
+    @ResponseBody
+    public ResponseEntity<String> exportVehiclesCsv() {
+
+    List<Vehicle> vehicles = vehicleService.getAllVehicles(null, null);
+
+    StringBuilder csv = new StringBuilder();
+    csv.append("Plate,Owner,Category,Make,Model,Status\n");
+
+    for (Vehicle vehicle : vehicles) {
+        String owner = "Guest";
+        if (vehicle.getUser() != null) {
+            String firstName = vehicle.getUser().getFirstName() != null ? vehicle.getUser().getFirstName().trim() : "";
+            String lastName = vehicle.getUser().getLastName() != null ? vehicle.getUser().getLastName().trim() : "";
+            String fullName = (firstName + " " + lastName).trim();
+            owner = fullName.isBlank() ? vehicle.getUser().getEmail() : fullName;
+        }
+
+        csv.append(csvSafe(vehicle.getLicensePlate())).append(",")
+                .append(csvSafe(owner)).append(",")
+                .append(csvSafe(vehicle.getCategory() != null ? formatCategory(vehicle.getCategory().name()) : "")).append(",")
+                .append(csvSafe(vehicle.getMake())).append(",")
+                .append(csvSafe(vehicle.getModel())).append(",")
+                .append(vehicle.isActive() ? "Active" : "Inactive")
+                .append("\n");
+    }
+
+    return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=vehicles.csv")
+                .contentType(new MediaType("text", "csv"))
+            .body(csv.toString());
+    }
+
+            private String csvSafe(String value) {
+            if (value == null) {
+                return "";
+            }
+            String escaped = value.replace("\"", "\"\"");
+            return "\"" + escaped + "\"";
+            }
+
+    private Map<String, Object> buildVehicleStats(List<Vehicle> vehicles) {
+            long activeCount = vehicles.stream().filter(Vehicle::isActive).count();
+            long inactiveCount = vehicles.size() - activeCount;
+
+            long parkedCount = vehicles.stream()
+                .filter(v -> vehicleService.isVehicleCurrentlyParked(v.getId()))
+                .count();
+
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("total", vehicles.size());
+            stats.put("parked", parkedCount);
+            stats.put("active", activeCount);
+            stats.put("inactive", inactiveCount);
+
+            return stats;
     }
 
     private String buildMakeModel(String make, String model) {
@@ -240,7 +323,7 @@ public class VehicleController {
     public String deleteVehicle(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             vehicleService.deleteVehicle(id);
-            redirectAttributes.addFlashAttribute("success", "Vehicle deleted.");
+            redirectAttributes.addFlashAttribute("success", "Vehicle deactivated.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }

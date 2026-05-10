@@ -39,6 +39,7 @@ public class VehicleService {
     private final UserRepository userRepository;
     private final ParkingRecordRepository parkingRecordRepository;
 
+    @Transactional(readOnly = true)
     public List<Vehicle> getAllVehicles(String search, String category) {
         List<Vehicle> vehicles = vehicleRepository.findAll();
 
@@ -72,6 +73,7 @@ public class VehicleService {
         return vehicleRepository.findByUserEmail(email);
     }
 
+    @Transactional(readOnly = true)
     public List<Vehicle> getVehiclesByCategory(String category) {
         if (category == null || category.isBlank()) return vehicleRepository.findAll();
         return vehicleRepository.findByCategory(VehicleCategory.valueOf(category.toUpperCase()));
@@ -81,6 +83,7 @@ public class VehicleService {
         return Arrays.stream(VehicleCategory.values()).map(Enum::name).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ParkingRecord> getVehicleParkingHistory(Long vehicleId) {
         return parkingRecordRepository.findParkingHistoryForVehicle(vehicleId);
     }
@@ -121,8 +124,20 @@ public class VehicleService {
 
     @Transactional
     public void deleteVehicle(Long id) {
-        vehicleRepository.deleteById(id);
+        Vehicle vehicle = getVehicleById(id);
+
+        vehicle.setActive(false); // soft delete instead of actual delete
+        vehicleRepository.save(vehicle);
     }
+
+    @Transactional(readOnly = true)
+    public boolean isVehicleCurrentlyParked(Long vehicleId) {
+        List<ParkingRecord> history = parkingRecordRepository
+            .findParkingHistoryForVehicle(vehicleId);
+
+        return history.stream().anyMatch(ParkingRecord::isActive);
+    }
+    
 
     @Transactional
     public void quickRegisterByPlate(String licensePlate, String category) {
