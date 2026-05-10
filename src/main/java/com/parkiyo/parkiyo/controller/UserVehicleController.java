@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -43,6 +44,29 @@ public class UserVehicleController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/vehicles/add";
+        }
+    }
+
+    @GetMapping("/vehicles/quick-register")
+    @PreAuthorize("isAuthenticated()")
+    public String userQuickRegisterPage(@RequestParam(required = false) String plate, Model model) {
+        model.addAttribute("plate", plate != null ? plate.toUpperCase() : "");
+        return "vehicles/quick-register-by-plate";
+    }
+
+    @PostMapping("/vehicles/quick-register")
+    @PreAuthorize("isAuthenticated()")
+    public String userQuickRegister(@RequestParam String licensePlate,
+                                    @RequestParam(required = false) String category,
+                                    Authentication auth,
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            vehicleService.quickRegisterByPlate(licensePlate, category);
+            redirectAttributes.addFlashAttribute("success", "Vehicle " + licensePlate.toUpperCase() + " registered.");
+            return "redirect:/entry";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/vehicles/quick-register";
         }
     }
 }
