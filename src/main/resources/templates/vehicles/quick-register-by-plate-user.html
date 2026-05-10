@@ -33,9 +33,9 @@
         .input-glass::placeholder { color: rgba(255,255,255,0.18); }
         select.input-glass option { background: #0f172a; }
         label.field-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 6px; display: block; }
-        .plate-input { background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.12); color: white; border-radius: 16px; padding: 18px 24px; font-size: 2.2rem; font-weight: 900; letter-spacing: 0.2em; text-align: center; text-transform: uppercase; transition: all 0.2s; outline: none; width: 100%; }
+        .plate-input { background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.12); color: #e2e8f0; border-radius: 16px; padding: 18px 24px; font-size: 2.2rem; font-weight: 900; letter-spacing: 0.2em; text-align: center; text-transform: uppercase; transition: all 0.2s; outline: none; width: 100%; }
         .plate-input:focus { border-color: #1f68f9; box-shadow: 0 0 0 4px rgba(31,104,249,0.15); }
-        .plate-input::placeholder { color: rgba(255,255,255,0.1); font-size: 1.5rem; letter-spacing: 0.1em; }
+        .plate-input::placeholder { color: rgba(255,255,255,0.4); font-size: 1.5rem; letter-spacing: 0.1em; }
         .step-indicator { display: flex; align-items: center; justify-content: center; gap: 0; }
         .step { display: flex; flex-direction: column; align-items: center; gap: 6px; }
         .step-circle { height: 36px; width: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 900; border: 2px solid; transition: all 0.3s; }
@@ -69,6 +69,7 @@
             <a th:href="@{/dashboard/user}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">dashboard</span><span class="nav-label text-sm">Dashboard</span></a>
             <a th:href="@{/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle Entry</span></a>
             <a th:href="@{/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span></a>
+            <a th:href="@{/vehicles}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">directions_car</span><span class="nav-label text-sm">Vehicles</span></a>
             <a th:href="@{/parking}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">local_parking</span><span class="nav-label text-sm">Active Parking</span></a>
             <a th:href="@{/reservation}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">event_available</span><span class="nav-label text-sm">Reservation</span></a>
             <a th:href="@{/payments/history}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">payments</span><span class="nav-label text-sm">Payments</span></a>
@@ -135,24 +136,24 @@
                     </div>
                 </div>
 
-                <div class="glass-card rounded-[2.5rem] p-8 mb-6 border border-emerald-500/15 bg-emerald-500/5">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-base font-black text-white">Step 1 — License Plate</h3>
-                        <span class="flex items-center gap-1 text-[10px] font-black text-emerald-400 uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-sm">check_circle</span> Entered
-                        </span>
-                    </div>
-                    <div class="flex items-center justify-between p-5 rounded-2xl bg-black/20 border border-white/5">
-                        <p class="text-4xl font-black text-white tracking-[0.15em]" th:text="${vehicleRequest?.licensePlate != null ? vehicleRequest.licensePlate : 'NEW-5588'}">NEW-5588</p>
-                        <a th:href="@{/vehicles/quick-register}" class="text-slate-500 hover:text-primary text-[10px] font-black uppercase tracking-wider transition-all">Edit</a>
-                    </div>
-                    <p class="text-[10px] font-bold text-emerald-400 mt-3 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm">info</span> No existing record found — proceeding with new registration.
-                    </p>
-                </div>
-
                 <form th:action="@{/vehicles/quick-register}" th:object="${vehicleRequest}" method="post">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                    <div class="glass-card rounded-[2.5rem] p-8 mb-6 border border-emerald-500/15 bg-emerald-500/5">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-base font-black text-white">Step 1 — License Plate</h3>
+                            <span class="flex items-center gap-1 text-[10px] font-black text-emerald-400 uppercase tracking-wider" th:if="${vehicleRequest?.licensePlate != null}">
+                                <span class="material-symbols-outlined text-sm">check_circle</span> Entered
+                            </span>
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" placeholder="e.g. ABC-1234" class="plate-input" th:field="*{licensePlate}" />
+                            <div th:if="${#fields.hasErrors('licensePlate')}" class="text-rose-400 text-xs mt-2 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">error</span>
+                                <span th:errors="*{licensePlate}"></span>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="glass-card rounded-[2.5rem] p-8 mb-6">
                         <h3 class="text-base font-black text-white mb-6">Step 2 — Vehicle Details</h3>
@@ -166,6 +167,10 @@
                                 <option value="TRUCK">Truck</option>
                                 <option value="VAN">Van</option>
                             </select>
+                            <div th:if="${#fields.hasErrors('category')}" class="text-rose-400 text-xs mt-2 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">error</span>
+                                <span th:errors="*{category}"></span>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-5">
