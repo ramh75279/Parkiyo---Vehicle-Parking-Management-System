@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${isEdit} ? 'Edit Pass Plan' : 'New Pass Plan'">Pass Plan</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#1f68f9", "background-dark": "#020617" }, fontFamily: { display: ["Public Sans", "sans-serif"] } } } }</script>
+    <style>
+        body { font-family: 'Public Sans', sans-serif; background-color: #020617; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .input-glass { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); color: white; border-radius: 12px; padding: 10px 14px; width: 100%; font-weight: 700; font-size: 0.85rem; }
+        .input-glass:focus { outline: none; border-color: rgba(31, 104, 249, 0.5); }
+        label.field { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 6px; display: block; }
+        .sidebar-container { width: 80px; transition: 0.4s; background: rgba(2, 6, 23, 0.6); overflow: hidden; white-space: nowrap; }
+        .sidebar-container:hover { width: 280px; background: rgba(2, 6, 23, 0.95); }
+        .nav-label { opacity: 0; transition: 0.3s; margin-left: 1rem; }
+        .sidebar-container:hover .nav-label { opacity: 1; }
+        .premium-blur { backdrop-filter: blur(20px); }
+        .bg-subtle-radial { background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%); }
+    </style>
+</head>
+<body class="text-slate-100 font-display antialiased min-h-screen flex flex-col overflow-hidden">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+<div class="flex flex-1 overflow-hidden">
+    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
+        <div class="p-6 mb-4 flex items-center">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+                <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
+            </div>
+            <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+        </div>
+        <nav class="flex-1 px-3 space-y-1">
+            <a th:href="@{/admin/pass-plans}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold">
+                <span class="material-symbols-outlined shrink-0">confirmation_number</span><span class="nav-label text-sm">Pass Plans</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-white/5">
+            <a th:href="@{/admin/pass-plans}" class="flex items-center px-4 py-3 text-slate-400 hover:text-white text-xs font-bold">← Back to list</a>
+        </div>
+    </aside>
+    <main class="flex-1 overflow-y-auto bg-subtle-radial p-10">
+        <div class="max-w-xl mx-auto">
+            <h2 class="text-xl font-black text-white mb-2" th:text="${isEdit} ? 'Edit plan' : 'Create plan'">Create plan</h2>
+            <p class="text-[11px] text-slate-500 font-bold mb-8 uppercase tracking-widest">Define pricing, duration, zone scope, and benefits</p>
+            <div th:if="${error}" class="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm font-black" th:text="${error}"></div>
+            <form th:action="@{/admin/pass-plans/save}" method="post" class="glass-card rounded-[2rem] p-8 space-y-5">
+                <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <input type="hidden" name="id" th:value="${plan.id}" th:if="${plan.id != null}" />
+
+                <div>
+                    <label class="field">Name</label>
+                    <input name="name" class="input-glass" required th:value="${plan.name}" placeholder="e.g. Monthly Zone A"/>
+                </div>
+                <div>
+                    <label class="field">Description</label>
+                    <textarea name="description" rows="2" class="input-glass" placeholder="Short summary for users" th:text="${plan.description}"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="field">Category</label>
+                        <select name="category" class="input-glass">
+                            <option th:each="c : ${categories}" th:value="${c}" th:text="${c}" th:selected="${plan.category == c}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="field">Display order</label>
+                        <input type="number" name="displayOrder" class="input-glass" th:value="${plan.displayOrder}"/>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="field">Price (Rs.)</label>
+                        <input type="number" step="0.01" min="0" name="price" class="input-glass" required th:value="${plan.price}"/>
+                    </div>
+                    <div>
+                        <label class="field">Duration (days)</label>
+                        <input type="number" min="1" name="durationDays" class="input-glass" required th:value="${plan.durationDays}"/>
+                    </div>
+                </div>
+                <div>
+                    <label class="field">Zone</label>
+                    <input name="zone" class="input-glass" th:value="${plan.zone}" placeholder="ALL or match slot zone e.g. Ground Floor"/>
+                    <p class="text-[10px] text-slate-600 mt-2 font-bold">Use <span class="text-primary">ALL</span> or leave blank for any zone.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" name="unlimitedParking" id="unl" value="true" th:checked="${plan.unlimitedParking}" class="rounded border-white/20 bg-white/5"/>
+                    <label for="unl" class="text-sm font-black text-white">Unlimited parking (exit fee Rs. 0)</label>
+                </div>
+                <div>
+                    <label class="field">Discount % (if not unlimited)</label>
+                    <input type="number" step="0.01" min="0" max="100" name="discountPercent" class="input-glass" th:value="${plan.discountPercent}"/>
+                </div>
+                <div>
+                    <label class="field">Catalog visibility</label>
+                    <div class="flex gap-6 mt-2">
+                        <label class="flex items-center gap-2 text-sm font-bold text-white cursor-pointer">
+                            <input type="radio" name="active" value="true" th:checked="${plan.active}"/> Show to users
+                        </label>
+                        <label class="flex items-center gap-2 text-sm font-bold text-slate-500 cursor-pointer">
+                            <input type="radio" name="active" value="false" th:checked="${!plan.active}"/> Hidden
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-4 rounded-2xl bg-primary text-white font-black text-sm hover:brightness-110">Save plan</button>
+            </form>
+        </div>
+    </main>
+</div>
+</body>
+</html>
