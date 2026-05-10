@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Parkiyo | Parking Passes</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#1f68f9", "background-dark": "#020617" }, fontFamily: { display: ["Public Sans", "sans-serif"] }, borderRadius: { squircle: "14px" } } } }</script>
+    <style>
+        body { font-family: 'Public Sans', sans-serif; background-color: #020617; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .sidebar-container { width: 80px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(2, 6, 23, 0.6); overflow: hidden; white-space: nowrap; }
+        .sidebar-container:hover { width: 280px; background: rgba(2, 6, 23, 0.95); }
+        .nav-label { opacity: 0; transition: opacity 0.3s ease; margin-left: 1rem; }
+        .sidebar-container:hover .nav-label { opacity: 1; }
+        .premium-blur { backdrop-filter: blur(20px); }
+        .bg-subtle-radial { background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%); }
+    </style>
+</head>
+<body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+<div class="flex flex-1 overflow-hidden">
+    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
+        <div class="p-6 mb-4 flex items-center">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+                <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
+            </div>
+            <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+        </div>
+        <nav class="flex-1 px-3 space-y-2 overflow-y-auto">
+            <a th:href="@{/dashboard/user}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold"><span class="material-symbols-outlined shrink-0">dashboard</span><span class="nav-label text-sm">Dashboard</span></a>
+            <a th:href="@{/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold"><span class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle Entry</span></a>
+            <a th:href="@{/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold"><span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span></a>
+            <a th:href="@{/parking}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold"><span class="material-symbols-outlined shrink-0">local_parking</span><span class="nav-label text-sm">Active Parking</span></a>
+            <a th:href="@{/reservation}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold"><span class="material-symbols-outlined shrink-0">event_available</span><span class="nav-label text-sm">Reservation</span></a>
+            <a th:href="@{/payments/history}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold"><span class="material-symbols-outlined shrink-0">payments</span><span class="nav-label text-sm">Payments</span></a>
+            <a th:href="@{/receipts}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold"><span class="material-symbols-outlined shrink-0">receipt_long</span><span class="nav-label text-sm">Receipts</span></a>
+            <a th:href="@{/wallet}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold"><span class="material-symbols-outlined shrink-0">account_balance_wallet</span><span class="nav-label text-sm">Wallet</span></a>
+            <a th:href="@{/passes}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold">
+                <span class="material-symbols-outlined shrink-0">confirmation_number</span><span class="nav-label text-sm">Parking Passes</span>
+            </a>
+            <a th:href="@{/notifications}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold"><span class="material-symbols-outlined shrink-0">notifications</span><span class="nav-label text-sm">Notifications</span></a>
+            <a th:href="@{/account/settings}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold"><span class="material-symbols-outlined shrink-0">settings</span><span class="nav-label text-sm">Account Settings</span></a>
+        </nav>
+        <div class="p-4 border-t border-white/5">
+            <a th:href="@{/logout}" class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black"><span class="material-symbols-outlined shrink-0">power_settings_new</span><span class="nav-label">Logout</span></a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
+            <div>
+                <h2 class="text-xl font-black text-white">Parking Passes</h2>
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Subscriptions · discounts · unlimited sessions</p>
+            </div>
+            <div class="text-right">
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Wallet</p>
+                <p class="text-sm font-black text-emerald-400">Rs. <span th:text="${#numbers.formatDecimal(walletBalance, 1, 'COMMA', 2, 'POINT')}">0</span></p>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-10">
+            <div class="max-w-5xl mx-auto space-y-8">
+
+                <div th:if="${success}" class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm font-black" th:text="${success}"></div>
+                <div th:if="${error}" class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm font-black" th:text="${error}"></div>
+
+                <div th:if="${activePass != null}" class="glass-card rounded-[2rem] p-8 border border-primary/30">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-primary mb-2">Active pass</p>
+                            <h3 class="text-lg font-black text-white" th:text="${activePass.passPlan.name}">Plan</h3>
+                            <p class="text-xs text-slate-500 font-bold mt-2">
+                                Valid <span th:text="${#temporals.format(activePass.startDate, 'dd MMM yyyy')}"></span>
+                                – <span th:text="${#temporals.format(activePass.endDate, 'dd MMM yyyy')}"></span>
+                            </p>
+                            <p class="text-[11px] text-slate-400 mt-3 max-w-lg">
+                                Linked to your registered vehicles when exiting: fees use this pass when the slot zone matches the plan (or plan zone is ALL).
+                                Ensure your vehicle is linked to your account for automatic savings.
+                            </p>
+                        </div>
+                        <form th:action="@{/passes/cancel}" method="post" class="shrink-0">
+                            <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit" class="px-6 py-3 rounded-xl border border-rose-500/40 text-rose-400 font-black text-xs hover:bg-rose-500/10 transition-all">Cancel pass</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div th:if="${activePass == null}">
+                    <h3 class="text-base font-black text-white mb-4">Available plans</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div th:each="plan : ${plans}" class="glass-card rounded-[2rem] p-8 flex flex-col">
+                            <div class="flex items-start justify-between gap-4 mb-4">
+                                <div>
+                                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500" th:text="${plan.category}">WEEKLY</span>
+                                    <h4 class="text-lg font-black text-white mt-1" th:text="${plan.name}">Name</h4>
+                                </div>
+                                <span class="text-emerald-400 font-black">Rs. <span th:text="${#numbers.formatDecimal(plan.price, 1, 'COMMA', 2, 'POINT')}">0</span></span>
+                            </div>
+                            <p class="text-xs text-slate-500 font-bold mb-4 flex-1" th:text="${plan.description} ?: 'Parking subscription'"></p>
+                            <ul class="text-[11px] text-slate-400 space-y-2 mb-6 font-bold">
+                                <li th:text="|Duration: ${plan.durationDays} days|"></li>
+                                <li th:text="${plan.zone != null and !#strings.isEmpty(plan.zone)} ? |Zone: ${plan.zone}| : 'Zone: ALL'"></li>
+                                <li th:if="${plan.unlimitedParking}">Benefit: Unlimited parking (Rs. 0 exit fee)</li>
+                                <li th:if="${!plan.unlimitedParking}" th:text="|Benefit: ${plan.discountPercent}% off exit fee|"></li>
+                            </ul>
+                            <form th:action="@{/passes/purchase}" method="post">
+                                <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <input type="hidden" name="planId" th:value="${plan.id}" />
+                                <button type="submit" class="w-full py-3.5 rounded-2xl bg-primary text-white font-black text-sm hover:brightness-110 shadow-[0_0_20px_rgba(31,104,249,0.25)]">
+                                    Buy with wallet
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <p th:if="${plans == null or plans.isEmpty()}" class="text-slate-500 font-bold text-sm py-10 text-center">No pass plans available yet.</p>
+                </div>
+
+                <div>
+                    <h3 class="text-base font-black text-white mb-4">Your pass history</h3>
+                    <div class="glass-card rounded-2xl overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead class="text-[10px] uppercase tracking-widest text-slate-500 border-b border-white/10">
+                                <tr>
+                                    <th class="text-left p-4">Plan</th>
+                                    <th class="text-left p-4">Status</th>
+                                    <th class="text-left p-4">Period</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${myPasses == null or myPasses.isEmpty()}">
+                                    <td colspan="3" class="p-8 text-center text-slate-600 font-bold">No passes yet</td>
+                                </tr>
+                                <tr th:each="up : ${myPasses}" class="border-b border-white/5">
+                                    <td class="p-4 font-black text-white" th:text="${up.passPlan.name}">—</td>
+                                    <td class="p-4">
+                                        <span th:if="${up.status.name() == 'ACTIVE'}" class="text-emerald-400 font-black text-xs">ACTIVE</span>
+                                        <span th:if="${up.status.name() == 'EXPIRED'}" class="text-slate-500 font-black text-xs">EXPIRED</span>
+                                        <span th:if="${up.status.name() == 'CANCELLED'}" class="text-rose-400 font-black text-xs">CANCELLED</span>
+                                    </td>
+                                    <td class="p-4 text-slate-400 text-xs">
+                                        <span th:text="${#temporals.format(up.startDate, 'dd MMM yyyy')}"></span>
+                                        – <span th:text="${#temporals.format(up.endDate, 'dd MMM yyyy')}"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

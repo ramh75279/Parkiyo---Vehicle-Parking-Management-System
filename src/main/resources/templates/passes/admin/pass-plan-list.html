@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Parkiyo | Pass Plans</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#1f68f9", "background-dark": "#020617" }, fontFamily: { display: ["Public Sans", "sans-serif"] } } } }</script>
+    <style>
+        body { font-family: 'Public Sans', sans-serif; background-color: #020617; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .sidebar-container { width: 80px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(2, 6, 23, 0.6); overflow: hidden; white-space: nowrap; }
+        .sidebar-container:hover { width: 280px; background: rgba(2, 6, 23, 0.95); }
+        .nav-label { opacity: 0; transition: 0.3s; margin-left: 1rem; }
+        .sidebar-container:hover .nav-label { opacity: 1; }
+        .premium-blur { backdrop-filter: blur(20px); }
+        .bg-subtle-radial { background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%); }
+    </style>
+</head>
+<body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+<div class="flex flex-1 overflow-hidden">
+    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
+        <div class="p-6 mb-4 flex items-center">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+                <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
+            </div>
+            <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
+        </div>
+        <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+            <a th:href="@{/admin/dashboard}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold"><span class="material-symbols-outlined shrink-0">dashboard</span><span class="nav-label text-sm">Dashboard</span></a>
+            <a th:href="@{/admin/payments}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold"><span class="material-symbols-outlined shrink-0">payments</span><span class="nav-label text-sm">Payments</span></a>
+            <a th:href="@{/admin/pass-plans}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span class="material-symbols-outlined shrink-0">confirmation_number</span><span class="nav-label text-sm">Pass Plans</span></a>
+            <a th:href="@{/admin/wallet-receipts}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold"><span class="material-symbols-outlined shrink-0">receipt_long</span><span class="nav-label text-sm">Wallet Top-Ups</span></a>
+            <a th:href="@{/admin/users}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold"><span class="material-symbols-outlined shrink-0">group</span><span class="nav-label text-sm">Users</span></a>
+        </nav>
+        <div class="p-4 border-t border-white/5">
+            <a th:href="@{/logout}" class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black"><span class="material-symbols-outlined shrink-0">power_settings_new</span><span class="nav-label">Logout</span></a>
+        </div>
+    </aside>
+    <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
+            <div>
+                <h2 class="text-xl font-black text-white">Parking Pass Plans</h2>
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Catalog · pricing · zones</p>
+            </div>
+            <a th:href="@{/admin/pass-plans/new}" class="flex items-center gap-2 bg-primary text-white font-black px-5 py-2.5 rounded-xl text-xs uppercase tracking-widest hover:brightness-110">
+                <span class="material-symbols-outlined text-lg">add</span> New plan
+            </a>
+        </header>
+        <div class="flex-1 overflow-y-auto p-10">
+            <div th:if="${success}" class="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm font-black" th:text="${success}"></div>
+            <div th:if="${error}" class="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm font-black" th:text="${error}"></div>
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead class="text-[10px] uppercase tracking-widest text-slate-500 border-b border-white/10">
+                        <tr>
+                            <th class="text-left p-4">Plan</th>
+                            <th class="text-left p-4">Category</th>
+                            <th class="text-left p-4">Price</th>
+                            <th class="text-left p-4">Days</th>
+                            <th class="text-left p-4">Zone</th>
+                            <th class="text-left p-4">Benefit</th>
+                            <th class="text-left p-4">Active</th>
+                            <th class="text-right p-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${plans}" class="border-b border-white/5 hover:bg-white/[0.02]">
+                            <td class="p-4 font-black text-white" th:text="${p.name}">—</td>
+                            <td class="p-4 text-slate-400 font-bold" th:text="${p.category}">—</td>
+                            <td class="p-4 text-emerald-400 font-black">Rs. <span th:text="${#numbers.formatDecimal(p.price, 1, 'COMMA', 2, 'POINT')}">0</span></td>
+                            <td class="p-4" th:text="${p.durationDays}">0</td>
+                            <td class="p-4 text-slate-400" th:text="${p.zone} ?: 'ALL'">—</td>
+                            <td class="p-4 text-xs font-bold text-slate-400">
+                                <span th:if="${p.unlimitedParking}">Unlimited</span>
+                                <span th:if="${!p.unlimitedParking}" th:text="|${p.discountPercent}% off|">—</span>
+                            </td>
+                            <td class="p-4">
+                                <span th:if="${p.active}" class="text-emerald-400 font-black text-xs">Yes</span>
+                                <span th:if="${!p.active}" class="text-slate-600 font-black text-xs">No</span>
+                            </td>
+                            <td class="p-4 text-right space-x-2">
+                                <a th:href="@{/admin/pass-plans/{id}/edit(id=${p.id})}" class="text-primary font-black text-xs hover:underline">Edit</a>
+                                <form th:if="${p.active}" th:action="@{/admin/pass-plans/{id}/deactivate(id=${p.id})}" method="post" class="inline">
+                                    <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    <button type="submit" class="text-rose-400 font-black text-xs hover:underline">Deactivate</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
