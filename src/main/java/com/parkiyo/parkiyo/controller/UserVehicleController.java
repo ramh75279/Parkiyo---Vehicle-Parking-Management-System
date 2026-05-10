@@ -29,6 +29,13 @@ public class UserVehicleController {
         return "vehicles/add-vehicle-user";
     }
 
+    @GetMapping("/vehicles/quick-register")
+    @PreAuthorize("isAuthenticated()")
+    public String userQuickRegisterPage(Model model) {
+        model.addAttribute("vehicleRequest", new VehicleRequest());
+        return "vehicles/quick-register-by-plate-user";
+    }
+
     @PostMapping("/vehicles/create")
     @PreAuthorize("isAuthenticated()")
     public String createUserVehicle(@Valid @ModelAttribute VehicleRequest request,
@@ -43,6 +50,23 @@ public class UserVehicleController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/vehicles/add";
+        }
+    }
+
+    @PostMapping("/vehicles/quick-register")
+    @PreAuthorize("isAuthenticated()")
+    public String createUserQuickVehicle(@Valid @ModelAttribute VehicleRequest request,
+                                         Authentication auth,
+                                         RedirectAttributes redirectAttributes) {
+        try {
+            User currentUser = userService.getUserByEmail(auth.getName());
+            request.setUserId(currentUser.getId());
+            vehicleService.createVehicle(request);
+            redirectAttributes.addFlashAttribute("success", "Vehicle registered successfully.");
+            return "redirect:/vehicles/quick-register";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/vehicles/quick-register";
         }
     }
 }
