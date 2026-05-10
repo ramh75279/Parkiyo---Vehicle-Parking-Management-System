@@ -58,6 +58,11 @@ public class Payment {
     @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Receipt receipt;
 
+    /** When exit fee was reduced or waived using an active parking pass */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_pass_id")
+    private UserPass userPass;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

@@ -8,6 +8,7 @@ import com.parkiyo.parkiyo.exception.BadRequestException;
 import com.parkiyo.parkiyo.model.ParkingRecord;
 import com.parkiyo.parkiyo.model.ParkingSlot;
 import com.parkiyo.parkiyo.model.Payment;
+import com.parkiyo.parkiyo.model.User;
 import com.parkiyo.parkiyo.repository.ParkingRecordRepository;
 import com.parkiyo.parkiyo.repository.ParkingSlotRepository;
 import com.parkiyo.parkiyo.repository.PaymentRepository;
@@ -16,9 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ public class ExitService {
     private final PaymentRepository paymentRepository;
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
+    private final ParkingPassBenefitService parkingPassBenefitService;
 
     private static final ZoneId COLOMBO_ZONE = ZoneId.of("Asia/Colombo");
 
@@ -49,23 +53,38 @@ public class ExitService {
         record.setActive(false);
 
         long durationMinutes = ChronoUnit.MINUTES.between(record.getEntryTime(), exitTime);
-        BigDecimal fee = calculateBasicFee(durationMinutes);
+        BigDecimal baseFee = calculateBasicFee(durationMinutes);
+
+        User vehicleOwner = record.getVehicle() != null ? record.getVehicle().getUser() : null;
+        LocalDate exitDay = exitTime.atZone(COLOMBO_ZONE).toLocalDate();
+        ParkingSlot slot = record.getSlot();
+
+        ParkingPassBenefitService.ExitFeeResult feeResult =
+                parkingPassBenefitService.applyPassBenefits(vehicleOwner, slot, exitDay, baseFee);
+        BigDecimal fee = feeResult.finalFee();
+
+        record.setDurationMinutes((int) durationMinutes);
+        record.setAmount(fee);
 
         parkingRecordRepository.save(record);
 
         // Free up the slot
-        ParkingSlot slot = record.getSlot();
         if (slot != null) {
             slot.setStatus(SlotStatus.AVAILABLE);
             slotRepository.save(slot);
         }
 
+        User billingUser = vehicleOwner != null ? vehicleOwner : record.getUser();
+
         // Create Payment
         Payment payment = Payment.builder()
+                .transactionCode("EXIT-" + UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase())
                 .parkingRecord(record)
+                .user(billingUser)
                 .amount(fee)
                 .status(PaymentStatus.PENDING)
-                .paymentMethod("CASH")                    // Default for now (since DTO doesn't have it)
+                .paymentMethod(feeResult.appliedPass() != null ? "Parkiyo Pass" : "CASH")
+                .userPass(feeResult.appliedPass())
                 .build();
 
         paymentRepository.save(payment);
@@ -76,19 +95,19 @@ public class ExitService {
                 operatorEmail,
                 "ParkingRecord",
                 record.getId(),
-                "Vehicle " + normalizedPlate + " exited. Fee: " + fee + " LKR",
+                "Vehicle " + normalizedPlate + " exited. Fee: " + fee + " LKR. " + feeResult.summary(),
                 null,
                 null,
                 null
         );
 
-        // Notification
-        if (record.getUser() != null) {
+        // Notification (prefer registered vehicle owner)
+        if (billingUser != null) {
             notificationService.createNotification(
-                    record.getUser(),
+                    billingUser,
                     NotificationType.EXIT,
                     "Vehicle Exit",
-                    "Your vehicle " + normalizedPlate + " exited. Total fee: " + fee + " LKR",
+                    "Your vehicle " + normalizedPlate + " exited. Total fee: Rs. " + fee + ". " + feeResult.summary(),
                     "/payments"
             );
         }
