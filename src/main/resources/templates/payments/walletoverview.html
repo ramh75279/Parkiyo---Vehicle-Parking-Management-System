@@ -3,127 +3,499 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Parkiyo | Wallet Overview</title>
-
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-
-    <script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+    <script th:inline="javascript">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: { primary: "#1f68f9", "background-dark": "#020617" },
-                    fontFamily: { display: ["Public Sans", "sans-serif"] }
+                    fontFamily: { display: ["Public Sans", "sans-serif"] },
+                    borderRadius: { squircle: "14px" },
                 }
             }
-        }
+        };
+        window.__walletBalance = /*[[${balance}]]*/ 0;
     </script>
-
     <style>
-        body { font-family: 'Public Sans', sans-serif; background-color: #020617; }
-        .glass-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .sidebar-container { width: 80px; transition: 0.4s; overflow: hidden; }
-        .sidebar-container:hover { width: 280px; }
-        .nav-label { opacity: 0; transition: 0.3s; margin-left: 1rem; }
-        .sidebar-container:hover .nav-label { opacity: 1; }
-        .input-glass { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color:white; border-radius:12px; padding:11px 16px; width:100%; }
-        .txn-in { color: #34d399; }
-        .txn-out { color: #f87171; }
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: #020617;
+        }
+
+        .premium-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .bg-subtle-radial {
+            background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-container {
+            width: 80px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(2, 6, 23, 0.6);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .sidebar-container:hover {
+            width: 280px;
+            background: rgba(2, 6, 23, 0.95);
+        }
+
+        .nav-label {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            margin-left: 1rem;
+        }
+
+        .sidebar-container:hover .nav-label {
+            opacity: 1;
+        }
+
+        .input-glass {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: white;
+            border-radius: 12px;
+            padding: 11px 16px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            outline: none;
+            width: 100%;
+        }
+
+        .input-glass:focus {
+            border-color: rgba(31, 104, 249, 0.5);
+            box-shadow: 0 0 0 3px rgba(31, 104, 249, 0.1);
+        }
+
+        .input-glass::placeholder {
+            color: rgba(255, 255, 255, 0.18);
+        }
+
+        select.input-glass option {
+            background: #0f172a;
+        }
+
+        label.field-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #64748b;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .txn-in {
+            color: #34d399;
+        }
+
+        .txn-out {
+            color: #f87171;
+        }
+
+        .txn-row {
+            transition: background 0.15s;
+        }
+
+        .txn-row:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .topup-amount {
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-weight: 900;
+            font-size: 1rem;
+            color: #94a3b8;
+        }
+
+        .topup-amount:hover {
+            border-color: rgba(31, 104, 249, 0.4);
+            color: white;
+        }
+
+        .topup-amount.selected {
+            border-color: #1f68f9;
+            background: rgba(31, 104, 249, 0.1);
+            color: #60a5fa;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            display: none;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        @media print {
+            .sidebar-container, .no-print { display: none !important; }
+            main { overflow: visible !important; }
+        }
     </style>
 </head>
 
-<body class="text-slate-100 flex">
+<body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
+    <div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+    <div class="flex flex-1 overflow-hidden">
 
-<!-- MAIN CONTENT -->
-<main class="flex-1 p-8 space-y-8">
-
-    <!-- HEADER -->
-    <div>
-        <h1 class="text-2xl font-black">Wallet Overview</h1>
-        <p class="text-slate-400 text-sm">Your balance and transactions</p>
-    </div>
-
-    <!-- BALANCE -->
-    <div class="glass-card p-6 rounded-xl">
-        <p class="text-slate-400 text-sm">Balance</p>
-        <h2 class="text-4xl font-black">
-            $<span th:text="${#numbers.formatDecimal(balance,1,'COMMA',2,'POINT')}">0.00</span>
-        </h2>
-    </div>
-
-    <!-- QUICK STATS -->
-    <div class="grid grid-cols-3 gap-4">
-
-        <!-- ✅ FIXED: use backend values instead -->
-        <div class="glass-card p-4 text-center">
-            <p class="text-xs text-slate-400">Total In</p>
-            <p class="text-green-400 font-bold">
-                $<span th:text="${totalIn != null ? totalIn : 0}">0.00</span>
-            </p>
-        </div>
-
-        <div class="glass-card p-4 text-center">
-            <p class="text-xs text-slate-400">Total Out</p>
-            <p class="text-red-400 font-bold">
-                $<span th:text="${totalOut != null ? totalOut : 0}">0.00</span>
-            </p>
-        </div>
-
-        <div class="glass-card p-4 text-center">
-            <p class="text-xs text-slate-400">Transactions</p>
-            <p class="text-white font-bold" th:text="${transactions != null ? transactions.size() : 0}">0</p>
-        </div>
-    </div>
-
-    <!-- TOPUP -->
-    <div class="glass-card p-6 rounded-xl">
-        <form th:action="@{/wallet/topup}" method="post">
-            <input id="amountInput" name="amount" type="number" class="input-glass" required />
-            <button class="mt-4 bg-primary px-4 py-2 rounded text-white font-bold">Top Up</button>
-        </form>
-    </div>
-
-    <!-- TRANSACTIONS -->
-    <div class="glass-card rounded-xl overflow-hidden">
-        <div class="p-4 border-b border-white/10">Transactions</div>
-
-        <div th:if="${transactions == null or transactions.isEmpty()}" class="p-6 text-center text-slate-500">
-            No transactions yet
-        </div>
-
-        <div th:each="txn : ${transactions}" class="p-4 flex justify-between border-b border-white/5">
-
-            <div>
-                <p th:text="${txn.description}">Description</p>
-                <p class="text-xs text-slate-500"
-                   th:text="${txn.createdAt != null ? #temporals.format(txn.createdAt,'MMM dd yyyy HH:mm') : '-'}">
-                </p>
+        <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
+            <div class="p-6 mb-4 flex items-center">
+                <div
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+                    <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
+                </div>
+                <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
             </div>
-
-            <div>
-                <p th:classappend="${txn.type == 'CREDIT'} ? 'txn-in' : 'txn-out'"
-                   th:text="${(txn.type == 'CREDIT' ? '+' : '-') + txn.amount}">
-                    +0.00
-                </p>
+            <nav class="flex-1 px-3 space-y-2 overflow-y-auto">
+                <a th:href="@{/dashboard/user}"
+                    class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">dashboard</span>
+                    <span class="nav-label text-sm">Dashboard</span>
+                </a>
+                <a th:href="@{/entry}"
+                    class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">login</span>
+                    <span class="nav-label text-sm">Vehicle Entry</span>
+                </a>
+                <a th:href="@{/exit}"
+                    class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">logout</span>
+                    <span class="nav-label text-sm">Vehicle Exit</span>
+                </a>
+                <a th:href="@{/parking}"
+                    class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">local_parking</span>
+                    <span class="nav-label text-sm">Active Parking</span>
+                </a>
+                <a th:href="@{/reservation}"
+                    class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">event_available</span>
+                    <span class="nav-label text-sm">Reservation</span>
+                </a>
+                <a th:href="@{/payments/history}"
+                    class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">payments</span>
+                    <span class="nav-label text-sm">Payments</span>
+                </a>
+                <a th:href="@{/receipts}"
+                    class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">receipt_long</span>
+                    <span class="nav-label text-sm">Receipts</span>
+                </a>
+                <a th:href="@{/wallet}"
+                    class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
+                    <span class="material-symbols-outlined shrink-0">account_balance_wallet</span>
+                    <span class="nav-label text-sm">Wallet</span>
+                </a>
+                <a th:href="@{/notifications}"
+                    class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">notifications</span>
+                    <span class="nav-label text-sm">Notifications</span>
+                </a>
+                <a th:href="@{/account/settings}"
+                    class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                    <span class="material-symbols-outlined shrink-0">settings</span>
+                    <span class="nav-label text-sm">Account Settings</span>
+                </a>
+            </nav>
+            <div class="p-4 border-t border-white/5">
+                <a th:href="@{/logout}"
+                    class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                    <span class="material-symbols-outlined shrink-0">power_settings_new</span>
+                    <span class="nav-label">Logout</span>
+                </a>
             </div>
+        </aside>
 
-        </div>
+        <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
+            <header
+                class="no-print h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
+                <div>
+                    <h2 class="text-xl font-black text-white">Parkiyo Wallet</h2>
+                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Balance & top-up
+                    </p>
+                </div>
+                <div class="h-10 w-10 rounded-squircle bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
+                    <div class="h-full w-full rounded-squircle bg-background-dark flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white/50">person</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-10">
+                <div class="max-w-4xl mx-auto space-y-8">
+
+                    <div th:if="${success}"
+                        class="flex items-center gap-3 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                        <span class="material-symbols-outlined text-emerald-400">check_circle</span>
+                        <p class="text-sm font-black text-emerald-300" th:text="${success}">Success</p>
+                    </div>
+                    <div th:if="${error}"
+                        class="flex items-center gap-3 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20">
+                        <span class="material-symbols-outlined text-rose-400">error</span>
+                        <p class="text-sm font-black text-rose-300" th:text="${error}">Error</p>
+                    </div>
+
+                    <!-- Wallet hero card -->
+                    <div class="rounded-[2.5rem] p-8 relative overflow-hidden"
+                        style="background:linear-gradient(135deg,#1a3a6e 0%,#1f68f9 50%,#3b82f6 100%);">
+                        <div class="absolute inset-0 pointer-events-none"
+                            style="background:radial-gradient(circle at 80% 50%,rgba(255,255,255,0.08) 0%,transparent 60%)">
+                        </div>
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-8">
+                                <div class="flex items-center gap-3">
+                                    <div class="h-10 w-10 rounded-xl bg-white/15 flex items-center justify-center">
+                                        <span
+                                            class="material-symbols-outlined text-white text-xl">account_balance_wallet</span>
+                                    </div>
+                                    <span class="text-white/80 font-black text-sm uppercase tracking-widest">Parkiyo
+                                        Wallet</span>
+                                </div>
+                                <span
+                                    class="text-[10px] font-black uppercase tracking-widest text-white/50 bg-white/10 px-3 py-1.5 rounded-lg">Active</span>
+                            </div>
+                            <p class="text-white/60 text-xs font-black uppercase tracking-widest mb-2">Available Balance
+                            </p>
+                            <p class="text-6xl font-black text-white mb-6">
+                                Rs. <span th:text="${#numbers.formatDecimal(balance, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-white/50 text-[10px] font-black uppercase tracking-widest">Wallet ID
+                                    </p>
+                                    <p class="text-white/80 font-mono text-sm font-bold mt-0.5"
+                                        th:text="|PKW-${#numbers.formatInteger(wallet.id, 5)}-${user.initials}|">PKW-00001-AB</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-white/50 text-[10px] font-black uppercase tracking-widest">Owner</p>
+                                    <p class="text-white font-black text-sm mt-0.5" th:text="${user.fullName}">Name</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick actions -->
+                    <div class="grid grid-cols-3 gap-4">
+                        <button type="button" onclick="document.getElementById('topupPanel').scrollIntoView({behavior:'smooth'})"
+                            class="glass-card p-5 rounded-2xl flex flex-col items-center gap-2 hover:bg-white/5 transition-all">
+                            <div
+                                class="h-11 w-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-emerald-400">add_circle</span>
+                            </div>
+                            <p class="text-xs font-black text-white">Top Up</p>
+                        </button>
+                        <a th:href="@{/payments/history}"
+                            class="glass-card p-5 rounded-2xl flex flex-col items-center gap-2 hover:bg-white/5 transition-all">
+                            <div
+                                class="h-11 w-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary">history</span>
+                            </div>
+                            <p class="text-xs font-black text-white">History</p>
+                        </a>
+                        <button type="button" onclick="window.print()"
+                            class="glass-card p-5 rounded-2xl flex flex-col items-center gap-2 hover:bg-white/5 transition-all">
+                            <div
+                                class="h-11 w-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-amber-400">download</span>
+                            </div>
+                            <p class="text-xs font-black text-white">Statement</p>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                        <!-- Top up panel -->
+                        <div class="glass-card rounded-[2.5rem] p-8" id="topupPanel">
+                            <h3 class="text-base font-black text-white mb-6">Top Up Wallet</h3>
+                            <p class="text-[11px] text-slate-500 font-bold mb-5">Select an amount or enter a custom
+                                value.</p>
+                            <form th:action="@{/wallet/topup}" method="post" id="topupForm" onsubmit="return prepareTopupSubmit(event)">
+                                <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <input type="hidden" name="amount" id="topupAmountField" value="50" />
+                                <div class="grid grid-cols-3 gap-3 mb-5">
+                                    <div class="topup-amount" data-amt="500" onclick="selectTopup(this,'500')">Rs. 500</div>
+                                    <div class="topup-amount" data-amt="1000" onclick="selectTopup(this,'1000')">Rs. 1,000</div>
+                                    <div class="topup-amount selected" data-amt="2500" onclick="selectTopup(this,'2500')">Rs. 2,500</div>
+                                    <div class="topup-amount" data-amt="5000" onclick="selectTopup(this,'5000')">Rs. 5,000</div>
+                                    <div class="topup-amount" data-amt="10000" onclick="selectTopup(this,'10000')">Rs. 10,000</div>
+                                    <div class="topup-amount" onclick="selectTopup(this,'custom')" id="customBtn">Custom
+                                    </div>
+                                </div>
+                                <div id="customInput" class="hidden mb-5">
+                                    <label class="field-label">Custom Amount (Rs.)</label>
+                                    <input type="number" id="customAmountInput" placeholder="e.g. 750" step="0.01" min="0.01"
+                                        class="input-glass bg-white/5 px-4 h-12 rounded-2xl"
+                                        oninput="syncCustomTopup()" />
+                                </div>
+                                <div class="mb-6">
+                                    <label class="field-label">Payment Method</label>
+                                    <select class="input-glass px-4 h-12 rounded-2xl" aria-label="Payment method (display only)">
+                                        <option>Credit / Debit Card</option>
+                                        <option>Online Banking</option>
+                                    </select>
+                                </div>
+                                <div
+                                    class="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/15 flex items-center justify-between mb-5">
+                                    <p class="text-sm font-black text-white">New Balance After Top-Up</p>
+                                    <p class="text-xl font-black text-emerald-400" id="newBalance">Rs. 0.00</p>
+                                </div>
+                                <button type="submit"
+                                    class="w-full flex items-center justify-center gap-2 bg-emerald-500 text-white font-black py-4 rounded-2xl hover:bg-emerald-600 transition-all text-sm shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                                    <span class="material-symbols-outlined text-lg">add_circle</span>
+                                    Top Up <span id="topupBtnAmt">Rs. 2,500.00</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Recent wallet activity -->
+                        <div class="glass-card rounded-[2.5rem] p-8">
+                            <h3 class="text-base font-black text-white mb-6">Recent Activity</h3>
+                            <div th:if="${transactions == null or transactions.isEmpty()}" class="py-12 text-center text-slate-500 font-bold text-sm">
+                                No wallet transactions yet. Top up to get started.
+                            </div>
+                            <div class="space-y-0 divide-y divide-white/5" th:if="${transactions != null and !transactions.isEmpty()}">
+                                <div class="txn-row py-4 flex items-center gap-4"
+                                    th:each="txn, iterStat : ${transactions}"
+                                    th:if="${iterStat.index &lt; 8}">
+                                    <!-- Credit top-up -->
+                                    <div th:if="${txn.type == 'CREDIT' and !(txn.description != null and #strings.contains(#strings.toLowerCase(txn.description), 'refund'))}"
+                                        class="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-emerald-400 text-lg">add</span>
+                                    </div>
+                                    <!-- Credit refund -->
+                                    <div th:if="${txn.type == 'CREDIT' and txn.description != null and #strings.contains(#strings.toLowerCase(txn.description), 'refund')}"
+                                        class="h-10 w-10 rounded-xl bg-slate-700/30 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-slate-400 text-lg">undo</span>
+                                    </div>
+                                    <!-- Debit -->
+                                    <div th:if="${txn.type == 'DEBIT'}"
+                                        class="h-10 w-10 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-rose-400 text-lg">local_parking</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-black text-white truncate" th:text="${txn.description} ?: 'Transaction'">—</p>
+                                        <p class="text-[10px] text-slate-500 font-bold"
+                                            th:text="${txn.createdAt != null ? #temporals.format(txn.createdAt, 'dd MMM') : '-'}">—</p>
+                                    </div>
+                                    <span th:if="${txn.type == 'CREDIT'}" class="txn-in font-black whitespace-nowrap"
+                                        th:text="|+Rs. ${#numbers.formatDecimal(txn.amount, 1, 'COMMA', 2, 'POINT')}|">+Rs. 0</span>
+                                    <span th:if="${txn.type == 'DEBIT'}" class="txn-out font-black whitespace-nowrap"
+                                        th:text="|-Rs. ${#numbers.formatDecimal(txn.amount, 1, 'COMMA', 2, 'POINT')}|">-Rs. 0</span>
+                                </div>
+                            </div>
+                            <a th:href="@{/payments/history}"
+                                class="mt-5 flex items-center gap-2 text-primary text-xs font-black hover:brightness-125 transition-all">
+                                <span class="material-symbols-outlined text-base">open_in_new</span> View full
+                                transaction history
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
     </div>
 
-</main>
+    <script>
+        let selectedAmt = 2500;
+        let isCustom = false;
 
-<!-- FIXED JS -->
-<script>
-    function setAmount(val, el) {
-        document.getElementById('amountInput').value = val;
-        document.querySelectorAll('.topup-amount').forEach(e => e.classList.remove('selected'));
-        if (el) el.classList.add('selected');
-    }
-</script>
+        function parseBalance() {
+            const b = window.__walletBalance;
+            if (typeof b === 'number') return b;
+            if (typeof b === 'string') return parseFloat(b.replace(/,/g, '')) || 0;
+            return parseFloat(b) || 0;
+        }
 
+        function fmtRs(n) {
+            return 'Rs. ' + Number(n).toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function updatePreview() {
+            const bal = parseBalance();
+            let add = selectedAmt;
+            if (isCustom) {
+                const raw = document.getElementById('customAmountInput').value;
+                add = parseFloat(raw);
+                if (isNaN(add) || add <= 0) add = 0;
+            }
+            document.getElementById('newBalance').textContent = fmtRs(bal + add);
+            document.getElementById('topupBtnAmt').textContent = fmtRs(add);
+            const field = document.getElementById('topupAmountField');
+            if (field) field.value = add > 0 ? add.toFixed(2) : '';
+        }
+
+        function selectTopup(el, val) {
+            document.querySelectorAll('.topup-amount').forEach(a => a.classList.remove('selected'));
+            el.classList.add('selected');
+            if (val === 'custom') {
+                document.getElementById('customInput').classList.remove('hidden');
+                isCustom = true;
+                selectedAmt = 0;
+                syncCustomTopup();
+            } else {
+                document.getElementById('customInput').classList.add('hidden');
+                isCustom = false;
+                selectedAmt = parseFloat(val);
+                updatePreview();
+            }
+        }
+
+        function syncCustomTopup() {
+            if (!isCustom) return;
+            const raw = document.getElementById('customAmountInput').value;
+            const v = parseFloat(raw);
+            selectedAmt = !isNaN(v) && v > 0 ? v : 0;
+            updatePreview();
+        }
+
+        function prepareTopupSubmit(ev) {
+            if (isCustom) {
+                const raw = document.getElementById('customAmountInput').value;
+                const v = parseFloat(raw);
+                if (isNaN(v) || v < 0.01) {
+                    ev.preventDefault();
+                    alert('Enter a valid custom amount (minimum Rs. 0.01).');
+                    return false;
+                }
+                document.getElementById('topupAmountField').value = v.toFixed(2);
+            } else {
+                document.getElementById('topupAmountField').value = selectedAmt.toFixed(2);
+            }
+            return true;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            updatePreview();
+        });
+    </script>
 </body>
+
 </html>
