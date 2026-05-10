@@ -87,6 +87,12 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
+
+        .tab-active {
+            border-color: rgba(31, 104, 249, 0.9);
+            background: rgba(31, 104, 249, 0.12);
+            color: #fff;
+        }
     </style>
 </head>
 
@@ -177,7 +183,6 @@
                     Reporting Centre</p>
             </div>
             <div class="flex items-center gap-4">
-
                 <div class="flex items-center gap-3">
                     <div class="text-right">
                         <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Admin'"></p>
@@ -201,32 +206,139 @@
 
         <div class="flex-1 overflow-y-auto p-10">
 
+            <div th:if="${success}" class="mb-6 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-3 text-sm font-bold text-emerald-200"
+                 th:text="${success}"></div>
+            <div th:if="${error}" class="mb-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-5 py-3 text-sm font-bold text-rose-200"
+                 th:text="${error}"></div>
+
             <!-- Summary Stats -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                 <div class="glass-card p-7 rounded-3xl">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Total Revenue</p>
-                    <h3 class="text-2xl font-black text-white">$45,820</h3>
-                    <p class="text-emerald-400 text-[10px] font-bold mt-2 flex items-center gap-1"><span
-                            class="material-symbols-outlined text-xs">trending_up</span> +14% this month</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Total revenue (success)</p>
+                    <h3 class="text-2xl font-black text-white">
+                        <span th:if="${summaryStats != null and summaryStats['totalRevenue'] != null}"
+                              th:text="${#numbers.formatDecimal(summaryStats['totalRevenue'], 0, 'COMMA', 2, 'POINT')}">0.00</span>
+                        <span th:if="${summaryStats == null or summaryStats['totalRevenue'] == null}">0.00</span>
+                    </h3>
+                    <p class="text-slate-500 text-[10px] font-bold mt-2">From ReportService / payments</p>
                 </div>
                 <div class="glass-card p-7 rounded-3xl">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Total Sessions</p>
-                    <h3 class="text-2xl font-black text-white">3,241</h3>
-                    <p class="text-slate-500 text-[10px] font-bold mt-2">This month</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Registered users</p>
+                    <h3 class="text-2xl font-black text-white" th:text="${summaryStats != null ? summaryStats['totalUsers'] : 0}">0</h3>
+                    <p class="text-slate-500 text-[10px] font-bold mt-2">All accounts</p>
                 </div>
                 <div class="glass-card p-7 rounded-3xl">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Avg Occupancy</p>
-                    <h3 class="text-2xl font-black text-primary">87%</h3>
-                    <p class="text-slate-500 text-[10px] font-bold mt-2">Peak: 94%</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Occupancy (slots)</p>
+                    <h3 class="text-2xl font-black text-primary"
+                        th:text="${occupancyPercent != null} ? |${#numbers.formatDecimal(occupancyPercent, 0, 'COMMA', 1, 'POINT')}%| : '0%'">0%</h3>
+                    <p class="text-slate-500 text-[10px] font-bold mt-2">Occupied share of total bays</p>
                 </div>
                 <div class="glass-card p-7 rounded-3xl">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Receipts Issued</p>
-                    <h3 class="text-2xl font-black text-white">3,198</h3>
-                    <p class="text-slate-500 text-[10px] font-bold mt-2">98.7% payment rate</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Available slots</p>
+                    <h3 class="text-2xl font-black text-white" th:text="${summaryStats != null ? summaryStats['availableSlots'] : 0}">0</h3>
+                    <p class="text-slate-500 text-[10px] font-bold mt-2">Ready for entry</p>
                 </div>
             </div>
 
+            <!-- Saved reports CRUD -->
+            <section class="glass-card rounded-[2rem] p-8 mb-12 border border-white/10">
+                <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-6 mb-8">
+                    <div>
+                        <h3 class="text-lg font-black text-white">Saved reports</h3>
+                        <p class="text-sm text-slate-500 mt-1">Create bookmarks to live analytics (revenue, occupancy, daily). Status is stored for your workflow (draft / published / archived).</p>
+                    </div>
+                    <button type="button" onclick="openModal('createModal')"
+                            class="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-black text-white shadow-lg shadow-primary/25 hover:bg-blue-600 transition shrink-0">
+                        <span class="material-symbols-outlined text-xl">add</span>
+                        New report
+                    </button>
+                </div>
+
+                <!-- Type tabs -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <a th:href="@{/admin/reports}"
+                       th:classappend="${filterType == null} ? ' tab-active' : ''"
+                       class="px-4 py-2 rounded-xl border border-white/10 text-xs font-black uppercase tracking-wider text-slate-300 hover:border-primary/40 transition">All types</a>
+                    <a th:href="@{/admin/reports(type=${T(com.parkiyo.parkiyo.enums.SavedReportType).REVENUE})}"
+                       th:classappend="${filterType != null and filterType.name() == 'REVENUE'} ? ' tab-active' : ''"
+                       class="px-4 py-2 rounded-xl border border-white/10 text-xs font-black uppercase tracking-wider text-slate-300 hover:border-primary/40 transition">Revenue</a>
+                    <a th:href="@{/admin/reports(type=${T(com.parkiyo.parkiyo.enums.SavedReportType).OCCUPANCY})}"
+                       th:classappend="${filterType != null and filterType.name() == 'OCCUPANCY'} ? ' tab-active' : ''"
+                       class="px-4 py-2 rounded-xl border border-white/10 text-xs font-black uppercase tracking-wider text-slate-300 hover:border-primary/40 transition">Occupancy</a>
+                    <a th:href="@{/admin/reports(type=${T(com.parkiyo.parkiyo.enums.SavedReportType).DAILY_REVENUE})}"
+                       th:classappend="${filterType != null and filterType.name() == 'DAILY_REVENUE'} ? ' tab-active' : ''"
+                       class="px-4 py-2 rounded-xl border border-white/10 text-xs font-black uppercase tracking-wider text-slate-300 hover:border-primary/40 transition">Daily revenue</a>
+                </div>
+
+                <!-- Filters -->
+                <form method="get" th:action="@{/admin/reports}" class="flex flex-col md:flex-row flex-wrap gap-3 mb-8">
+                    <input th:if="${filterType != null}" type="hidden" name="type" th:value="${filterType.name()}" />
+                    <select name="status"
+                            class="rounded-xl bg-white/5 border border-white/10 text-sm text-white px-4 py-2.5 font-bold min-w-[160px]">
+                        <option value="" th:selected="${filterStatus == null}">All statuses</option>
+                        <option th:each="s : ${reportStatuses}" th:value="${s.name()}" th:text="${s.label}"
+                                th:selected="${filterStatus != null and filterStatus == s}"></option>
+                    </select>
+                    <input type="search" name="q" placeholder="Search title or description…"
+                           th:value="${searchQuery}"
+                           class="flex-1 min-w-[200px] rounded-xl bg-white/5 border border-white/10 text-sm text-white px-4 py-2.5 placeholder:text-slate-600" />
+                    <button type="submit" class="rounded-xl bg-white/10 border border-white/10 px-6 py-2.5 text-xs font-black uppercase tracking-wider hover:bg-white/15 transition">Apply</button>
+                    <a th:href="@{/admin/reports}" class="inline-flex items-center justify-center rounded-xl border border-white/10 px-6 py-2.5 text-xs font-black uppercase tracking-wider text-slate-400 hover:text-white transition">Reset</a>
+                </form>
+
+                <!-- Table -->
+                <div class="overflow-x-auto rounded-2xl border border-white/10">
+                    <table class="min-w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        <tr>
+                            <th class="px-5 py-4">Title</th>
+                            <th class="px-5 py-4">Type</th>
+                            <th class="px-5 py-4">Status</th>
+                            <th class="px-5 py-4">Updated</th>
+                            <th class="px-5 py-4 text-right">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                        <tr th:if="${savedReports == null or savedReports.isEmpty()}">
+                            <td colspan="5" class="px-5 py-16 text-center text-slate-500 font-medium">No saved reports yet. Click “New report” to create one.</td>
+                        </tr>
+                        <tr th:each="r : ${savedReports}" class="hover:bg-white/[0.02]"
+                            th:data-id="${r.id}"
+                            th:data-title="${r.title}"
+                            th:data-description="${r.description}"
+                            th:data-type="${r.reportType.name()}"
+                            th:data-type-label="${r.reportType.label}"
+                            th:data-status="${r.status.name()}"
+                            th:data-status-label="${r.status.label}"
+                            th:data-updated="${#temporals.format(r.updatedAt, 'yyyy-MM-dd HH:mm')}"
+                            th:data-live-href="@{/admin/reports/{seg}(seg=${r.reportType.pathSegment()})}">
+                            <td class="px-5 py-4 font-bold text-white" th:text="${r.title}">—</td>
+                            <td class="px-5 py-4 text-slate-300" th:text="${r.reportType.label}">—</td>
+                            <td class="px-5 py-4">
+                                <span th:if="${r.status.name() == 'DRAFT'}"
+                                      class="inline-flex items-center rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-wider bg-slate-500/20 text-slate-300 border border-slate-500/30">Draft</span>
+                                <span th:if="${r.status.name() == 'PUBLISHED'}"
+                                      class="inline-flex items-center rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Published</span>
+                                <span th:if="${r.status.name() == 'ARCHIVED'}"
+                                      class="inline-flex items-center rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-200 border border-amber-500/30">Archived</span>
+                            </td>
+                            <td class="px-5 py-4 text-slate-500 text-xs" th:text="${#temporals.format(r.updatedAt, 'MMM d, yyyy HH:mm')}">—</td>
+                            <td class="px-5 py-4 text-right whitespace-nowrap">
+                                <button type="button" class="text-primary font-bold text-xs mr-3 hover:underline"
+                                        onclick="openViewFromRow(this)">View</button>
+                                <button type="button" class="text-slate-300 font-bold text-xs mr-3 hover:underline"
+                                        onclick="openEditFromRow(this)">Edit</button>
+                                <button type="button" class="text-rose-400 font-bold text-xs hover:underline"
+                                        onclick="openDeleteFromRow(this)">Delete</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <!-- Report Cards Grid -->
+            <h3 class="text-sm font-black uppercase tracking-[0.2em] text-slate-500 mb-4">Quick analytics</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                 <a th:href="@{/admin/reports/revenue}" class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer">
@@ -239,7 +351,7 @@
                     <p class="text-slate-400 text-sm font-medium leading-relaxed mb-6">Total revenue, payment method
                         breakdown, daily and monthly trends, and receipt summaries.</p>
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-slate-500 font-bold">Last updated: Today</span>
+                        <span class="text-xs text-slate-500 font-bold">Live data</span>
                         <div
                                 class="h-9 w-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                             <span class="material-symbols-outlined text-emerald-400 text-lg">arrow_forward</span>
@@ -257,7 +369,7 @@
                     <p class="text-slate-400 text-sm font-medium leading-relaxed mb-6">Slot usage patterns, peak
                         times, available vs occupied trends, and zone-level breakdowns.</p>
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-slate-500 font-bold">Last updated: Today</span>
+                        <span class="text-xs text-slate-500 font-bold">Live data</span>
                         <div
                                 class="h-9 w-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
                             <span class="material-symbols-outlined text-primary text-lg">arrow_forward</span>
@@ -275,7 +387,7 @@
                     <p class="text-slate-400 text-sm font-medium leading-relaxed mb-6">Today's revenue total,
                         successful and pending payments, and full transaction list for the day.</p>
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-slate-500 font-bold">Today only</span>
+                        <span class="text-xs text-slate-500 font-bold">Today focus</span>
                         <div
                                 class="h-9 w-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
                             <span class="material-symbols-outlined text-amber-400 text-lg">arrow_forward</span>
@@ -283,7 +395,7 @@
                     </div>
                 </a>
 
-                <a th:href="@{/admin/reports/audit-log}" class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer">
+                <a th:href="@{/admin/audit}" class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer">
                     <div
                             class="h-14 w-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined text-rose-400 text-2xl">fact_check</span>
@@ -319,17 +431,16 @@
                     </div>
                 </a>
 
-                <a th:href="@{/admin/slots/history}" class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer">
+                <a th:href="@{/admin/slots}" class="report-card glass-card rounded-[2.5rem] p-8 cursor-pointer">
                     <div
                             class="h-14 w-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined text-cyan-400 text-2xl">history</span>
                     </div>
                     <p class="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-400 mb-2">Slots</p>
-                    <h3 class="text-xl font-black text-white mb-3">Slot Usage History</h3>
-                    <p class="text-slate-400 text-sm font-medium leading-relaxed mb-6">Per-slot occupancy history,
-                        reservation records, and usage timeline for every bay in the system.</p>
+                    <h3 class="text-xl font-black text-white mb-3">Slot overview</h3>
+                    <p class="text-slate-400 text-sm font-medium leading-relaxed mb-6">Manage bays, usage, and history from the parking slots area.</p>
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-slate-500 font-bold">Full history</span>
+                        <span class="text-xs text-slate-500 font-bold">Operations</span>
                         <div
                                 class="h-9 w-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
                             <span class="material-symbols-outlined text-cyan-400 text-lg">arrow_forward</span>
@@ -341,6 +452,191 @@
         </div>
     </main>
 </div>
-</body>
 
+<!-- View modal -->
+<div id="viewModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div class="glass-card max-w-lg w-full rounded-3xl border border-white/15 p-8 shadow-2xl">
+        <div class="flex justify-between items-start gap-4 mb-6">
+            <h4 id="viewTitle" class="text-xl font-black text-white">Report</h4>
+            <button type="button" onclick="closeModal('viewModal')" class="text-slate-500 hover:text-white">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <dl class="space-y-4 text-sm">
+            <div>
+                <dt class="text-[10px] font-black uppercase text-slate-500">Type</dt>
+                <dd id="viewType" class="text-slate-200 font-bold mt-1">—</dd>
+            </div>
+            <div>
+                <dt class="text-[10px] font-black uppercase text-slate-500">Status</dt>
+                <dd id="viewStatus" class="text-slate-200 font-bold mt-1">—</dd>
+            </div>
+            <div>
+                <dt class="text-[10px] font-black uppercase text-slate-500">Description</dt>
+                <dd id="viewDescription" class="text-slate-400 mt-1 whitespace-pre-wrap">—</dd>
+            </div>
+            <div>
+                <dt class="text-[10px] font-black uppercase text-slate-500">Last updated</dt>
+                <dd id="viewUpdated" class="text-slate-500 mt-1 text-xs">—</dd>
+            </div>
+        </dl>
+        <div class="mt-8 flex flex-wrap gap-3">
+            <a id="viewLiveLink" href="#" class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-black text-white hover:bg-blue-600 transition">
+                Open live report
+                <span class="material-symbols-outlined text-lg">open_in_new</span>
+            </a>
+            <button type="button" onclick="closeModal('viewModal')" class="rounded-xl border border-white/15 px-5 py-2.5 text-xs font-black text-slate-400 hover:text-white transition">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Create modal -->
+<div id="createModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div class="glass-card max-w-lg w-full rounded-3xl border border-white/15 p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h4 class="text-xl font-black text-white">New saved report</h4>
+            <button type="button" onclick="closeModal('createModal')" class="text-slate-500 hover:text-white">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <form th:action="@{/admin/reports}" th:object="${savedReportRequest}" method="post" class="space-y-5">
+            <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <div>
+                <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Title</label>
+                <input type="text" th:field="*{title}" required maxlength="255"
+                       class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white" placeholder="e.g. Q1 revenue review" />
+            </div>
+            <div>
+                <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Description</label>
+                <textarea th:field="*{description}" rows="3" maxlength="4000"
+                          class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white placeholder:text-slate-600"
+                          placeholder="Optional notes for your team"></textarea>
+            </div>
+            <div>
+                <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Report type</label>
+                <select th:field="*{reportType}" class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white font-bold">
+                    <option th:each="t : ${reportTypes}" th:value="${t.name()}" th:text="${t.label}"></option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Status</label>
+                <select th:field="*{status}" class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white font-bold">
+                    <option th:each="s : ${reportStatuses}" th:value="${s.name()}" th:text="${s.label}"></option>
+                </select>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="flex-1 rounded-xl bg-primary py-3 text-xs font-black uppercase tracking-wider text-white hover:bg-blue-600 transition">Create report</button>
+                <button type="button" onclick="closeModal('createModal')" class="rounded-xl border border-white/15 px-6 py-3 text-xs font-black uppercase text-slate-400 hover:text-white transition">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit modal -->
+<div id="editModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div class="glass-card max-w-lg w-full rounded-3xl border border-white/15 p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h4 class="text-xl font-black text-white">Edit saved report</h4>
+            <button type="button" onclick="closeModal('editModal')" class="text-slate-500 hover:text-white">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <form id="editForm" method="post" class="space-y-5">
+            <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <div>
+                <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Title</label>
+                <input id="editTitle" name="title" type="text" required maxlength="255"
+                       class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white" />
+            </div>
+            <div>
+                <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Description</label>
+                <textarea id="editDescription" name="description" rows="3" maxlength="4000"
+                          class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white"></textarea>
+            </div>
+            <div>
+                <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Report type</label>
+                <select id="editReportType" name="reportType" class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white font-bold">
+                    <option th:each="t : ${reportTypes}" th:value="${t.name()}" th:text="${t.label}"></option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Status</label>
+                <select id="editStatus" name="status" class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white font-bold">
+                    <option th:each="s : ${reportStatuses}" th:value="${s.name()}" th:text="${s.label}"></option>
+                </select>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="flex-1 rounded-xl bg-primary py-3 text-xs font-black uppercase tracking-wider text-white hover:bg-blue-600 transition">Save changes</button>
+                <button type="button" onclick="closeModal('editModal')" class="rounded-xl border border-white/15 px-6 py-3 text-xs font-black uppercase text-slate-400 hover:text-white transition">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete modal -->
+<div id="deleteModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div class="glass-card max-w-md w-full rounded-3xl border border-rose-500/20 p-8 shadow-2xl">
+        <h4 class="text-lg font-black text-white mb-2">Delete report?</h4>
+        <p class="text-sm text-slate-400 mb-6">This removes the saved bookmark <span id="deleteTitleDisplay" class="text-white font-bold"></span>. Live analytics pages are not deleted.</p>
+        <form id="deleteForm" method="post">
+            <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <div class="flex gap-3">
+                <button type="submit" class="flex-1 rounded-xl bg-rose-600 py-3 text-xs font-black uppercase tracking-wider text-white hover:bg-rose-500 transition">Delete report</button>
+                <button type="button" onclick="closeModal('deleteModal')" class="rounded-xl border border-white/15 px-6 py-3 text-xs font-black uppercase text-slate-400 hover:text-white transition">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const BASE = /*[[@{/admin/reports}]]*/ '/admin/reports';
+
+    function openModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+    }
+    function closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+    }
+
+    function openViewFromRow(btn) {
+        const tr = btn.closest('tr');
+        document.getElementById('viewTitle').textContent = tr.dataset.title || '';
+        document.getElementById('viewType').textContent = tr.dataset.typeLabel || '';
+        document.getElementById('viewStatus').textContent = tr.dataset.statusLabel || '';
+        document.getElementById('viewDescription').textContent = tr.dataset.description || '—';
+        document.getElementById('viewUpdated').textContent = tr.dataset.updated || '';
+        const live = document.getElementById('viewLiveLink');
+        live.href = tr.dataset.liveHref || '#';
+        openModal('viewModal');
+    }
+
+    function openEditFromRow(btn) {
+        const tr = btn.closest('tr');
+        const id = tr.dataset.id;
+        document.getElementById('editForm').action = BASE + '/' + id + '/update';
+        document.getElementById('editTitle').value = tr.dataset.title || '';
+        document.getElementById('editDescription').value = tr.dataset.description || '';
+        document.getElementById('editReportType').value = tr.dataset.type || 'REVENUE';
+        document.getElementById('editStatus').value = tr.dataset.status || 'DRAFT';
+        openModal('editModal');
+    }
+
+    function openDeleteFromRow(btn) {
+        const tr = btn.closest('tr');
+        const id = tr.dataset.id;
+        document.getElementById('deleteForm').action = BASE + '/' + id + '/delete';
+        document.getElementById('deleteTitleDisplay').textContent = '"' + (tr.dataset.title || '') + '"';
+        openModal('deleteModal');
+    }
+
+    ['viewModal', 'createModal', 'editModal', 'deleteModal'].forEach(function (mid) {
+        const el = document.getElementById(mid);
+        if (el) {
+            el.addEventListener('click', function (e) {
+                if (e.target === el) closeModal(mid);
+            });
+        }
+    });
+</script>
+</body>
 </html>
