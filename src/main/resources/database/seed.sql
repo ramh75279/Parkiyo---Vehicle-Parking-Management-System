@@ -23,3 +23,24 @@ INSERT INTO parking_slots (slot_number, zone, status, hourly_rate, created_at, u
 ('B-002', 'Covered', 'AVAILABLE', 350.00, NOW(6), NOW(6)),
 ('EV-001', 'EV Charging', 'AVAILABLE', 500.00, NOW(6), NOW(6))
 ON DUPLICATE KEY UPDATE updated_at = VALUES(updated_at);
+
+INSERT INTO vehicles (
+    user_id, license_plate, category, make, model, color, manufacture_year, active, created_at, updated_at
+)
+SELECT u.id, v.license_plate, v.category, v.make, v.model, v.color, v.manufacture_year, v.active, NOW(6), NOW(6)
+FROM users u
+JOIN (
+    SELECT 'CAB-2401' AS license_plate, 'CAR' AS category, 'Toyota' AS make, 'Yaris' AS model, 'White' AS color, 2021 AS manufacture_year, TRUE AS active
+    UNION ALL
+    SELECT 'KLL-9981', 'MOTORCYCLE', 'Yamaha', 'FZ', 'Blue', 2022, TRUE
+    UNION ALL
+    SELECT 'NCP-7720', 'VAN', 'Nissan', 'Caravan', 'Silver', 2020, FALSE
+) v
+WHERE u.email = 'user@parkiyo.com'
+ON DUPLICATE KEY UPDATE
+    make = VALUES(make),
+    model = VALUES(model),
+    color = VALUES(color),
+    manufacture_year = VALUES(manufacture_year),
+    active = VALUES(active),
+    updated_at = VALUES(updated_at);
