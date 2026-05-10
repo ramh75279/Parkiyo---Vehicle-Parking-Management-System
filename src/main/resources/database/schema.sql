@@ -201,3 +201,16 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     INDEX idx_audit_created_at (created_at),
     INDEX idx_audit_entity_type (entity_type)
 );
+
+CREATE TABLE IF NOT EXISTS saved_reports (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    report_type VARCHAR(32) NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    created_at DATETIME(6) NOT NULL,
+    updated_at DATETIME(6) NOT NULL,
+    INDEX idx_saved_reports_type (report_type),
+    INDEX idx_saved_reports_status (status),
+    INDEX idx_saved_reports_updated (updated_at)
+);

@@ -88,9 +88,15 @@ public class CompatibilityController {
     //     return "redirect:/admin/payments";
     // }
 
-    @GetMapping({"/admin/reports/audit-log", "/admin/reports/daily/export"})
+    @GetMapping("/admin/reports/audit-log")
     @PreAuthorize("hasRole('ADMIN')")
-    public String reportShortcutAlias() {
+    public String reportAuditShortcutAlias() {
+        return "redirect:/admin/audit";
+    }
+
+    @GetMapping("/admin/reports/daily/export")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String reportDailyExportAlias() {
         return "redirect:/admin/reports";
     }
 
