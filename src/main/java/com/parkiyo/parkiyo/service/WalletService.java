@@ -61,6 +61,11 @@ public class WalletService {
 
     @Transactional
     public void topUp(String email, BigDecimal amount) {
+        topUp(email, amount, "Wallet Top-up");
+    }
+
+    @Transactional
+    public void topUp(String email, BigDecimal amount, String description) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Top-up amount must be positive");
         }
@@ -70,12 +75,14 @@ public class WalletService {
         BigDecimal newBalance = wallet.getBalance().add(amount);
         wallet.setBalance(newBalance);
 
+        String desc = (description == null || description.isBlank()) ? "Wallet Top-up" : description.trim();
+
         WalletTransaction transaction = WalletTransaction.builder()
                 .wallet(wallet)
                 .type("CREDIT")
                 .amount(amount)
                 .balanceAfter(newBalance)
-                .description("Wallet Top-up")
+                .description(desc)
                 .build();
 
         if (wallet.getTransactions() == null) {

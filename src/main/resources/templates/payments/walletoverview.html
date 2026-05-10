@@ -157,6 +157,16 @@
             .sidebar-container, .no-print { display: none !important; }
             main { overflow: visible !important; }
         }
+
+        .receipt-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.12);
+            border-radius: 1.25rem;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.02);
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .receipt-zone:hover { border-color: rgba(31, 104, 249, 0.35); background: rgba(31, 104, 249, 0.04); }
+        fieldset:disabled .receipt-zone { opacity: 0.5; }
     </style>
 </head>
 
@@ -262,6 +272,28 @@
                         <p class="text-sm font-black text-rose-300" th:text="${error}">Error</p>
                     </div>
 
+                    <div th:if="${pendingReceiptSubmission != null}"
+                        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 rounded-2xl bg-amber-500/10 border border-amber-500/25">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-amber-400 shrink-0">schedule</span>
+                            <div>
+                                <p class="text-sm font-black text-amber-200">Top-up pending admin approval</p>
+                                <p class="text-[11px] text-amber-200/70 font-bold mt-1">
+                                    Rs. <span th:text="${#numbers.formatDecimal(pendingReceiptSubmission.amount, 1, 'COMMA', 2, 'POINT')}">0</span><span
+                                        th:if="${pendingReceiptSubmission.paymentMethod != null}"
+                                        th:text="| · ${pendingReceiptSubmission.paymentMethod}|"></span><span
+                                        th:if="${pendingReceiptSubmission.createdAt != null}"
+                                        th:text="| · Submitted ${#temporals.format(pendingReceiptSubmission.createdAt, 'dd MMM yyyy HH:mm')}|"></span>
+                                </p>
+                            </div>
+                        </div>
+                        <a th:href="|/uploads/wallet-receipts/${pendingReceiptSubmission.storedFilename}|" target="_blank" rel="noopener"
+                           class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-amber-100 text-xs font-black hover:bg-white/15 transition-all shrink-0">
+                            <span class="material-symbols-outlined text-base">open_in_new</span>
+                            View uploaded receipt
+                        </a>
+                    </div>
+
                     <!-- Wallet hero card -->
                     <div class="rounded-[2.5rem] p-8 relative overflow-hidden"
                         style="background:linear-gradient(135deg,#1a3a6e 0%,#1f68f9 50%,#3b82f6 100%);">
@@ -333,20 +365,19 @@
 
                         <!-- Top up panel -->
                         <div class="glass-card rounded-[2.5rem] p-8" id="topupPanel">
-                            <h3 class="text-base font-black text-white mb-6">Top Up Wallet</h3>
-                            <p class="text-[11px] text-slate-500 font-bold mb-5">Select an amount or enter a custom
-                                value.</p>
-                            <form th:action="@{/wallet/topup}" method="post" id="topupForm" onsubmit="return prepareTopupSubmit(event)">
+                            <h3 class="text-base font-black text-white mb-2">Top Up Wallet</h3>
+                            <p class="text-[11px] text-slate-500 font-bold mb-5">Choose amount, payment method, and upload your transfer receipt. Your balance updates after an admin approves.</p>
+                            <form th:action="@{/wallet/submit-receipt}" method="post" enctype="multipart/form-data" id="topupForm" onsubmit="return prepareTopupSubmit(event)">
                                 <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                <input type="hidden" name="amount" id="topupAmountField" value="50" />
+                                <fieldset th:disabled="${pendingReceiptSubmission != null}" class="min-w-0 border-0 p-0 m-0">
+                                <input type="hidden" name="amount" id="topupAmountField" value="2500" />
                                 <div class="grid grid-cols-3 gap-3 mb-5">
                                     <div class="topup-amount" data-amt="500" onclick="selectTopup(this,'500')">Rs. 500</div>
                                     <div class="topup-amount" data-amt="1000" onclick="selectTopup(this,'1000')">Rs. 1,000</div>
                                     <div class="topup-amount selected" data-amt="2500" onclick="selectTopup(this,'2500')">Rs. 2,500</div>
                                     <div class="topup-amount" data-amt="5000" onclick="selectTopup(this,'5000')">Rs. 5,000</div>
                                     <div class="topup-amount" data-amt="10000" onclick="selectTopup(this,'10000')">Rs. 10,000</div>
-                                    <div class="topup-amount" onclick="selectTopup(this,'custom')" id="customBtn">Custom
-                                    </div>
+                                    <div class="topup-amount" onclick="selectTopup(this,'custom')" id="customBtn">Custom</div>
                                 </div>
                                 <div id="customInput" class="hidden mb-5">
                                     <label class="field-label">Custom Amount (Rs.)</label>
@@ -354,24 +385,36 @@
                                         class="input-glass bg-white/5 px-4 h-12 rounded-2xl"
                                         oninput="syncCustomTopup()" />
                                 </div>
-                                <div class="mb-6">
+                                <div class="mb-5">
                                     <label class="field-label">Payment Method</label>
-                                    <select class="input-glass px-4 h-12 rounded-2xl" aria-label="Payment method (display only)">
-                                        <option>Credit / Debit Card</option>
-                                        <option>Online Banking</option>
+                                    <select name="paymentMethod" class="input-glass px-4 h-12 rounded-2xl">
+                                        <option value="Credit / Debit Card">Credit / Debit Card</option>
+                                        <option value="Online Banking">Online Banking</option>
                                     </select>
+                                </div>
+                                <div class="mb-6">
+                                    <label class="field-label">Payment Receipt</label>
+                                    <div class="receipt-zone">
+                                        <input type="file" name="receipt" id="receiptFile" accept="image/*,.pdf,application/pdf"
+                                            class="block w-full text-xs font-bold text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-primary/20 file:text-primary hover:file:bg-primary/30 cursor-pointer" />
+                                        <p class="text-[10px] text-slate-600 font-bold mt-2">PNG, JPG, or PDF · max 10MB</p>
+                                    </div>
                                 </div>
                                 <div
                                     class="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/15 flex items-center justify-between mb-5">
-                                    <p class="text-sm font-black text-white">New Balance After Top-Up</p>
+                                    <p class="text-sm font-black text-white">Estimated balance after approval</p>
                                     <p class="text-xl font-black text-emerald-400" id="newBalance">Rs. 0.00</p>
                                 </div>
                                 <button type="submit"
-                                    class="w-full flex items-center justify-center gap-2 bg-emerald-500 text-white font-black py-4 rounded-2xl hover:bg-emerald-600 transition-all text-sm shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-                                    <span class="material-symbols-outlined text-lg">add_circle</span>
-                                    Top Up <span id="topupBtnAmt">Rs. 2,500.00</span>
+                                    class="w-full flex items-center justify-center gap-2 bg-emerald-500 text-white font-black py-4 rounded-2xl hover:bg-emerald-600 transition-all text-sm shadow-[0_0_20px_rgba(16,185,129,0.3)] disabled:opacity-40 disabled:pointer-events-none">
+                                    <span class="material-symbols-outlined text-lg">upload_file</span>
+                                    Submit <span id="topupBtnAmt">Rs. 2,500.00</span> for approval
                                 </button>
+                                </fieldset>
                             </form>
+                            <p th:if="${pendingReceiptSubmission != null}" class="text-[11px] text-slate-500 font-bold mt-4">
+                                You cannot submit another request until this one is approved or rejected.
+                            </p>
                         </div>
 
                         <!-- Recent wallet activity -->
@@ -477,6 +520,11 @@
         }
 
         function prepareTopupSubmit(ev) {
+            const fs = document.querySelector('#topupPanel fieldset');
+            if (fs && fs.disabled) {
+                ev.preventDefault();
+                return false;
+            }
             if (isCustom) {
                 const raw = document.getElementById('customAmountInput').value;
                 const v = parseFloat(raw);
@@ -488,6 +536,12 @@
                 document.getElementById('topupAmountField').value = v.toFixed(2);
             } else {
                 document.getElementById('topupAmountField').value = selectedAmt.toFixed(2);
+            }
+            const rf = document.getElementById('receiptFile');
+            if (rf && (!rf.files || rf.files.length === 0)) {
+                ev.preventDefault();
+                alert('Please attach a receipt image or PDF.');
+                return false;
             }
             return true;
         }
