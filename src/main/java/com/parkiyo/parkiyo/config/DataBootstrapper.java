@@ -1,12 +1,15 @@
 package com.parkiyo.parkiyo.config;
 
+import com.parkiyo.parkiyo.enums.PassPlanCategory;
 import com.parkiyo.parkiyo.enums.Role;
 import com.parkiyo.parkiyo.enums.SlotStatus;
 import com.parkiyo.parkiyo.enums.UserStatus;
 import com.parkiyo.parkiyo.model.ParkingSlot;
+import com.parkiyo.parkiyo.model.PassPlan;
 import com.parkiyo.parkiyo.model.User;
 import com.parkiyo.parkiyo.model.Wallet;
 import com.parkiyo.parkiyo.repository.ParkingSlotRepository;
+import com.parkiyo.parkiyo.repository.PassPlanRepository;
 import com.parkiyo.parkiyo.repository.UserRepository;
 import com.parkiyo.parkiyo.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,7 @@ public class DataBootstrapper {
     private final UserRepository userRepository;
     private final WalletRepository walletRepository;
     private final ParkingSlotRepository slotRepository;
+    private final PassPlanRepository passPlanRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${parkiyo.bootstrap.enabled:true}")
@@ -49,6 +53,8 @@ public class DataBootstrapper {
         if (properties.isDemoSlotsEnabled() && slotRepository.count() == 0) {
             seedDemoSlots();
         }
+
+        seedPassPlansIfEmpty();
 
         log.info("✅ Bootstrap completed successfully!");
     }
@@ -100,5 +106,63 @@ public class DataBootstrapper {
                 .status(SlotStatus.AVAILABLE)
                 .hourlyRate(new BigDecimal(rate))
                 .build();
+    }
+
+    private void seedPassPlansIfEmpty() {
+        if (passPlanRepository.count() > 0) {
+            return;
+        }
+        List<PassPlan> plans = List.of(
+                PassPlan.builder()
+                        .name("Weekly Flex")
+                        .description("50% off exit fees for 7 days — any zone.")
+                        .category(PassPlanCategory.WEEKLY)
+                        .price(BigDecimal.valueOf(1500))
+                        .durationDays(7)
+                        .zone(null)
+                        .unlimitedParking(false)
+                        .discountPercent(BigDecimal.valueOf(50))
+                        .active(true)
+                        .displayOrder(10)
+                        .build(),
+                PassPlan.builder()
+                        .name("Monthly Value")
+                        .description("40% off for 30 days — ideal for daily commuters.")
+                        .category(PassPlanCategory.MONTHLY)
+                        .price(BigDecimal.valueOf(5000))
+                        .durationDays(30)
+                        .zone(null)
+                        .unlimitedParking(false)
+                        .discountPercent(BigDecimal.valueOf(40))
+                        .active(true)
+                        .displayOrder(20)
+                        .build(),
+                PassPlan.builder()
+                        .name("VIP Unlimited")
+                        .description("No exit parking charges for 14 days system-wide.")
+                        .category(PassPlanCategory.VIP)
+                        .price(BigDecimal.valueOf(12000))
+                        .durationDays(14)
+                        .zone(null)
+                        .unlimitedParking(true)
+                        .discountPercent(BigDecimal.ZERO)
+                        .active(true)
+                        .displayOrder(30)
+                        .build(),
+                PassPlan.builder()
+                        .name("Employee Ground Floor")
+                        .description("Unlimited parking when using Ground Floor slots.")
+                        .category(PassPlanCategory.EMPLOYEE)
+                        .price(BigDecimal.valueOf(2500))
+                        .durationDays(30)
+                        .zone("Ground Floor")
+                        .unlimitedParking(true)
+                        .discountPercent(BigDecimal.ZERO)
+                        .active(true)
+                        .displayOrder(40)
+                        .build()
+        );
+        passPlanRepository.saveAll(plans);
+        log.info("🎫 {} default parking pass plans created", plans.size());
     }
 }
