@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Parkiyo Admin | Feedback Hub</title>
+    <th:block th:replace="~{feedback/fragments :: head-extra}"></th:block>
+</head>
+<body class="text-slate-100 font-display antialiased min-h-screen bg-subtle-radial">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary"></div>
+<div class="border-b border-white/5 bg-background-dark/40 premium-blur px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-4">
+        <a th:href="@{/admin/dashboard}" class="text-sm font-bold text-slate-400 hover:text-white">← Admin</a>
+        <h1 class="text-lg font-black text-white">Feedback Hub</h1>
+    </div>
+    <div class="flex gap-3 text-sm font-bold">
+        <a th:href="@{/admin/feedback/analytics}" class="text-slate-400 hover:text-white">Analytics</a>
+    </div>
+</div>
+
+<div class="p-6 lg:p-10 max-w-7xl mx-auto">
+    <div th:if="${success}" class="mb-4 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-sm font-bold text-emerald-200" th:text="${success}"></div>
+    <div th:if="${error}" class="mb-4 rounded-xl border border-rose-500/25 bg-rose-500/10 px-4 py-3 text-sm font-bold text-rose-200" th:text="${error}"></div>
+
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
+        <div class="glass-card rounded-2xl p-4 border border-amber-500/15">
+            <p class="text-[10px] font-black uppercase text-slate-500">Pending</p>
+            <p class="text-2xl font-black text-amber-300 mt-1" th:text="${pending}">0</p>
+        </div>
+        <div class="glass-card rounded-2xl p-4 border border-sky-500/15">
+            <p class="text-[10px] font-black uppercase text-slate-500">In review</p>
+            <p class="text-2xl font-black text-sky-300 mt-1" th:text="${inReview}">0</p>
+        </div>
+        <div class="glass-card rounded-2xl p-4 border border-emerald-500/15">
+            <p class="text-[10px] font-black uppercase text-slate-500">Resolved</p>
+            <p class="text-2xl font-black text-emerald-300 mt-1" th:text="${resolved}">0</p>
+        </div>
+        <div class="glass-card rounded-2xl p-4 border border-slate-600/30">
+            <p class="text-[10px] font-black uppercase text-slate-500">Rejected</p>
+            <p class="text-2xl font-black text-slate-400 mt-1" th:text="${rejected}">0</p>
+        </div>
+        <div class="glass-card rounded-2xl p-4 border border-primary/20 col-span-2 md:col-span-1">
+            <p class="text-[10px] font-black uppercase text-slate-500">Avg rating</p>
+            <p class="text-2xl font-black text-white mt-1" th:text="${avgRating}">0</p>
+        </div>
+    </div>
+
+    <form method="get" class="flex flex-wrap gap-3 mb-6 items-end">
+        <div>
+            <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Status</label>
+            <select name="status" class="rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm font-bold text-white min-w-[140px]">
+                <option value="ALL" th:selected="${statusFilter == 'ALL'}">All</option>
+                <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s.displayLabel}" th:selected="${statusFilter == s.name()}">—</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-[10px] font-black uppercase text-slate-500 mb-1">Category</label>
+            <select name="category" class="rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm font-bold text-white min-w-[180px]">
+                <option value="ALL" th:selected="${categoryFilter == 'ALL'}">All</option>
+                <option th:each="c : ${categories}" th:value="${c.name()}" th:text="${c.displayLabel}" th:selected="${categoryFilter == c.name()}">—</option>
+            </select>
+        </div>
+        <button type="submit" class="rounded-xl bg-primary text-white font-black px-5 py-2 text-sm h-[38px]">Filter</button>
+    </form>
+
+    <div class="glass-card rounded-[1.5rem] border border-white/[0.06] overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-white/[0.03] text-[10px] font-black uppercase tracking-widest text-slate-500">
+                <tr>
+                    <th class="px-4 py-3">User</th>
+                    <th class="px-4 py-3">Title</th>
+                    <th class="px-4 py-3">Category</th>
+                    <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3">Priority</th>
+                    <th class="px-4 py-3">Created</th>
+                    <th class="px-4 py-3"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${reports}" class="border-t border-white/[0.05] hover:bg-white/[0.02]">
+                    <td class="px-4 py-3 font-bold text-slate-300" th:text="${r.user.email}">user</td>
+                    <td class="px-4 py-3 text-white font-black max-w-[200px] truncate" th:text="${r.title}">—</td>
+                    <td class="px-4 py-3 text-slate-400 font-semibold text-xs" th:text="${r.category.displayLabel}">—</td>
+                    <td class="px-4 py-3 text-xs font-black text-amber-300" th:text="${r.status.displayLabel}">—</td>
+                    <td class="px-4 py-3 text-xs font-bold text-slate-500" th:text="${r.priority.displayLabel}">—</td>
+                    <td class="px-4 py-3 text-xs text-slate-500 font-bold" th:text="${#temporals.format(r.createdAt, 'dd MMM yy HH:mm')}">—</td>
+                    <td class="px-4 py-3">
+                        <a th:href="@{/admin/feedback/{id}(id=${r.id})}" class="text-primary font-black text-xs hover:underline">Open</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(reports)}">
+                    <td colspan="7" class="px-4 py-10 text-center text-slate-500 font-bold">No reports match filters.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
