@@ -76,6 +76,15 @@
             <a th:href="@{/admin/payments}" class="flex items-center gap-3 px-4 py-4 rounded-xl text-sm font-bold transition-all" th:classappend="${active == 'payments'} ? ' text-primary bg-primary/10 border-r-4 border-primary' : ' text-slate-400 hover:text-white hover:bg-white/5'">
                 <span class="material-symbols-outlined shrink-0 text-[22px]">payments</span><span class="nav-label text-sm">Payments</span>
             </a>
+            <a th:href="@{/admin/pass-plans}" class="flex items-center gap-3 px-4 py-4 rounded-xl text-sm font-bold transition-all" th:classappend="${active == 'passPlans'} ? ' text-primary bg-primary/10 border-r-4 border-primary' : ' text-slate-400 hover:text-white hover:bg-white/5'">
+                <span class="material-symbols-outlined shrink-0 text-[22px]">confirmation_number</span><span class="nav-label text-sm">Pass Plans</span>
+            </a>
+            <a th:href="@{/admin/wallet-receipts}" class="flex items-center gap-3 px-4 py-4 rounded-xl text-sm font-bold transition-all" th:classappend="${active == 'walletReceipts'} ? ' text-primary bg-primary/10 border-r-4 border-primary' : ' text-slate-400 hover:text-white hover:bg-white/5'">
+                <span class="material-symbols-outlined shrink-0 text-[22px]">receipt_long</span><span class="nav-label text-sm">Wallet Top-Ups</span>
+            </a>
+            <a th:href="@{/admin/feedback}" class="flex items-center gap-3 px-4 py-4 rounded-xl text-sm font-bold transition-all" th:classappend="${active == 'feedback'} ? ' text-primary bg-primary/10 border-r-4 border-primary' : ' text-slate-400 hover:text-white hover:bg-white/5'">
+                <span class="material-symbols-outlined shrink-0 text-[22px]">support_agent</span><span class="nav-label text-sm">Feedback Hub</span>
+            </a>
             <a th:href="@{/admin/reports}" class="flex items-center gap-3 px-4 py-4 rounded-xl text-sm font-bold transition-all" th:classappend="${active == 'reports'} ? ' text-primary bg-primary/10 border-r-4 border-primary' : ' text-slate-400 hover:text-white hover:bg-white/5'">
                 <span class="material-symbols-outlined shrink-0 text-[22px]">bar_chart</span><span class="nav-label text-sm">Reports</span>
             </a>
