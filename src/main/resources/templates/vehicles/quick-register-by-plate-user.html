@@ -169,7 +169,7 @@
                             </span>
                         </div>
                         <div class="mb-4">
-                            <input type="text" placeholder="e.g. ABC-1234" class="plate-input" th:field="*{licensePlate}" />
+                            <input type="text" placeholder="e.g. ABC-1234" class="plate-input bg-white/5 backdrop-blur-md rounded-2xl" th:field="*{licensePlate}" />
                             <div th:if="${#fields.hasErrors('licensePlate')}" class="text-rose-400 text-xs mt-2 flex items-center gap-1">
                                 <span class="material-symbols-outlined text-sm">error</span>
                                 <span th:errors="*{licensePlate}"></span>
