@@ -214,3 +214,25 @@ CREATE TABLE IF NOT EXISTS saved_reports (
     INDEX idx_saved_reports_status (status),
     INDEX idx_saved_reports_updated (updated_at)
 );
+
+-- User feedback & issue reports (Smart Feedback Center)
+CREATE TABLE IF NOT EXISTS feedback_reports (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(40) NOT NULL,
+    rating INT NULL,
+    status VARCHAR(20) NOT NULL,
+    priority VARCHAR(20) NOT NULL,
+    admin_response TEXT NULL,
+    attachment_path VARCHAR(500) NULL,
+    responded_at DATETIME(6) NULL,
+    created_at DATETIME(6) NULL,
+    updated_at DATETIME(6) NULL,
+    CONSTRAINT fk_feedback_user FOREIGN KEY (user_id) REFERENCES users(id),
+    INDEX idx_feedback_user (user_id),
+    INDEX idx_feedback_status (status),
+    INDEX idx_feedback_category (category),
+    INDEX idx_feedback_created (created_at)
+);
