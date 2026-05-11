@@ -16,9 +16,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.parkiyo.parkiyo.model.Reservation;
+
+import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @RequiredArgsConstructor
@@ -36,8 +42,43 @@ public class PaymentController {
     public String pendingPayment(@PathVariable Long id,
                                  Authentication auth,
                                  Model model) {
-        model.addAttribute("pendingPayment", paymentService.getPendingPayment(id, auth.getName()));
-        model.addAttribute("walletBalance", walletService.getBalance(auth.getName()));
+        var payment = paymentService.getPendingPayment(id, auth.getName());
+        String email = auth.getName();
+        BigDecimal walletBalance = walletService.getBalance(email);
+        model.addAttribute("pendingPayment", payment);
+        model.addAttribute("walletBalance", walletBalance);
+        model.addAttribute("walletAfterPay", walletBalance.subtract(payment.getAmount()));
+
+        Reservation res = payment.getReservation();
+        if (res != null) {
+            long diffMin = Duration.between(res.getStartTime(), res.getEndTime()).toMinutes();
+            long billHours = diffMin > 0 ? (long) Math.ceil(diffMin / 60.0) : 1L;
+            model.addAttribute("reservationDurationLabel", billHours == 1 ? "1 hour" : billHours + " hours");
+            var slot = res.getSlot();
+            if (slot != null) {
+                String z = slot.getZone() != null && !slot.getZone().isBlank() ? slot.getZone() : "—";
+                String floor = slot.getFloor();
+                String zoneLine = "Zone " + z
+                        + (floor != null && !floor.isBlank() ? " · " + floor : "");
+                model.addAttribute("reservationZoneLine", zoneLine);
+                model.addAttribute("slotHourlyRate", slot.getHourlyRate() != null ? slot.getHourlyRate() : BigDecimal.ZERO);
+            } else {
+                model.addAttribute("reservationZoneLine", "—");
+                model.addAttribute("slotHourlyRate", BigDecimal.ZERO);
+            }
+            var v = res.getVehicle();
+            if (v != null && res.getUser() != null) {
+                String mm = Stream.of(v.getMake(), v.getModel())
+                        .filter(s -> s != null && !s.isBlank())
+                        .map(String::trim)
+                        .collect(Collectors.joining(" "));
+                String sub = res.getUser().getFullName() + (mm.isEmpty() ? "" : " · " + mm);
+                model.addAttribute("reservationVehicleSubtitle", sub);
+            } else {
+                model.addAttribute("reservationVehicleSubtitle", "—");
+            }
+        }
+
         return "payments/pendingpayment";
     }
 

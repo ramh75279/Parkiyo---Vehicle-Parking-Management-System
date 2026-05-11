@@ -11,8 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,6 +38,15 @@ public class SlotService {
             slots = slots.stream().filter(s -> zone.equalsIgnoreCase(s.getZone())).toList();
         }
         return slots;
+    }
+
+    /** All slots (every status), ordered for the user slot-selection map. */
+    public List<ParkingSlot> findAllSlotsForSlotSelection() {
+        List<ParkingSlot> list = new ArrayList<>(slotRepository.findAll());
+        list.sort(Comparator
+                .comparing((ParkingSlot s) -> s.getZone() != null ? s.getZone() : "", String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(s -> s.getSlotNumber() != null ? s.getSlotNumber() : "", String.CASE_INSENSITIVE_ORDER));
+        return list;
     }
 
     public List<ParkingSlot> getSlots(String status, String zone) {
@@ -61,6 +73,18 @@ public class SlotService {
                 .distinct()
                 .sorted()
                 .toList();
+    }
+
+    /** Average hourly rate across all slots — used for reservation modal estimates. */
+    public BigDecimal getAverageHourlyRateForEstimate() {
+        List<ParkingSlot> slots = slotRepository.findAll();
+        if (slots.isEmpty()) {
+            return new BigDecimal("5.50");
+        }
+        BigDecimal sum = slots.stream()
+                .map(s -> s.getHourlyRate() != null ? s.getHourlyRate() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return sum.divide(BigDecimal.valueOf(slots.size()), 2, RoundingMode.HALF_UP);
     }
 
     public Map<String, Object> getSlotOverview() {

@@ -5,6 +5,7 @@ import com.parkiyo.parkiyo.enums.NotificationType;
 import com.parkiyo.parkiyo.enums.PaymentStatus;
 import com.parkiyo.parkiyo.enums.ReservationStatus;
 import com.parkiyo.parkiyo.enums.SlotStatus;
+import com.parkiyo.parkiyo.enums.VehicleCategory;
 import com.parkiyo.parkiyo.model.*;
 import com.parkiyo.parkiyo.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -28,6 +32,7 @@ public class ReservationService {
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
     private final NotificationService notificationService;
+    private final VehicleService vehicleService;
 
     /**
      * Get all reservations for a user - NEVER returns null
@@ -37,8 +42,46 @@ public class ReservationService {
         if (email == null || email.isBlank()) {
             return Collections.emptyList();
         }
-        List<Reservation> reservations = reservationRepository.findByUserEmail(email);
+        List<Reservation> reservations = reservationRepository.findAllByUserEmailWithAssociations(email);
         return reservations != null ? reservations : Collections.emptyList();
+    }
+
+    /** Confirmed reservations whose start time falls in the next 7 calendar days (including today). */
+    @Transactional(readOnly = true)
+    public long countConfirmedStartingWithinSevenDays(String email) {
+        if (email == null || email.isBlank()) {
+            return 0;
+        }
+        LocalDateTime from = LocalDate.now().atStartOfDay();
+        LocalDateTime until = LocalDate.now().plusDays(7).atStartOfDay();
+        return reservationRepository.countByUserEmailAndStatusAndStartTimeBetween(
+                email, ReservationStatus.CONFIRMED, from, until);
+    }
+
+    /** Reservations with a start time in the current calendar month (excluding cancelled). */
+    @Transactional(readOnly = true)
+    public long countBookingsStartingThisMonth(String email) {
+        if (email == null || email.isBlank()) {
+            return 0;
+        }
+        YearMonth ym = YearMonth.now();
+        LocalDateTime from = ym.atDay(1).atStartOfDay();
+        LocalDateTime until = ym.plusMonths(1).atDay(1).atStartOfDay();
+        return reservationRepository.countByUserEmailAndStartTimeBetweenExcludingStatus(
+                email, from, until, ReservationStatus.CANCELLED);
+    }
+
+    /** Cancelled reservations whose updated timestamp falls in the current calendar month. */
+    @Transactional(readOnly = true)
+    public long countCancellationsThisMonth(String email) {
+        if (email == null || email.isBlank()) {
+            return 0;
+        }
+        YearMonth ym = YearMonth.now();
+        LocalDateTime from = ym.atDay(1).atStartOfDay();
+        LocalDateTime until = ym.plusMonths(1).atDay(1).atStartOfDay();
+        return reservationRepository.countByUserEmailAndStatusAndUpdatedAtBetween(
+                email, ReservationStatus.CANCELLED, from, until);
     }
 
     /**
@@ -117,8 +160,7 @@ public class ReservationService {
             throw new RuntimeException("Slot " + slot.getSlotNumber() + " is not available.");
         }
 
-        Vehicle vehicle = vehicleRepository.findById(request.getVehicleId())
-                .orElseThrow(() -> new RuntimeException("Vehicle not found."));
+        Vehicle vehicle = resolveVehicleForReservation(request, email);
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found."));
@@ -249,5 +291,27 @@ public class ReservationService {
                 "Reservation " + reservation.getReservationCode() + " was cancelled.",
                 "/reservations"
         );
+    }
+
+    private Vehicle resolveVehicleForReservation(ReservationRequest request, String email) {
+        if (request.getVehicleId() != null) {
+            Vehicle vehicle = vehicleRepository.findById(request.getVehicleId())
+                    .orElseThrow(() -> new RuntimeException("Vehicle not found."));
+            if (vehicle.getUser() != null && !email.equalsIgnoreCase(vehicle.getUser().getEmail())) {
+                throw new RuntimeException("Vehicle does not belong to your account.");
+            }
+            return vehicle;
+        }
+        String plate = request.getReservationPlate();
+        String catRaw = request.getReservationVehicleCategory();
+        if (plate != null && !plate.isBlank() && catRaw != null && !catRaw.isBlank()) {
+            try {
+                VehicleCategory cat = VehicleCategory.valueOf(catRaw.trim().toUpperCase(Locale.ROOT));
+                return vehicleService.getOrCreateVehicleForUserReservation(email, plate.trim(), cat);
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid vehicle category.");
+            }
+        }
+        throw new RuntimeException("Vehicle is required.");
     }
 }

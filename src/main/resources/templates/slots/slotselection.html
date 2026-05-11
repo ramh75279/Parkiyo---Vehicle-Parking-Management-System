@@ -234,7 +234,7 @@
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">payments</span><span
                     class="nav-label text-sm">Payments</span></a>
-            <a th:href="@{/wallet}"
+            <a th:href="@{/wallet/overview}"
                class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span
                     class="material-symbols-outlined shrink-0">account_balance_wallet</span><span
                     class="nav-label text-sm">Wallet</span></a>
@@ -258,7 +258,8 @@
                 </a>
                 <div>
                     <h2 class="text-xl font-black text-white">Select a Slot</h2>
-                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Make a new reservation</p>
+                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1"
+                       th:text="${slotHeaderSubtitle}">Make a new reservation</p>
                 </div>
             </div>
             <div class="h-10 w-10 rounded-[14px] bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
@@ -273,12 +274,21 @@
             <!-- Map area -->
             <div class="flex-1 flex flex-col overflow-hidden">
 
+                <div th:if="${error != null}" class="mx-8 mt-4 shrink-0 rounded-2xl border border-rose-500/25 bg-rose-500/10 px-4 py-3 text-sm font-bold text-rose-200 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">error</span>
+                    <span th:text="${error}">Something went wrong.</span>
+                </div>
+                <div th:if="${success != null}" class="mx-8 mt-4 shrink-0 rounded-2xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-sm font-bold text-emerald-200 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">check_circle</span>
+                    <span th:text="${success}"></span>
+                </div>
+
                 <!-- Zone tabs + legend -->
                 <div class="px-8 pt-6 pb-4 flex items-center justify-between gap-4 flex-wrap shrink-0">
-                    <div class="flex gap-1 bg-white/[0.03] border border-white/5 rounded-xl p-1" id="zoneTabsContainer">
-                        <button th:each="z, iterStat : ${zones}" 
-                                th:class="${iterStat.first} ? 'zone-tab active' : 'zone-tab'" 
-                                th:onclick="'setZone(this, \\'' + ${z} + '\\')'"
+                    <div class="flex gap-1 bg-white/[0.03] border border-white/5 rounded-xl p-1" id="zoneTabsContainer" role="tablist">
+                        <button type="button" th:each="z, iterStat : ${zones}"
+                                th:class="${(initialZone != null and #strings.equals(initialZone, z)) or (initialZone == null and iterStat.first)} ? 'zone-tab active' : 'zone-tab'"
+                                th:attr="data-zone=${z}"
                                 th:text="'Zone ' + ${z}"></button>
                     </div>
                     <div class="flex items-center gap-5 flex-wrap">
@@ -302,8 +312,7 @@
                         <p class="text-[10px] text-slate-500 font-bold">25 slots · <span class="text-emerald-400">14
                                     available</span> during your time window</p>
                     </div>
-                    <span class="ml-auto text-[10px] font-black text-slate-500 uppercase tracking-widest">Standard ·
-                            $5.50/hr</span>
+                    <span class="ml-auto text-[10px] font-black text-slate-500 uppercase tracking-widest" id="zoneRateLabel">Standard</span>
                 </div>
 
                 <!-- Slot grid -->
@@ -314,34 +323,80 @@
                 </div>
             </div>
 
-            <!-- Confirm panel -->
-            <form id="reservationForm" th:action="@{/reservations/create}" method="post" class="w-72 border-l border-white/5 flex flex-col bg-background-dark/40 premium-blur shrink-0 p-6">
+            <!-- Confirm panel (matches reservation hub → slot selection mock) -->
+            <form id="reservationForm" th:action="@{/reservations/create}" method="post"
+                  class="w-80 border-l border-white/5 flex flex-col bg-background-dark/40 premium-blur shrink-0 p-6">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <h3 class="text-sm font-black text-white mb-5">Reservation Summary</h3>
 
                 <input type="hidden" name="slotId" id="selectedSlotId" />
 
-                <div class="space-y-4 mb-6 text-xs">
-                    <div>
-                        <label class="text-slate-500 font-bold mb-1 block uppercase tracking-widest text-[9px]">Vehicle</label>
-                        <select name="vehicleId" class="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-white font-bold" required>
-                            <option value="">-- Select --</option>
-                            <option th:each="v : ${userVehicles}" th:value="${v.id}" th:text="${v.licensePlate}"></option>
+                <input type="hidden" th:if="${prefVehicleId != null}" name="vehicleId" id="resVehicleId" th:value="${prefVehicleId}"/>
+                <input type="hidden" th:if="${showTimesReadOnly}" name="startTime" id="resStartTime" th:value="${prefStart}"/>
+                <input type="hidden" th:if="${showTimesReadOnly}" name="endTime" id="resEndTime" th:value="${prefEnd}"/>
+
+                <div class="space-y-3 mb-6 text-xs">
+                    <div class="flex justify-between gap-2 items-center" th:if="${prefVehicleId != null}">
+                        <span class="text-slate-500 font-bold">Vehicle</span>
+                        <span class="text-white font-black text-right tracking-wide" th:text="${summaryPlateDisplay}">—</span>
+                    </div>
+                    <div th:unless="${prefVehicleId != null}">
+                        <label class="text-slate-500 font-bold mb-1 block uppercase tracking-widest text-[9px]">Vehicle type</label>
+                        <select id="slotVehicleType" class="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-white font-bold mb-4">
+                            <option value="CAR" th:selected="${defaultVehicleCategory == 'CAR'}">Car</option>
+                            <option value="MOTORCYCLE" th:selected="${defaultVehicleCategory == 'MOTORCYCLE'}">Bike</option>
+                            <option value="VAN" th:selected="${defaultVehicleCategory == 'VAN'}">Van</option>
+                            <option value="TRUCK" th:selected="${defaultVehicleCategory == 'TRUCK'}">Truck</option>
                         </select>
+                        <th:block th:if="${usePlateAndTypeOnly}">
+                            <input type="hidden" name="reservationPlate" th:value="${prefPlate}"/>
+                            <input type="hidden" name="reservationVehicleCategory" id="reservationVehicleCategoryField" th:value="${defaultVehicleCategory}"/>
+                        </th:block>
+                        <th:block th:unless="${usePlateAndTypeOnly}">
+                            <label class="text-slate-500 font-bold mb-1 block uppercase tracking-widest text-[9px]">Vehicle</label>
+                            <select name="vehicleId" id="resVehicleId" class="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-white font-bold"
+                                    th:required="${prefVehicleId == null}">
+                                <option value="">-- Select --</option>
+                                <option th:each="v : ${userVehicles}" th:value="${v.id}"
+                                        th:attr="data-category=${v.category.name()}"
+                                        th:with="typeLbl=${v.category.name() == 'MOTORCYCLE' ? 'Bike' : (v.category.name() == 'CAR' ? 'Car' : (v.category.name() == 'VAN' ? 'Van' : 'Truck'))}"
+                                        th:text="|${v.licensePlate} · ${typeLbl}|"
+                                        th:selected="${prefPlate != null and #strings.equalsIgnoreCase(prefPlate, v.licensePlate)}"></option>
+                            </select>
+                        </th:block>
                     </div>
-                    <div>
-                        <label class="text-slate-500 font-bold mb-1 block uppercase tracking-widest text-[9px]">Arrival</label>
-                        <input type="datetime-local" name="startTime" class="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-white font-bold" required />
+                    <div class="flex justify-between gap-2 items-center" th:if="${prefVehicleId != null and summaryVehicleTypeLabel != null}">
+                        <span class="text-slate-500 font-bold">Vehicle type</span>
+                        <span class="text-white font-black text-right" th:text="${summaryVehicleTypeLabel}">Car</span>
                     </div>
-                    <div>
-                        <label class="text-slate-500 font-bold mb-1 block uppercase tracking-widest text-[9px]">Departure</label>
-                        <input type="datetime-local" name="endTime" class="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-white font-bold" required />
-                    </div>
-                    
-                    <div class="flex justify-between border-t border-white/5 pt-4 mt-4"><span
-                            class="text-slate-500 font-bold">Slot</span><span class="text-primary font-black"
-                                                                              id="selectedSlotLabel">—</span></div>
-                    <div class="flex justify-between"><span class="text-slate-500 font-bold">Zone</span><span
-                            class="text-slate-300 font-black" id="selectedZoneLabel">—</span></div>
+
+                    <th:block th:if="${showTimesReadOnly}">
+                        <div class="flex justify-between gap-2"><span class="text-slate-500 font-bold">Date</span><span class="text-white font-black" th:text="${summaryDateFormatted}">—</span></div>
+                        <div class="flex justify-between gap-2"><span class="text-slate-500 font-bold">Arrival</span><span class="text-white font-black" th:text="${summaryArrivalFormatted}">—</span></div>
+                        <div class="flex justify-between gap-2"><span class="text-slate-500 font-bold">Departure</span><span class="text-white font-black" th:text="${summaryDepartureFormatted}">—</span></div>
+                        <div class="flex justify-between gap-2"><span class="text-slate-500 font-bold">Duration</span><span class="text-white font-black" th:text="${summaryDurationLabel}">—</span></div>
+                    </th:block>
+                    <th:block th:unless="${showTimesReadOnly}">
+                        <div>
+                            <label class="text-slate-500 font-bold mb-1 block uppercase tracking-widest text-[9px]">Arrival</label>
+                            <input type="datetime-local" name="startTime" id="resStartTime" class="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-white font-bold" required
+                                   th:value="${prefStart}"/>
+                        </div>
+                        <div>
+                            <label class="text-slate-500 font-bold mb-1 block uppercase tracking-widest text-[9px]">Departure</label>
+                            <input type="datetime-local" name="endTime" id="resEndTime" class="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-white font-bold" required
+                                   th:value="${prefEnd}"/>
+                        </div>
+                    </th:block>
+
+                    <div class="flex justify-between border-t border-white/5 pt-3 mt-1"><span class="text-slate-500 font-bold">Slot</span><span class="text-primary font-black" id="selectedSlotLabel">—</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500 font-bold">Zone</span><span class="text-slate-300 font-black" id="selectedZoneLabel">—</span></div>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-primary/5 border border-primary/15 mb-6">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Estimated Fee</p>
+                    <p class="text-2xl font-black text-white" th:text="${summaryFeeTotal}">Rs. 0.00</p>
+                    <p class="text-[9px] text-slate-500 font-bold mt-1" th:text="${summaryFeeSubtext}">Based on typical slot rate</p>
                 </div>
 
                 <button id="confirmBtn" type="button" onclick="confirmSlot()" disabled
@@ -362,68 +417,142 @@
     </main>
 </div>
 
-<!-- Success toast -->
-<div id="successToast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-    <div
-            class="flex items-center gap-3 bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-black px-6 py-4 rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.2)] backdrop-blur-xl">
-        <span class="material-symbols-outlined text-emerald-400">check_circle</span>
-        <span>Slot reserved! Redirecting to payment…</span>
-    </div>
-</div>
-
 <script th:inline="javascript">
     /*<![CDATA[*/
-    const availableSlotsList = /*[[${availableSlots}]]*/ [];
-    const allZonesList = /*[[${zones}]]*/ ['A', 'B', 'C', 'D'];
+    const rawSlots = /*[[${slotsForPicker}]]*/ [];
+    const allZonesList = /*[[${zones}]]*/ [];
+    const avgRateLabel = /*[[${avgRateLabel}]]*/ 'Standard';
+    const serverInitialZone = /*[[${initialZone}]]*/ null;
+    const defaultVehicleCategory = /*[[${defaultVehicleCategory}]]*/ 'CAR';
     /*]]>*/
 
     const zoneMetadata = {
-        A: { label: 'Zone A — Ground Floor', rate: 'Standard · $5.50/hr' },
-        B: { label: 'Zone B — Level 1', rate: 'Standard · $5.50/hr' },
-        C: { label: 'Zone C — Level 2', rate: 'Standard · $5.50/hr' },
-        D: { label: 'Zone D — Rooftop', rate: 'Standard · $5.50/hr' }
+        A: { label: 'Zone A — Ground Floor' },
+        B: { label: 'Zone B — Level 1' },
+        C: { label: 'Zone C — Level 2' },
+        D: { label: 'Zone D — Rooftop' }
     };
 
     const zones = {};
-    if (allZonesList) {
-        allZonesList.forEach(z => {
-            zones[z] = {
-                label: zoneMetadata[z] ? zoneMetadata[z].label : 'Zone ' + z,
-                sub: 'Available slots: 0',
-                rate: zoneMetadata[z] ? zoneMetadata[z].rate : 'Standard',
-                slots: []
-            };
-        });
-    }
+    (allZonesList || []).forEach(z => {
+        zones[z] = {
+            label: zoneMetadata[z] ? zoneMetadata[z].label : ('Zone ' + z),
+            rate: avgRateLabel,
+            slots: []
+        };
+    });
 
-    if (availableSlotsList) {
-        availableSlotsList.forEach(s => {
-            const zName = s.zone || 'A';
-            if (!zones[zName]) {
-                zones[zName] = { label: 'Zone ' + zName, sub: 'Available', rate: 'Standard', slots: [] };
-            }
-            zones[zName].slots.push({ id: s.id, code: s.slotNumber, s: 'available' });
-        });
-        
-        // Update subtext
-        Object.keys(zones).forEach(z => {
-            zones[z].sub = `Available slots: ${zones[z].slots.length}`;
-        });
-    }
+    (rawSlots || []).forEach(function (row) {
+        const zName = row.zone || 'A';
+        if (!zones[zName]) {
+            zones[zName] = { label: 'Zone ' + zName, rate: avgRateLabel, slots: [] };
+        }
+        const st = row.s || 'available';
+        zones[zName].slots.push({ id: row.id, code: row.code, s: st });
+    });
 
-    let currentZone = allZonesList && allZonesList.length > 0 ? allZonesList[0] : 'A';
+    let currentZone = 'A';
+    if (serverInitialZone && allZonesList && allZonesList.indexOf(serverInitialZone) >= 0) {
+        currentZone = serverInitialZone;
+    } else if (allZonesList && allZonesList.length > 0) {
+        currentZone = allZonesList[0];
+    }
+    if (!zones[currentZone]) {
+        const keys = Object.keys(zones).sort();
+        currentZone = keys.length > 0 ? keys[0] : 'A';
+    }
     let selectedSlot = null;
 
     const iconMap = { available: 'check', occupied: 'directions_car', reserved: 'event_busy' };
 
-    function renderZone(z) {
-        const zd = zones[z];
-        document.getElementById('zoneInfo').children[1].children[0].textContent = zd.label;
-        document.getElementById('zoneInfo').children[1].children[1].innerHTML = `${zd.sub.split('·')[0]}· <span class="text-emerald-400">${zd.sub.split('·')[1]}</span>`;
-        document.getElementById('zoneInfo').children[2].textContent = zd.rate;
+    const confirmBtnDisabledClass = 'w-full flex items-center justify-center gap-2 bg-primary/30 text-white/40 font-black py-3.5 rounded-2xl text-sm cursor-not-allowed transition-all';
+    const confirmBtnEnabledClass = 'w-full flex items-center justify-center gap-2 bg-primary text-white font-black py-3.5 rounded-2xl text-sm hover:bg-primary/80 transition-all shadow-[0_0_20px_rgba(31,104,249,0.3)]';
 
+    function resetConfirmButton() {
+        const btn = document.getElementById('confirmBtn');
+        btn.disabled = true;
+        btn.style.pointerEvents = 'none';
+        btn.className = confirmBtnDisabledClass;
+    }
+
+    function hasVehicleForSubmit() {
+        var plateEl = document.querySelector('input[name="reservationPlate"]');
+        if (plateEl && plateEl.value && String(plateEl.value).trim() !== '') {
+            return true;
+        }
+        var el = document.getElementById('resVehicleId');
+        return !!(el && el.value && String(el.value).trim() !== '');
+    }
+
+    function syncReservationCategoryFromType() {
+        var typeSel = document.getElementById('slotVehicleType');
+        var catField = document.getElementById('reservationVehicleCategoryField');
+        if (typeSel && catField) {
+            catField.value = typeSel.value;
+        }
+    }
+
+    function updateConfirmButtonState() {
+        const btn = document.getElementById('confirmBtn');
+        const hint = document.getElementById('selectHint');
+        if (!btn) return;
+        const slotIdEl = document.getElementById('selectedSlotId');
+        const slotOk = selectedSlot != null && slotIdEl && String(slotIdEl.value || '').trim() !== '';
+        const vehOk = hasVehicleForSubmit();
+        if (slotOk && vehOk) {
+            btn.disabled = false;
+            btn.style.pointerEvents = 'auto';
+            btn.className = confirmBtnEnabledClass;
+            if (hint) {
+                var code = document.getElementById('selectedSlotLabel') && document.getElementById('selectedSlotLabel').textContent;
+                hint.textContent = code ? ('Slot ' + code + ' — click Confirm to reserve') : 'Click Confirm to reserve';
+                hint.classList.add('text-primary');
+                hint.classList.remove('text-slate-600');
+            }
+        } else {
+            resetConfirmButton();
+            if (hint) {
+                if (slotOk && !vehOk) {
+                    hint.textContent = document.getElementById('resVehicleId')
+                        ? 'Select a vehicle matching your type'
+                        : 'Choose vehicle type, then pick a slot on the map';
+                    hint.classList.add('text-primary');
+                    hint.classList.remove('text-slate-600');
+                } else if (!slotOk && vehOk) {
+                    hint.textContent = 'Select a slot on the map';
+                    hint.classList.remove('text-primary');
+                    hint.classList.add('text-slate-600');
+                } else if (!slotOk) {
+                    hint.textContent = 'Choose vehicle type, then pick a slot on the map';
+                    hint.classList.remove('text-primary');
+                    hint.classList.add('text-slate-600');
+                }
+            }
+        }
+    }
+
+    function renderZone(z) {
         const grid = document.getElementById('slotGrid');
+        const zd = zones[z];
+        if (!zd) {
+            grid.innerHTML = '<p class="text-slate-500 text-sm font-bold p-4 w-full">No slots in this zone for the selected date.</p>';
+            return;
+        }
+        const zoneInfo = document.getElementById('zoneInfo');
+        const inner = zoneInfo.children[1];
+        inner.children[0].textContent = zd.label;
+        const avail = zd.slots.filter(s => s.s === 'available').length;
+        const total = zd.slots.length;
+        inner.children[1].innerHTML = total === 0
+            ? '<span class="text-slate-500">No slots in this zone</span>'
+            : (total + ' slot' + (total === 1 ? '' : 's') + ' · <span class="text-emerald-400">' + avail + ' available</span> <span class="text-slate-600">for this date</span>');
+        zoneInfo.children[2].textContent = zd.rate;
+
         grid.innerHTML = '';
+        if (zd.slots.length === 0) {
+            grid.innerHTML = '<p class="text-slate-500 text-sm font-bold p-4 w-full">No available slots in this zone. Try another zone or date.</p>';
+            return;
+        }
         zd.slots.forEach(slot => {
             const tip = slot.s === 'available' ? `${slot.code} · Available` : slot.s === 'occupied' ? `${slot.code} · Occupied` : `${slot.code} · Reserved`;
             const cell = document.createElement('div');
@@ -447,16 +576,10 @@
         el.classList.remove('available');
         el.classList.add('selected');
         selectedSlot = id;
-        document.getElementById('selectedSlotId').value = id;
+        document.getElementById('selectedSlotId').value = String(id);
         document.getElementById('selectedSlotLabel').textContent = code;
-        document.getElementById('selectedZoneLabel').textContent = `Zone ${zone}`;
-        const btn = document.getElementById('confirmBtn');
-        btn.disabled = false;
-        btn.style.pointerEvents = 'auto';
-        btn.className = 'w-full flex items-center justify-center gap-2 bg-primary text-white font-black py-3.5 rounded-2xl text-sm hover:bg-primary/80 transition-all shadow-[0_0_20px_rgba(31,104,249,0.3)]';
-        document.getElementById('selectHint').textContent = `Slot ${code} selected ✓`;
-        document.getElementById('selectHint').classList.add('text-primary');
-        document.getElementById('selectHint').classList.remove('text-slate-600');
+        document.getElementById('selectedZoneLabel').textContent = 'Zone ' + zone;
+        updateConfirmButtonState();
     }
 
     function setZone(el, z) {
@@ -464,28 +587,115 @@
         el.classList.add('active');
         currentZone = z;
         selectedSlot = null;
+        document.getElementById('selectedSlotId').value = '';
         document.getElementById('selectedSlotLabel').textContent = '—';
         document.getElementById('selectedZoneLabel').textContent = '—';
+        resetConfirmButton();
+        document.querySelectorAll('.slot-cell.selected').forEach(c => {
+            c.classList.remove('selected');
+            c.classList.add('available');
+        });
         renderZone(z);
+        updateConfirmButtonState();
     }
 
     function confirmSlot() {
         if (!selectedSlot) return;
-        
-        // Basic frontend validation for required fields
+
+        syncReservationCategoryFromType();
         const form = document.getElementById('reservationForm');
-        if (!form.vehicleId.value || !form.startTime.value || !form.endTime.value) {
-            alert('Please select a vehicle, arrival, and departure time.');
+        const slotId = document.getElementById('selectedSlotId') && document.getElementById('selectedSlotId').value;
+        const vehicleIdEl = document.getElementById('resVehicleId');
+        const vehicleId = vehicleIdEl && vehicleIdEl.value;
+        const plateEl = document.querySelector('input[name="reservationPlate"]');
+        const hasPlateFlow = plateEl && plateEl.value && String(plateEl.value).trim() !== '';
+        const startTime = document.getElementById('resStartTime') && document.getElementById('resStartTime').value;
+        const endTime = document.getElementById('resEndTime') && document.getElementById('resEndTime').value;
+
+        if (!slotId) {
+            alert('Please select a slot on the map.');
+            return;
+        }
+        if (!hasPlateFlow && (!vehicleId || !String(vehicleId).trim())) {
+            alert('Please select a vehicle.');
+            return;
+        }
+        if (!startTime || !endTime) {
+            alert('Please set arrival and departure date & time.');
             return;
         }
 
-        document.getElementById('successToast').classList.remove('hidden');
-        setTimeout(() => form.submit(), 800);
+        function withSeconds(iso) {
+            if (!iso) return iso;
+            return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(iso) ? iso + ':00' : iso;
+        }
+        document.getElementById('resStartTime').value = withSeconds(startTime);
+        document.getElementById('resEndTime').value = withSeconds(endTime);
+
+        /* POST /reservations/create → server redirects to /payments/pending/{paymentId} */
+        form.submit();
     }
 
-    if (currentZone) {
+    document.getElementById('zoneTabsContainer').addEventListener('click', function (e) {
+        const btn = e.target.closest('button[data-zone]');
+        if (!btn) return;
+        setZone(btn, btn.getAttribute('data-zone'));
+    });
+
+    if (currentZone && zones[currentZone]) {
         renderZone(currentZone);
+    } else {
+        document.getElementById('slotGrid').innerHTML = '<p class="text-slate-500 text-sm font-bold p-4 w-full">No parking slots are configured yet.</p>';
     }
+
+    function syncVehicleOptionsToType() {
+        const typeSel = document.getElementById('slotVehicleType');
+        const vehSel = document.getElementById('resVehicleId');
+        if (!typeSel || !vehSel) return;
+        const cat = typeSel.value;
+        const opts = Array.from(vehSel.querySelectorAll('option')).filter(function (o) { return o.value; });
+        let enabled = 0;
+        let lastEnabled = null;
+        opts.forEach(function (o) {
+            var ok = o.getAttribute('data-category') === cat;
+            o.disabled = !ok;
+            if (ok) {
+                enabled++;
+                lastEnabled = o;
+            }
+        });
+        if (enabled === 0) {
+            opts.forEach(function (o) { o.disabled = false; });
+        } else if (enabled === 1 && lastEnabled) {
+            vehSel.value = lastEnabled.value;
+        }
+        var sel = vehSel.selectedOptions[0];
+        if (sel && sel.disabled) {
+            vehSel.value = '';
+        }
+        updateConfirmButtonState();
+    }
+
+    (function initVehicleTypeOnConfirm() {
+        const typeSel = document.getElementById('slotVehicleType');
+        if (!typeSel) return;
+        if (defaultVehicleCategory) {
+            typeSel.value = defaultVehicleCategory;
+        }
+        const vehSel = document.getElementById('resVehicleId');
+        if (vehSel) {
+            syncVehicleOptionsToType();
+            typeSel.addEventListener('change', syncVehicleOptionsToType);
+            vehSel.addEventListener('change', updateConfirmButtonState);
+        } else {
+            syncReservationCategoryFromType();
+            typeSel.addEventListener('change', function () {
+                syncReservationCategoryFromType();
+                updateConfirmButtonState();
+            });
+        }
+        updateConfirmButtonState();
+    })();
 </script>
 </body>
 

@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -146,6 +147,36 @@ public class VehicleService {
         return history.stream().anyMatch(ParkingRecord::isActive);
     }
     
+
+    /**
+     * For reservations entered with a plate + type only: reuse the user's vehicle with that plate,
+     * attach an orphan plate to the user, or create a new vehicle on the user's account.
+     */
+    @Transactional
+    public Vehicle getOrCreateVehicleForUserReservation(String userEmail, String licensePlate, VehicleCategory category) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found."));
+        String plate = licensePlate.trim().toUpperCase(Locale.ROOT);
+        Optional<Vehicle> existing = vehicleRepository.findByLicensePlate(plate);
+        if (existing.isPresent()) {
+            Vehicle v = existing.get();
+            if (v.getUser() != null && !v.getUser().getId().equals(user.getId())) {
+                throw new RuntimeException("This plate is already registered to another account.");
+            }
+            if (v.getUser() == null) {
+                v.setUser(user);
+            }
+            v.setCategory(category);
+            return vehicleRepository.save(v);
+        }
+        Vehicle created = Vehicle.builder()
+                .licensePlate(plate)
+                .category(category)
+                .user(user)
+                .active(true)
+                .build();
+        return vehicleRepository.save(created);
+    }
 
     @Transactional
     public void quickRegisterByPlate(String licensePlate, String category) {

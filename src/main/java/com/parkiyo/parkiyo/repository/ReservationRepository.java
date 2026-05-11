@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,40 @@ import java.util.Optional;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     List<Reservation> findByUserEmail(String email);
+
+    @Query("SELECT DISTINCT r FROM Reservation r " +
+            "LEFT JOIN FETCH r.user " +
+            "LEFT JOIN FETCH r.vehicle " +
+            "LEFT JOIN FETCH r.slot " +
+            "LEFT JOIN FETCH r.payment " +
+            "LEFT JOIN FETCH r.parkingRecord " +
+            "WHERE r.user.email = :email ORDER BY r.startTime DESC")
+    List<Reservation> findAllByUserEmailWithAssociations(@Param("email") String email);
+
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.user.email = :email AND r.status = :status " +
+            "AND r.startTime >= :from AND r.startTime < :until")
+    long countByUserEmailAndStatusAndStartTimeBetween(
+            @Param("email") String email,
+            @Param("status") ReservationStatus status,
+            @Param("from") LocalDateTime from,
+            @Param("until") LocalDateTime until);
+
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.user.email = :email " +
+            "AND r.startTime >= :from AND r.startTime < :until " +
+            "AND r.status <> :excluded")
+    long countByUserEmailAndStartTimeBetweenExcludingStatus(
+            @Param("email") String email,
+            @Param("from") LocalDateTime from,
+            @Param("until") LocalDateTime until,
+            @Param("excluded") ReservationStatus excluded);
+
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.user.email = :email AND r.status = :status " +
+            "AND r.updatedAt >= :from AND r.updatedAt < :until")
+    long countByUserEmailAndStatusAndUpdatedAtBetween(
+            @Param("email") String email,
+            @Param("status") ReservationStatus status,
+            @Param("from") LocalDateTime from,
+            @Param("until") LocalDateTime until);
 
     List<Reservation> findByUserEmailAndStatus(String email, ReservationStatus status);
 

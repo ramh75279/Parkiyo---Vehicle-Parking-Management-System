@@ -115,6 +115,12 @@
             border: 1px solid rgba(245, 158, 11, 0.18);
         }
 
+        .res-pill-expired {
+            background: rgba(251, 146, 60, 0.08);
+            color: #fdba74;
+            border: 1px solid rgba(251, 146, 60, 0.22);
+        }
+
         .res-pill {
             padding: 3px 11px;
             border-radius: 9px;
@@ -214,6 +220,17 @@
             border-radius: 4px;
         }
 
+        input[type="time"].input-glass {
+            background: rgba(255, 255, 255, 0.04) !important;
+            color: rgba(148, 163, 184, 0.9) !important;
+            color-scheme: dark;
+        }
+
+        input[type="time"].input-glass:focus {
+            background: rgba(31, 104, 249, 0.07) !important;
+            color: white !important;
+        }
+
         /* res-card filter hiding */
         .res-card[data-status] { display: flex; flex-direction: column; }
         .res-card.hidden-by-tab { display: none; }
@@ -222,104 +239,96 @@
 
 <body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
 <div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
-<div class="flex flex-1 overflow-hidden">
+<div class="flex flex-1 min-h-0 overflow-hidden">
 
-    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
+    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col h-full min-h-0 shrink-0 z-50">
         <div class="p-6 mb-4 flex items-center">
-            <div
-                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
                 <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
             </div>
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
-        <nav class="flex-1 px-3 space-y-2 overflow-y-auto">
-            <a th:href="@{/dashboard}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+        <nav class="flex-1 min-h-0 px-3 space-y-2 overflow-y-auto">
+            <a th:href="@{/dashboard/user}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">dashboard</span>
                 <span class="nav-label text-sm">Dashboard</span>
             </a>
-            <a th:href="@{/entry}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a th:href="@{/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">login</span>
                 <span class="nav-label text-sm">Vehicle Entry</span>
             </a>
-            <a th:href="@{/exit}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a th:href="@{/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">logout</span>
                 <span class="nav-label text-sm">Vehicle Exit</span>
             </a>
-            <a th:href="@{/parking}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a th:href="@{/vehicles}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">directions_car</span>
+                <span class="nav-label text-sm">Vehicles</span>
+            </a>
+            <a th:href="@{/parking}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">local_parking</span>
                 <span class="nav-label text-sm">Active Parking</span>
             </a>
-            <a th:href="@{/reservations}"
-               class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
+            <a th:href="@{/reservations}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
                 <span class="material-symbols-outlined shrink-0">event_available</span>
                 <span class="nav-label text-sm">Reservation</span>
             </a>
-                <a th:href="@{/payments/history}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a th:href="@{/payments/history}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">payments</span>
                 <span class="nav-label text-sm">Payments</span>
             </a>
-            <a th:href="@{/receipts}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a th:href="@{/receipts}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">receipt_long</span>
                 <span class="nav-label text-sm">Receipts</span>
             </a>
-            <a th:href="@{/wallet}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a th:href="@{/wallet/overview}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">account_balance_wallet</span>
                 <span class="nav-label text-sm">Wallet</span>
             </a>
-            <a th:href="@{/passes}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a th:href="@{/passes}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">confirmation_number</span>
                 <span class="nav-label text-sm">Parking Passes</span>
             </a>
-            <a th:href="@{/notifications}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a th:href="@{/notifications}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">notifications</span>
                 <span class="nav-label text-sm">Notifications</span>
             </a>
-            <a th:href="@{/settings}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+            <a th:href="@{/account/settings}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
                 <span class="material-symbols-outlined shrink-0">settings</span>
                 <span class="nav-label text-sm">Account Settings</span>
             </a>
         </nav>
         <div class="p-4 border-t border-white/5">
-            <a th:href="@{/logout}"
-               class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+            <a th:href="@{/logout}" class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
                 <span class="material-symbols-outlined shrink-0">power_settings_new</span>
                 <span class="nav-label">Logout</span>
             </a>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
-        <header
-                class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
+    <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial min-h-0">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-6 lg:px-10 bg-background-dark/30 premium-blur shrink-0">
             <div>
                 <h2 class="text-xl font-black text-white">Advance Reservations</h2>
-                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Book & manage slot
-                    reservations</p>
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Book &amp; manage slot reservations</p>
             </div>
             <div class="flex items-center gap-3">
-                <a th:href="@{/reservations/slot-selection}"
-                   class="flex items-center gap-2 bg-primary text-white font-black px-5 py-2.5 rounded-xl hover:bg-primary/80 transition-all text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(31,104,249,0.25)]">
-                    <span class="material-symbols-outlined text-lg">add</span> New Reservation
-                </a>
-                <div class="h-10 w-10 rounded-[14px] bg-gradient-to-tr from-primary to-blue-400 p-[2px]">
-                    <div class="h-full w-full rounded-[14px] bg-background-dark flex items-center justify-center">
-                        <span class="material-symbols-outlined text-white/50">person</span>
+                <button type="button" id="openNewResModalBtn" class="open-new-res-modal flex items-center gap-2 bg-primary text-white font-black px-4 lg:px-5 py-2.5 rounded-xl hover:bg-primary/80 transition-all text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(31,104,249,0.25)]">
+                    <span class="material-symbols-outlined text-lg">add</span>
+                    <span class="hidden sm:inline">New Reservation</span>
+                </button>
+                <div class="h-10 w-10 rounded-[14px] bg-gradient-to-tr from-primary to-blue-400 p-[2px] shrink-0">
+                    <div class="h-full w-full rounded-[14px] bg-background-dark flex items-center justify-center overflow-hidden">
+                        <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
+                             th:src="@{${currentUser.profilePicturePath}}" class="h-full w-full object-cover" alt=""/>
+                        <span th:unless="${currentUser != null and currentUser.profilePicturePath != null}"
+                              class="material-symbols-outlined text-white/50">person</span>
                     </div>
                 </div>
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-10">
+        <div class="flex-1 overflow-y-auto p-6 lg:p-10 min-h-0">
 
             <!-- Flash messages -->
             <div th:if="${success}"
@@ -333,34 +342,27 @@
                 <span th:text="${error}"></span>
             </div>
 
-            <!-- KPI strip — dynamic counts -->
-            <div th:with="
-                upcomingCount=${#lists.size(reservations.?[status.name() == 'CONFIRMED' and startTime.isAfter(#dates.createToday())])},
-                todayCount=${#lists.size(reservations.?[status.name() == 'CONFIRMED' and startTime.toLocalDate() == T(java.time.LocalDate).now()])},
-                totalMonth=${#lists.size(reservations.?[createdAt != null and createdAt.monthValue == T(java.time.LocalDate).now().monthValue])},
-                cancelCount=${#lists.size(reservations.?[status.name() == 'CANCELLED' and createdAt != null and createdAt.monthValue == T(java.time.LocalDate).now().monthValue])}
-            ">
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-                    <div class="glass-card p-5 rounded-2xl">
-                        <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Upcoming</p>
-                        <p class="text-3xl font-black text-primary" th:text="${upcomingCount}">0</p>
-                        <p class="text-[10px] text-slate-500 font-bold mt-1">Next 7 days</p>
-                    </div>
-                    <div class="glass-card p-5 rounded-2xl">
-                        <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Today</p>
-                        <p class="text-3xl font-black text-emerald-400" th:text="${todayCount}">0</p>
-                        <p class="text-[10px] text-slate-500 font-bold mt-1">Arrive today</p>
-                    </div>
-                    <div class="glass-card p-5 rounded-2xl">
-                        <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">This Month</p>
-                        <p class="text-3xl font-black text-white" th:text="${totalMonth}">0</p>
-                        <p class="text-[10px] text-slate-500 font-bold mt-1">Total bookings</p>
-                    </div>
-                    <div class="glass-card p-5 rounded-2xl">
-                        <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Cancellations</p>
-                        <p class="text-3xl font-black text-amber-400" th:text="${cancelCount}">0</p>
-                        <p class="text-[10px] text-slate-500 font-bold mt-1">This month</p>
-                    </div>
+            <!-- KPI strip -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 mb-8">
+                <div class="glass-card p-5 rounded-2xl">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Upcoming</p>
+                    <p class="text-3xl font-black text-primary" th:text="${kpiUpcomingWeek}">0</p>
+                    <p class="text-[10px] text-slate-500 font-bold mt-1">Next 7 days</p>
+                </div>
+                <div class="glass-card p-5 rounded-2xl">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Today</p>
+                    <p class="text-3xl font-black text-emerald-400" th:text="${kpiToday}">0</p>
+                    <p class="text-[10px] text-slate-500 font-bold mt-1">Arrive today</p>
+                </div>
+                <div class="glass-card p-5 rounded-2xl">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">This Month</p>
+                    <p class="text-3xl font-black text-white" th:text="${kpiMonthBookings}">0</p>
+                    <p class="text-[10px] text-slate-500 font-bold mt-1">Total bookings</p>
+                </div>
+                <div class="glass-card p-5 rounded-2xl">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Cancellations</p>
+                    <p class="text-3xl font-black text-amber-400" th:text="${kpiMonthCancellations}">0</p>
+                    <p class="text-[10px] text-slate-500 font-bold mt-1">This month</p>
                 </div>
             </div>
 
@@ -388,46 +390,53 @@
 
                 <!-- Empty state -->
                 <div th:if="${#lists.isEmpty(reservations)}"
-                     class="glass-card rounded-2xl p-16 flex flex-col items-center justify-center text-center">
-                    <span class="material-symbols-outlined text-slate-600 text-5xl mb-4">event_busy</span>
-                    <p class="text-slate-400 font-black text-lg">No reservations yet</p>
-                    <p class="text-slate-600 text-sm font-bold mt-1">Book a slot to get started</p>
-                    <a th:href="@{/reservations/slot-selection}"
-                       class="mt-6 flex items-center gap-2 bg-primary text-white font-black px-5 py-2.5 rounded-xl hover:bg-primary/80 transition-all text-xs uppercase tracking-widest">
-                        <span class="material-symbols-outlined text-lg">add</span> New Reservation
-                    </a>
+                     class="glass-card rounded-[2rem] border border-white/[0.06] px-8 py-20 md:py-24 flex flex-col items-center justify-center text-center max-w-xl mx-auto w-full">
+                    <div class="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-white/[0.03] border border-white/10">
+                        <span class="material-symbols-outlined text-6xl text-slate-600/90 leading-none" style="font-variation-settings: 'FILL' 0, 'wght' 300;">calendar_month</span>
+                    </div>
+                    <p class="text-slate-200 font-black text-xl md:text-2xl tracking-tight">No reservations yet</p>
+                    <p class="text-slate-500 text-sm font-bold mt-2 max-w-xs leading-relaxed">Book a slot to get started</p>
+                    <button type="button" class="open-new-res-modal mt-10 flex items-center justify-center gap-2.5 bg-primary text-white font-black px-8 py-3.5 rounded-xl hover:bg-primary/85 transition-all text-[11px] uppercase tracking-[0.22em] shadow-[0_0_28px_rgba(31,104,249,0.35)] min-w-[240px]">
+                        <span class="material-symbols-outlined text-xl font-bold">add</span>
+                        New reservation
+                    </button>
                 </div>
 
                 <!-- Loop over each reservation -->
                 <div th:each="res : ${reservations}"
                      th:with="
-                        status=${res.status.name()},
+                        now=${T(java.time.LocalDateTime).now()},
                         isToday=${res.startTime.toLocalDate() == T(java.time.LocalDate).now()},
                         isConfirmed=${res.status.name() == 'CONFIRMED'},
                         isCompleted=${res.status.name() == 'COMPLETED'},
-                        isCancelled=${res.status.name() == 'CANCELLED'}
+                        isCancelled=${res.status.name() == 'CANCELLED'},
+                        isExpired=${res.status.name() == 'EXPIRED'},
+                        isActiveToday=${isConfirmed and isToday and !res.startTime.isAfter(now) and !res.endTime.isBefore(now)},
+                        isUpcomingToday=${isConfirmed and isToday and res.startTime.isAfter(now)},
+                        ownerLine=${res.user.fullName + ' · ' + res.vehicle.make + ' ' + res.vehicle.model}
                      "
                      th:attr="data-status=${res.status.name()},
-                              data-today=${res.startTime.toLocalDate() == T(java.time.LocalDate).now()},
+                              data-today=${isToday},
                               data-plate=${res.vehicle.licensePlate},
                               data-name=${res.vehicle.make + ' ' + res.vehicle.model},
+                              data-owner=${res.user.fullName},
                               data-date=${#temporals.format(res.startTime,'yyyy-MM-dd')}"
-                     th:classappend="${isConfirmed and isToday} ? 'border-l-4 border-emerald-500' :
-                                    (${isConfirmed} ? 'border-l-4 border-primary' :
-                                    (${isCompleted} ? 'border-l-4 border-amber-500/40 opacity-60' :
-                                    'border-l-4 border-slate-700/60 opacity-50'))"
+                     th:classappend="${isActiveToday} ? ' border-l-4 border-emerald-500' :
+                                    (${isUpcomingToday} ? ' border-l-4 border-primary' :
+                                    (${isConfirmed and !isToday} ? ' border-l-4 border-primary/40' :
+                                    (${isCompleted} ? ' border-l-4 border-amber-500/40 opacity-60' :
+                                    (${isExpired} ? ' border-l-4 border-orange-500/30 opacity-60' :
+                                    ' border-l-4 border-slate-700/60 opacity-50'))))"
                      class="res-card">
 
                     <div class="flex flex-wrap items-start justify-between gap-4">
 
-                        <!-- Left: icon + plate + name -->
                         <div class="flex items-center gap-4">
-                            <!-- Icon varies by status -->
-                            <div th:if="${isConfirmed and isToday}"
+                            <div th:if="${isActiveToday}"
                                  class="h-11 w-11 rounded-xl bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center shrink-0">
                                 <span class="material-symbols-outlined text-emerald-400">event_available</span>
                             </div>
-                            <div th:if="${isConfirmed and !isToday}"
+                            <div th:if="${isConfirmed and !isActiveToday}"
                                  class="h-11 w-11 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center shrink-0">
                                 <span class="material-symbols-outlined text-primary">schedule</span>
                             </div>
@@ -435,99 +444,92 @@
                                  class="h-11 w-11 rounded-xl bg-amber-500/10 border border-amber-500/15 flex items-center justify-center shrink-0">
                                 <span class="material-symbols-outlined text-amber-400">check_circle</span>
                             </div>
+                            <div th:if="${isExpired}"
+                                 class="h-11 w-11 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-orange-300">history</span>
+                            </div>
                             <div th:if="${isCancelled}"
                                  class="h-11 w-11 rounded-xl bg-slate-700/30 border border-slate-700/30 flex items-center justify-center shrink-0">
                                 <span class="material-symbols-outlined text-slate-500">cancel</span>
                             </div>
 
                             <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <!-- Plate — strikethrough if cancelled -->
+                                <div class="flex flex-wrap items-center gap-2 mb-1">
                                     <p th:text="${res.vehicle.licensePlate}"
-                                       th:classappend="${isCancelled} ? 'line-through text-slate-400' : 'text-white'"
+                                       th:classappend="${isCancelled or isExpired} ? ' line-through text-slate-400' : ' text-white'"
                                        class="text-base font-black tracking-widest">PLATE</p>
 
-                                    <!-- Status pill -->
-                                    <span th:if="${isConfirmed and isToday}"  class="res-pill res-pill-active">Active</span>
+                                    <span th:if="${isActiveToday}" class="res-pill res-pill-active">Active</span>
+                                    <span th:if="${isUpcomingToday}" class="res-pill res-pill-upcoming">Upcoming</span>
                                     <span th:if="${isConfirmed and !isToday}" class="res-pill res-pill-upcoming">Upcoming</span>
-                                    <span th:if="${isCompleted}"              class="res-pill res-pill-completed">Completed</span>
-                                    <span th:if="${isCancelled}"              class="res-pill res-pill-cancelled">Cancelled</span>
+                                    <span th:if="${isCompleted}" class="res-pill res-pill-completed">Completed</span>
+                                    <span th:if="${isExpired}" class="res-pill res-pill-expired">Expired</span>
+                                    <span th:if="${isCancelled}" class="res-pill res-pill-cancelled">Cancelled</span>
 
-                                    <!-- "Today" badge for upcoming today -->
-                                    <span th:if="${isConfirmed and isToday}"
+                                    <span th:if="${isUpcomingToday}"
                                           class="text-[9px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg">Today</span>
                                 </div>
 
-                                <!-- Vehicle make/model — or cancelled note -->
                                 <p th:if="${!isCancelled}"
-                                   th:text="${res.vehicle.make} + ' · ' + ${res.vehicle.model}"
-                                   class="text-xs text-slate-400 font-bold">Make · Model</p>
+                                   th:text="${ownerLine}"
+                                   class="text-xs text-slate-400 font-bold">Owner · Vehicle</p>
                                 <p th:if="${isCancelled}"
-                                   th:text="${res.vehicle.make + ' ' + res.vehicle.model} + ' · Cancelled ' + ${#temporals.format(res.updatedAt,'dd MMM')}"
+                                   th:text="${ownerLine} + ' · Cancelled ' + ${#temporals.format(res.updatedAt,'dd MMM')}"
                                    class="text-xs text-slate-500 font-bold">Cancelled</p>
                             </div>
                         </div>
 
-                        <!-- Right: slot / time / fee / actions -->
                         <div class="flex items-center gap-6 flex-wrap">
 
-                            <!-- Slot -->
                             <div class="text-center">
                                 <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Slot</p>
                                 <p th:text="${res.slot.slotNumber}"
-                                   th:classappend="${isCancelled or isCompleted} ? 'text-slate-400' : 'text-primary'"
+                                   th:classappend="${isCancelled or isCompleted or isExpired} ? ' text-slate-400' : ' text-primary'"
                                    class="text-sm font-black mt-0.5">—</p>
                             </div>
 
-                            <!-- Date (shown for non-today confirmed, completed, cancelled) -->
-                            <div th:if="${!isToday or isCompleted or isCancelled}" class="text-center">
+                            <div th:if="${(isConfirmed and !isToday) or isCompleted or isCancelled or isExpired}" class="text-center">
                                 <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Date</p>
                                 <p th:text="${#temporals.format(res.startTime,'dd MMM')}"
-                                   th:classappend="${isCancelled or isCompleted} ? 'text-slate-400' : 'text-white'"
+                                   th:classappend="${isCancelled or isCompleted or isExpired} ? ' text-slate-400' : ' text-white'"
                                    class="text-sm font-black mt-0.5">—</p>
                             </div>
 
-                            <!-- Arrival time (for confirmed today) -->
-                            <div th:if="${isConfirmed and isToday}" class="text-center">
+                            <div th:if="${isConfirmed and isToday and (isActiveToday or isUpcomingToday)}" class="text-center">
                                 <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Arrival</p>
                                 <p th:text="${#temporals.format(res.startTime,'hh:mm a')}"
                                    class="text-sm font-black text-white mt-0.5">—</p>
                             </div>
 
-                            <!-- Until time (for confirmed today) -->
-                            <div th:if="${isConfirmed and isToday}" class="text-center">
+                            <div th:if="${isConfirmed and isToday and (isActiveToday or isUpcomingToday)}" class="text-center">
                                 <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Until</p>
                                 <p th:text="${#temporals.format(res.endTime,'hh:mm a')}"
                                    class="text-sm font-black text-white mt-0.5">—</p>
                             </div>
 
-                            <!-- Time range (for upcoming not today) -->
                             <div th:if="${isConfirmed and !isToday}" class="text-center">
                                 <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Time</p>
                                 <p th:text="${#temporals.format(res.startTime,'HH:mm')} + '–' + ${#temporals.format(res.endTime,'HH:mm')}"
                                    class="text-sm font-black text-white mt-0.5">—</p>
                             </div>
 
-                            <!-- Time range (for completed / cancelled) -->
-                            <div th:if="${isCompleted or isCancelled}" class="text-center">
+                            <div th:if="${isCompleted or isCancelled or isExpired}" class="text-center">
                                 <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Time</p>
                                 <p th:text="${#temporals.format(res.startTime,'HH:mm')} + '–' + ${#temporals.format(res.endTime,'HH:mm')}"
                                    class="text-sm font-black text-slate-400 mt-0.5">—</p>
                             </div>
 
-                            <!-- Fee / Paid / Refund -->
                             <div class="text-center">
-                                <p th:text="${isCompleted} ? 'Paid' : (${isCancelled} ? 'Refund' : 'Fee')"
+                                <p th:text="${isCompleted} ? 'Paid' : (${isCancelled} ? 'Refund' : (${res.payment != null and res.payment.status.name() == 'PENDING'} ? 'Due' : 'Fee'))"
                                    class="text-[9px] font-black uppercase tracking-widest text-slate-500">Fee</p>
-                                <p th:text="${res.payment != null} ? '$' + ${#numbers.formatDecimal(res.payment.amount, 1, 2)} : '—'"
-                                   th:classappend="${isCancelled} ? 'text-slate-400' : 'text-emerald-400'"
+                                <p th:if="${res.payment != null}"
+                                   th:text="'Rs. ' + ${#numbers.formatDecimal(res.payment.amount, 1, 2)}"
+                                   th:classappend="${isCancelled or isExpired} ? ' text-slate-400' : (${res.payment.status.name() == 'PENDING'} ? ' text-amber-400' : ' text-emerald-400')"
                                    class="text-sm font-black mt-0.5">—</p>
+                                <p th:unless="${res.payment != null}" class="text-sm font-black text-slate-500 mt-0.5">—</p>
                             </div>
 
-                            <!-- Action buttons -->
                             <div class="flex gap-2">
-
-                                <!-- CONFIRMED: edit button (links to edit page) -->
                                 <a th:if="${isConfirmed}"
                                    th:href="@{/reservations/{id}/edit(id=${res.id})}"
                                    class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all"
@@ -535,11 +537,17 @@
                                     <span class="material-symbols-outlined text-sm text-slate-400">edit</span>
                                 </a>
 
-                                <!-- CONFIRMED: cancel button (submits form POST) -->
+                                <a th:if="${res.parkingRecord != null}"
+                                   th:href="@{/parking/{id}(id=${res.parkingRecord.id})}"
+                                   class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary/20 transition-all"
+                                   title="Parking session">
+                                    <span class="material-symbols-outlined text-sm text-slate-400">open_in_new</span>
+                                </a>
+
                                 <form th:if="${isConfirmed}"
                                       th:action="@{/reservations/{id}/cancel(id=${res.id})}"
                                       method="post"
-                                      onsubmit="return confirm('Cancel this reservation?')">
+                                      onsubmit="return confirm('Cancel this reservation?');">
                                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                     <button type="submit"
                                             class="h-9 w-9 rounded-xl bg-rose-500/10 border border-rose-500/15 flex items-center justify-center hover:bg-rose-500/20 transition-all"
@@ -548,14 +556,12 @@
                                     </button>
                                 </form>
 
-                                <!-- COMPLETED: view receipt -->
                                 <a th:if="${isCompleted}"
                                    th:href="@{/receipts}"
                                    class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all"
                                    title="View receipt">
                                     <span class="material-symbols-outlined text-sm text-slate-400">receipt_long</span>
                                 </a>
-
                             </div>
                         </div>
                     </div>
@@ -569,7 +575,154 @@
     </main>
 </div>
 
+<!-- New reservation modal -->
+<div id="newResModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-6">
+    <div class="absolute inset-0 bg-black/60 premium-blur" onclick="document.getElementById('newResModal').classList.add('hidden')"></div>
+    <div class="relative glass-card rounded-[2.5rem] p-8 w-full max-w-lg border border-white/10 z-10 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-black text-white">New Reservation</h3>
+            <button type="button" onclick="document.getElementById('newResModal').classList.add('hidden')"
+                    class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                <span class="material-symbols-outlined text-slate-400 text-lg">close</span>
+            </button>
+        </div>
+        <div class="space-y-5">
+            <div>
+                <label class="field-label">Vehicle plate <span class="text-rose-400">*</span></label>
+                <input type="text" id="modalPlate" placeholder="e.g. ABC-1234" autocomplete="off"
+                       class="input-glass bg-white/5 rounded-2xl px-4 h-12 uppercase tracking-widest font-black"/>
+            </div>
+            <div>
+                <label class="field-label">Vehicle type <span class="text-rose-400">*</span></label>
+                <select id="modalVehicleType" class="input-glass rounded-2xl px-4 h-12 w-full font-bold text-white">
+                    <option value="CAR">Car</option>
+                    <option value="MOTORCYCLE">Bike</option>
+                    <option value="VAN">Van</option>
+                    <option value="TRUCK">Truck</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="field-label">Date <span class="text-rose-400">*</span></label>
+                    <input type="date" id="modalResDate" class="input-glass px-4 h-12 rounded-2xl w-full"
+                           th:value="${#temporals.format(T(java.time.LocalDate).now(), 'yyyy-MM-dd')}"/>
+                </div>
+                <div>
+                    <label class="field-label">Zone preference</label>
+                    <select class="input-glass rounded-2xl px-4 h-12" id="modalZonePref">
+                        <option value="">Any zone</option>
+                        <option th:each="z : ${zones}" th:value="${z}" th:text="${'Zone ' + z}">Zone A</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="field-label">Arrival time <span class="text-rose-400">*</span></label>
+                    <input type="time" id="modalArrival" value="09:00" class="input-glass bg-white/5 rounded-2xl px-4 h-12 w-full"/>
+                </div>
+                <div>
+                    <label class="field-label">Departure time <span class="text-rose-400">*</span></label>
+                    <input type="time" id="modalDeparture" value="12:00" class="input-glass bg-white/5 rounded-2xl px-4 h-12 w-full"/>
+                </div>
+            </div>
+            <div class="p-4 rounded-2xl bg-primary/5 border border-primary/15 flex items-center justify-between gap-4">
+                <div>
+                    <p class="text-xs font-black text-white">Estimated fee</p>
+                    <p class="text-[10px] text-slate-500 font-bold mt-0.5" id="modalFeeSubtext">Based on typical slot rate</p>
+                </div>
+                <p class="text-2xl font-black text-white shrink-0" id="modalFeeTotal">Rs. 0.00</p>
+            </div>
+            <button type="button" id="slotSelectionContinue"
+                    class="w-full flex items-center justify-center gap-2 bg-primary text-white font-black py-4 rounded-2xl hover:bg-primary/80 transition-all text-sm shadow-[0_0_20px_rgba(31,104,249,0.25)]">
+                <span class="material-symbols-outlined">event_available</span> Continue to Slot Selection
+            </button>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const AVG_HOURLY_RATE = Number(/*[[${avgHourlyRate}]]*/ 5.5);
+    const SLOT_SELECTION_URL = /*[[@{/reservations/slot-selection}]]*/ '/reservations/slot-selection';
+    /*]]>*/
+</script>
 <script>
+    function modalTimeToMinutes(t) {
+        if (!t || t.length < 4) return null;
+        const parts = t.split(':');
+        return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+    }
+
+    function updateModalEstimate() {
+        const sub = document.getElementById('modalFeeSubtext');
+        const tot = document.getElementById('modalFeeTotal');
+        const arr = document.getElementById('modalArrival')?.value;
+        const dep = document.getElementById('modalDeparture')?.value;
+        const rate = isNaN(AVG_HOURLY_RATE) ? 5.5 : AVG_HOURLY_RATE;
+        if (!arr || !dep) {
+            sub.textContent = 'Enter arrival and departure times';
+            tot.textContent = 'Rs. 0.00';
+            return;
+        }
+        let ma = modalTimeToMinutes(arr);
+        let md = modalTimeToMinutes(dep);
+        if (ma == null || md == null) {
+            sub.textContent = 'Enter arrival and departure times';
+            tot.textContent = 'Rs. 0.00';
+            return;
+        }
+        if (md <= ma) md += 24 * 60;
+        const diffMin = md - ma;
+        const hours = Math.ceil(diffMin / 60);
+        const fee = Math.round(hours * rate * 100) / 100;
+        sub.textContent = 'Based on ' + hours + 'h · Rs. ' + rate.toFixed(2) + '/hr';
+        tot.textContent = 'Rs. ' + fee.toFixed(2);
+    }
+
+    function wireNewReservationModal() {
+        const plate = document.getElementById('modalPlate');
+        const date = document.getElementById('modalResDate');
+        const zone = document.getElementById('modalZonePref');
+        const vehicleType = document.getElementById('modalVehicleType');
+        const arr = document.getElementById('modalArrival');
+        const dep = document.getElementById('modalDeparture');
+        const btn = document.getElementById('slotSelectionContinue');
+        [arr, dep, date].forEach(el => el && el.addEventListener('input', updateModalEstimate));
+        [arr, dep, date].forEach(el => el && el.addEventListener('change', updateModalEstimate));
+        if (btn) {
+            btn.addEventListener('click', function () {
+                const p = (plate?.value || '').trim();
+                const d = date?.value || '';
+                const z = zone?.value || '';
+                const a = arr?.value || '';
+                const x = dep?.value || '';
+                if (!p) { alert('Please enter the vehicle plate.'); return; }
+                if (!d) { alert('Please select a date.'); return; }
+                if (!a || !x) { alert('Please select arrival and departure times.'); return; }
+                const url = new URL(SLOT_SELECTION_URL, window.location.origin);
+                url.searchParams.set('plate', p);
+                url.searchParams.set('date', d);
+                url.searchParams.set('arrival', a);
+                url.searchParams.set('departure', x);
+                if (z) url.searchParams.set('zone', z);
+                const vt = vehicleType && vehicleType.value ? vehicleType.value.trim() : '';
+                if (vt) url.searchParams.set('vehicleCategory', vt);
+                window.location.href = url.pathname + url.search;
+            });
+        }
+        document.querySelectorAll('.open-new-res-modal').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.getElementById('newResModal').classList.remove('hidden');
+                updateModalEstimate();
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        wireNewReservationModal();
+        updateModalEstimate();
+    });
+
     let activeTab = 'ALL';
 
     function setTab(tab, el) {
@@ -581,28 +734,24 @@
 
     function filterCards() {
         const search = document.getElementById('searchInput').value.toLowerCase().trim();
-        const dateVal = document.getElementById('dateFilter').value; // yyyy-MM-dd or empty
-        const today = new Date().toISOString().slice(0, 10);
+        const dateVal = document.getElementById('dateFilter').value;
 
         document.querySelectorAll('#reservationList .res-card').forEach(card => {
-            const status   = card.dataset.status || '';
-            const isToday  = card.dataset.today === 'true';
-            const plate    = (card.dataset.plate || '').toLowerCase();
-            const name     = (card.dataset.name  || '').toLowerCase();
-            const cardDate = card.dataset.date   || '';
+            const status = card.dataset.status || '';
+            const isToday = card.dataset.today === 'true';
+            const plate = (card.dataset.plate || '').toLowerCase();
+            const name = (card.dataset.name || '').toLowerCase();
+            const owner = (card.dataset.owner || '').toLowerCase();
+            const cardDate = card.dataset.date || '';
 
-            // Tab filter
             let tabMatch = false;
-            if (activeTab === 'ALL')       tabMatch = true;
+            if (activeTab === 'ALL') tabMatch = true;
             else if (activeTab === 'CONFIRMED') tabMatch = status === 'CONFIRMED';
-            else if (activeTab === 'TODAY')     tabMatch = status === 'CONFIRMED' && isToday;
-            else if (activeTab === 'COMPLETED') tabMatch = status === 'COMPLETED';
+            else if (activeTab === 'TODAY') tabMatch = status === 'CONFIRMED' && isToday;
+            else if (activeTab === 'COMPLETED') tabMatch = status === 'COMPLETED' || status === 'EXPIRED';
             else if (activeTab === 'CANCELLED') tabMatch = status === 'CANCELLED';
 
-            // Search filter
-            const searchMatch = !search || plate.includes(search) || name.includes(search);
-
-            // Date filter
+            const searchMatch = !search || plate.includes(search) || name.includes(search) || owner.includes(search);
             const dateMatch = !dateVal || cardDate === dateVal;
 
             if (tabMatch && searchMatch && dateMatch) {

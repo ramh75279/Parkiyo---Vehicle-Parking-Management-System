@@ -41,6 +41,7 @@ public class PaymentService {
 
     // ==================== BASIC GETTERS ====================
 
+    @Transactional(readOnly = true)
     public Payment getPendingPayment(Long id, String email) {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Payment not found."));
