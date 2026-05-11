@@ -11,7 +11,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -47,9 +51,35 @@ public class UserDashboardController {
     @GetMapping("/notifications")
     public String userNotifications(Authentication auth, Model model) {
         String email = auth.getName();
-        model.addAttribute("currentUser", userService.getUserByEmail(email)); // added
-        model.addAttribute("notifications", notificationService.getUserNotifications(email));
+        List<Notification> notifications = notificationService.getUserNotifications(email);
+        model.addAttribute("currentUser", userService.getUserByEmail(email));
+        model.addAttribute("notifications", notifications);
+        model.addAttribute("unreadCount", notificationService.getUnreadCount(email));
+        model.addAttribute("totalCount", notifications.size());
+        LocalDate today = LocalDate.now();
+        long todayCount = notifications.stream()
+                .filter(n -> n.getCreatedAt() != null && n.getCreatedAt().toLocalDate().equals(today))
+                .count();
+        model.addAttribute("todayCount", todayCount);
         return "account/notification-user";
+    }
+
+    @PostMapping("/notifications/{id}/read")
+    public String markNotificationRead(@PathVariable Long id,
+                                       Authentication auth,
+                                       RedirectAttributes redirectAttributes) {
+        try {
+            notificationService.markAsRead(auth.getName(), id);
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/notifications";
+    }
+
+    @PostMapping("/notifications/read-all")
+    public String markAllNotificationsRead(Authentication auth) {
+        notificationService.markAllAsRead(auth.getName());
+        return "redirect:/notifications";
     }
 
     // GET /assistant

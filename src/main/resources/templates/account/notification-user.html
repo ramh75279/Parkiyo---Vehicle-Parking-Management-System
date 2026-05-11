@@ -3,44 +3,274 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Parkiyo | My Notifications</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+    <title>Parkiyo | Notifications</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#1f68f9", "background-dark": "#020617" }, fontFamily: { display: ["Public Sans", "sans-serif"] } } } }</script>
     <style>
-        body { font-family: 'Public Sans', sans-serif; background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%); }
-        .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.09); }
+        body { font-family: 'Public Sans', sans-serif; background-color: #020617; }
+        .premium-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .bg-subtle-radial { background: radial-gradient(circle at 0% 0%, #1e293b 0%, #020617 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .sidebar-container {
+            width: 80px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(2, 6, 23, 0.6);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .sidebar-container:hover { width: 280px; background: rgba(2, 6, 23, 0.95); }
+        .nav-label { opacity: 0; transition: opacity 0.3s ease; margin-left: 1rem; }
+        .sidebar-container:hover .nav-label { opacity: 1; }
+        .notif-row {
+            display: flex;
+            gap: 16px;
+            padding: 18px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.15s;
+        }
+        .notif-row:last-child { border-bottom: none; }
+        .notif-row:hover { background: rgba(255, 255, 255, 0.025); }
+        .notif-row.unread { background: rgba(31, 104, 249, 0.03); }
+        .notif-row.unread:hover { background: rgba(31, 104, 249, 0.06); }
+        .filter-btn {
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .filter-btn.active {
+            background: rgba(31, 104, 249, 0.1);
+            color: #60a5fa;
+            border-color: rgba(31, 104, 249, 0.2);
+        }
+        .filter-btn:not(.active):hover { color: white; background: rgba(255, 255, 255, 0.04); }
+        ::-webkit-scrollbar { width: 5px; display: none; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        a { cursor: pointer; }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen">
-<main class="max-w-5xl mx-auto px-5 md:px-8 py-8 space-y-6">
-    <header class="flex items-center justify-between flex-wrap gap-3">
-        <div>
-            <h1 class="text-2xl font-black">My Notifications</h1>
-            <p class="text-xs uppercase tracking-[0.2em] text-slate-500 mt-1">Live updates</p>
-        </div>
-        <a class="px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-sm font-black hover:bg-white/20" th:href="@{/dashboard/user}">Back to Dashboard</a>
-    </header>
+<body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+<div class="flex flex-1 min-h-0 overflow-hidden">
 
-    <section class="card rounded-3xl overflow-hidden">
-        <div class="px-5 py-4 border-b border-white/10 text-xs uppercase tracking-widest text-slate-500 font-black">Notifications</div>
-        <div th:if="${#lists.isEmpty(notifications)}" class="px-5 py-8 text-slate-500 text-sm">No notifications yet.</div>
-        <div th:each="n : ${notifications}" class="px-5 py-4 border-b border-white/5 last:border-b-0">
-            <div class="flex flex-wrap items-center justify-between gap-2">
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-black px-2 py-1 rounded-lg border bg-blue-500/10 border-blue-500/20 text-blue-300" th:text="${n.type}">SYSTEM</span>
-                    <span class="text-xs font-black px-2 py-1 rounded-lg border"
-                          th:classappend="${n.read} ? ' bg-slate-500/10 border-slate-500/20 text-slate-300' : ' bg-emerald-500/10 border-emerald-500/20 text-emerald-300'"
-                          th:text="${n.read} ? 'READ' : 'UNREAD'">UNREAD</span>
-                </div>
-                <span class="text-xs text-slate-500" th:text="${n.createdAt != null ? #temporals.format(n.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">-</span>
+    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col h-full min-h-0 shrink-0 z-50">
+        <div class="p-6 mb-4 flex items-center">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
+                <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
             </div>
-            <h3 class="font-bold mt-2" th:text="${n.title}">Notification title</h3>
-            <p class="text-sm text-slate-300 mt-1" th:text="${n.message}">Notification message</p>
-            <a th:if="${n.actionUrl != null and !#strings.isEmpty(n.actionUrl)}"
-               th:href="@{${n.actionUrl}}"
-               class="inline-block mt-2 text-xs font-black text-blue-300">Open</a>
+            <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
-    </section>
-</main>
+        <nav class="flex-1 min-h-0 px-3 space-y-2 overflow-y-auto">
+            <a th:href="@{/dashboard/user}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">dashboard</span>
+                <span class="nav-label text-sm">Dashboard</span>
+            </a>
+            <a th:href="@{/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">login</span>
+                <span class="nav-label text-sm">Vehicle Entry</span>
+            </a>
+            <a th:href="@{/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">logout</span>
+                <span class="nav-label text-sm">Vehicle Exit</span>
+            </a>
+            <a th:href="@{/vehicles}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">directions_car</span>
+                <span class="nav-label text-sm">Vehicles</span>
+            </a>
+            <a th:href="@{/parking}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">local_parking</span>
+                <span class="nav-label text-sm">Active Parking</span>
+            </a>
+            <a th:href="@{/reservation}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">event_available</span>
+                <span class="nav-label text-sm">Reservation</span>
+            </a>
+            <a th:href="@{/payments/history}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">payments</span>
+                <span class="nav-label text-sm">Payments</span>
+            </a>
+            <a th:href="@{/receipts}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">receipt_long</span>
+                <span class="nav-label text-sm">Receipts</span>
+            </a>
+            <a th:href="@{/wallet/overview}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">account_balance_wallet</span>
+                <span class="nav-label text-sm">Wallet</span>
+            </a>
+            <a th:href="@{/passes}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">confirmation_number</span>
+                <span class="nav-label text-sm">Parking Passes</span>
+            </a>
+            <a th:href="@{/notifications}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
+                <span class="material-symbols-outlined shrink-0">notifications</span>
+                <span class="nav-label text-sm">Notifications</span>
+            </a>
+            <a th:href="@{/account/settings}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">settings</span>
+                <span class="nav-label text-sm">Account Settings</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-white/5">
+            <a th:href="@{/logout}" class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
+                <span class="material-symbols-outlined shrink-0">power_settings_new</span>
+                <span class="nav-label">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial min-h-0">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-6 lg:px-10 bg-background-dark/30 premium-blur shrink-0">
+            <div>
+                <h2 class="text-xl font-black text-white">Notifications</h2>
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">System &amp; account alerts</p>
+            </div>
+            <div class="flex items-center gap-3 lg:gap-4">
+                <form th:if="${unreadCount > 0}" th:action="@{/notifications/read-all}" method="post" class="inline">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit"
+                            class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 font-black px-4 lg:px-5 py-2.5 rounded-xl hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
+                        <span class="material-symbols-outlined text-base">done_all</span>
+                        <span class="hidden sm:inline">Mark all read</span>
+                    </button>
+                </form>
+                <div class="h-10 w-10 rounded-[14px] bg-gradient-to-tr from-primary to-blue-400 p-[2px] shrink-0">
+                    <div class="h-full w-full rounded-[14px] bg-background-dark flex items-center justify-center overflow-hidden">
+                        <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
+                             th:src="@{${currentUser.profilePicturePath}}"
+                             class="h-full w-full object-cover" alt=""/>
+                        <span th:unless="${currentUser != null and currentUser.profilePicturePath != null}"
+                              class="material-symbols-outlined text-white/50">person</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 lg:p-10 min-h-0">
+            <div class="max-w-3xl mx-auto space-y-6">
+                <div th:if="${error != null}" class="rounded-2xl border border-rose-500/25 bg-rose-500/10 px-4 py-3 text-sm font-bold text-rose-200" th:text="${error}"></div>
+
+                <!-- KPI strip -->
+                <div class="grid grid-cols-3 gap-4 lg:gap-5">
+                    <div class="glass-card p-4 lg:p-5 rounded-3xl text-center">
+                        <p class="text-2xl font-black text-primary" th:text="${unreadCount}">0</p>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-1">Unread</p>
+                    </div>
+                    <div class="glass-card p-4 lg:p-5 rounded-3xl text-center">
+                        <p class="text-2xl font-black text-white" th:text="${totalCount}">0</p>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-1">Total</p>
+                    </div>
+                    <div class="glass-card p-4 lg:p-5 rounded-3xl text-center">
+                        <p class="text-2xl font-black text-emerald-400" th:text="${todayCount}">0</p>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-1">Today</p>
+                    </div>
+                </div>
+
+                <!-- Filter tabs -->
+                <div class="flex gap-2 flex-wrap">
+                    <button type="button" class="filter-btn active" onclick="filterNotifs('all',this)">All</button>
+                    <button type="button" class="filter-btn" onclick="filterNotifs('unread',this)">Unread</button>
+                    <button type="button" class="filter-btn" onclick="filterNotifs('payment',this)">Payments</button>
+                    <button type="button" class="filter-btn" onclick="filterNotifs('system',this)">System</button>
+                    <button type="button" class="filter-btn" onclick="filterNotifs('alert',this)">Alerts</button>
+                </div>
+
+                <!-- Notifications list -->
+                <div class="glass-card rounded-[2.5rem] overflow-hidden">
+                    <div th:if="${#lists.isEmpty(notifications)}" class="px-8 py-16 text-center">
+                        <span class="material-symbols-outlined text-slate-600 text-4xl mb-3 block">notifications_off</span>
+                        <p class="text-sm font-black text-slate-400">No notifications yet</p>
+                        <p class="text-xs text-slate-600 font-bold mt-2">Payments, reservations and parking activity will appear here.</p>
+                    </div>
+
+                    <th:block th:each="n : ${notifications}">
+                        <div th:id="${'n-' + n.id}"
+                             class="notif-row"
+                             th:classappend="${n.read} ? ' opacity-60' : ' unread'"
+                             th:attr="data-cat=${n.type.uiCategory()}">
+                            <!-- Icon by type -->
+                            <th:block th:switch="${n.type}">
+                                <div th:case="${T(com.parkiyo.parkiyo.enums.NotificationType).PAYMENT}"
+                                     class="h-11 w-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                                    <span class="material-symbols-outlined text-emerald-400">payments</span>
+                                </div>
+                                <div th:case="${T(com.parkiyo.parkiyo.enums.NotificationType).SYSTEM}"
+                                     class="h-11 w-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                                    <span class="material-symbols-outlined text-primary">system_update</span>
+                                </div>
+                                <div th:case="${T(com.parkiyo.parkiyo.enums.NotificationType).ENTRY}"
+                                     class="h-11 w-11 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                                    <span class="material-symbols-outlined text-sky-400">login</span>
+                                </div>
+                                <div th:case="${T(com.parkiyo.parkiyo.enums.NotificationType).EXIT}"
+                                     class="h-11 w-11 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                                    <span class="material-symbols-outlined text-rose-400">logout</span>
+                                </div>
+                                <div th:case="${T(com.parkiyo.parkiyo.enums.NotificationType).RESERVATION}"
+                                     class="h-11 w-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                                    <span class="material-symbols-outlined text-amber-400">event_available</span>
+                                </div>
+                                <div th:case="*"
+                                     class="h-11 w-11 rounded-xl bg-slate-700/30 border border-white/10 flex items-center justify-center shrink-0 mt-0.5">
+                                    <span class="material-symbols-outlined text-slate-400">notifications</span>
+                                </div>
+                            </th:block>
+
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-3">
+                                    <p class="text-sm font-black text-white" th:text="${n.title}">Title</p>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <span th:unless="${n.read}" class="h-2 w-2 bg-primary rounded-full unread-dot"></span>
+                                        <span class="text-[9px] font-black text-slate-600 uppercase tracking-widest whitespace-nowrap"
+                                              th:text="${T(com.parkiyo.parkiyo.service.NotificationService).formatRelativeTime(n.createdAt)}">—</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-400 font-bold mt-1" th:text="${n.message}">Message</p>
+                                <div class="flex flex-wrap items-center gap-2 mt-3">
+                                    <form th:unless="${n.read}" th:action="@{/notifications/{id}/read(id=${n.id})}" method="post" class="inline">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                        <button type="submit" class="text-[10px] font-black text-primary hover:brightness-125 transition-all bg-transparent border-0 p-0 cursor-pointer">
+                                            Mark read
+                                        </button>
+                                    </form>
+                                    <th:block th:if="${n.actionUrl != null and !#strings.isEmpty(n.actionUrl)}">
+                                        <span th:unless="${n.read}" class="text-slate-700">·</span>
+                                        <a th:href="${n.actionUrl}" class="text-[10px] font-black text-slate-400 hover:text-white transition-all"
+                                           th:text="${#strings.contains(n.actionUrl,'receipt') ? 'View receipt' : (#strings.contains(n.actionUrl,'payment') ? 'View payments' : (#strings.contains(n.actionUrl,'wallet') ? 'View wallet' : (#strings.contains(n.actionUrl,'reservation') ? 'View reservation' : 'Open')))}">Open</a>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function filterNotifs(cat, btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.notif-row').forEach(el => {
+            if (cat === 'all') {
+                el.style.display = '';
+                return;
+            }
+            if (cat === 'unread') {
+                el.style.display = el.classList.contains('unread') ? '' : 'none';
+                return;
+            }
+            el.style.display = (el.getAttribute('data-cat') === cat) ? '' : 'none';
+        });
+    }
+</script>
 </body>
 </html>
