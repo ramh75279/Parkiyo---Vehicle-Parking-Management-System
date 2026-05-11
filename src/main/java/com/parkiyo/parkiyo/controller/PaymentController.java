@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.parkiyo.parkiyo.enums.PaymentStatus;
 import com.parkiyo.parkiyo.model.Reservation;
 
 import java.math.BigDecimal;
@@ -45,9 +46,13 @@ public class PaymentController {
         var payment = paymentService.getPendingPayment(id, auth.getName());
         String email = auth.getName();
         BigDecimal walletBalance = walletService.getBalance(email);
+        if (walletBalance == null) {
+            walletBalance = BigDecimal.ZERO;
+        }
+        BigDecimal amount = payment.getAmount() != null ? payment.getAmount() : BigDecimal.ZERO;
         model.addAttribute("pendingPayment", payment);
         model.addAttribute("walletBalance", walletBalance);
-        model.addAttribute("walletAfterPay", walletBalance.subtract(payment.getAmount()));
+        model.addAttribute("walletAfterPay", walletBalance.subtract(amount));
 
         Reservation res = payment.getReservation();
         if (res != null) {
@@ -90,7 +95,7 @@ public class PaymentController {
                                  RedirectAttributes redirectAttributes) {
         try {
             paymentService.initiatePayment(paymentId, auth.getName());
-            return "redirect:/payments/processing/" + paymentId;
+            return "redirect:/payment/success?paymentId=" + paymentId;
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/payments/pending/" + paymentId;
@@ -112,8 +117,24 @@ public class PaymentController {
     @PreAuthorize("isAuthenticated()")
     public String paymentSuccess(@RequestParam(required = false) Long paymentId,
                                  Authentication auth,
-                                 Model model) {
-        model.addAttribute("payment", paymentService.getLatestSuccessfulPayment(auth.getName()));
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
+        String email = auth.getName();
+        Payment payment;
+        if (paymentId != null) {
+            payment = paymentService.getPaymentById(paymentId, email);
+            if (payment.getStatus() != PaymentStatus.SUCCESS) {
+                redirectAttributes.addFlashAttribute("error", "This payment is not complete yet.");
+                return "redirect:/payments/pending/" + paymentId;
+            }
+        } else {
+            payment = paymentService.getLatestSuccessfulPayment(email);
+            if (payment == null) {
+                redirectAttributes.addFlashAttribute("error", "No successful payment found.");
+                return "redirect:/payments/history";
+            }
+        }
+        model.addAttribute("payment", payment);
         return "payments/paymentsuccess";
     }
 

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -41,4 +42,18 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>, JpaSpec
     List<Payment> findTop10ByOrderByCreatedAtDesc();
 
     List<Payment> findByUser_Id(Long userId);
+
+    /**
+     * Loads payment with reservation graph so controllers/templates can read
+     * reservation, slot, vehicle, and user after the service transaction ends.
+     */
+    @Query("""
+            SELECT DISTINCT p FROM Payment p
+            LEFT JOIN FETCH p.reservation r
+            LEFT JOIN FETCH r.slot
+            LEFT JOIN FETCH r.vehicle
+            LEFT JOIN FETCH r.user
+            WHERE p.id = :id
+            """)
+    Optional<Payment> findByIdWithReservationDetails(@Param("id") Long id);
 }
