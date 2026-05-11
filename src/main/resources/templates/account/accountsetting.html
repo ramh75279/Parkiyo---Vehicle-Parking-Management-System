@@ -521,7 +521,7 @@
         if (!nav) return;
 
         const a = 'flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold';
-        const n = 'flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all';
+        const n = 'flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group';
 
         const lnk = (href, icon, label, active) =>
             `<a href="${href}" class="${active ? a : n}"><span class="material-symbols-outlined shrink-0">${icon}</span><span class="nav-label text-sm">${label}</span></a>`;
@@ -534,6 +534,9 @@
             lnk('/admin/vehicles', 'directions_car', 'Vehicles', false),
             lnk('/admin/users', 'group', 'Users', false),
             lnk('/admin/payments', 'payments', 'Payments', false),
+            lnk('/admin/pass-plans', 'confirmation_number', 'Pass Plans', false),
+            lnk('/admin/wallet-receipts', 'receipt_long', 'Wallet Top-Ups', false),
+            lnk('/admin/feedback', 'support_agent', 'Feedback Hub', false),
             lnk('/admin/reports', 'bar_chart', 'Reports', false),
             lnk('/admin/notifications', 'notifications', 'Notifications', false),
             lnk('/admin/system-status', 'monitor_heart', 'System Status', false),
@@ -552,6 +555,7 @@
             lnk('/wallet/overview', 'account_balance_wallet', 'Wallet', false),
             lnk('/passes', 'confirmation_number', 'Parking Passes', false),
             lnk('/notifications', 'notifications', 'Notifications', false),
+            lnk('/feedback', 'support_agent', 'Feedback', false),
             lnk('/account/settings', 'settings', 'Account Settings', true),
         ];
 
