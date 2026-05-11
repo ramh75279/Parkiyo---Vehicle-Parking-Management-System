@@ -103,8 +103,10 @@ public class UserVehicleController {
                                     Authentication auth,
                                     RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("vehicleRequest", request);
-            return "vehicles/add-vehicle-user";
+            redirectAttributes.addFlashAttribute("error", "Please complete the required vehicle details.");
+            redirectAttributes.addFlashAttribute("showVehicleRegistration", true);
+            redirectAttributes.addFlashAttribute("vehicleRequest", request);
+            return "redirect:/entry";
         }
         
         try {
@@ -112,10 +114,13 @@ public class UserVehicleController {
             request.setUserId(currentUser.getId());
             vehicleService.createVehicle(request);
             redirectAttributes.addFlashAttribute("success", "Vehicle registered successfully.");
+            redirectAttributes.addFlashAttribute("registeredPlate", request.getLicensePlate());
             return "redirect:/entry";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/vehicles/add";
+            redirectAttributes.addFlashAttribute("showVehicleRegistration", true);
+            redirectAttributes.addFlashAttribute("vehicleRequest", request);
+            return "redirect:/entry";
         }
     }
 

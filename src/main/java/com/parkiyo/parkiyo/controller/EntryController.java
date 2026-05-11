@@ -1,6 +1,8 @@
 package com.parkiyo.parkiyo.controller;
 
 import com.parkiyo.parkiyo.dto.EntryRequest;
+import com.parkiyo.parkiyo.dto.VehicleRequest;
+import com.parkiyo.parkiyo.model.Vehicle;
 import com.parkiyo.parkiyo.service.EntryService;
 import com.parkiyo.parkiyo.service.SlotService;
 import com.parkiyo.parkiyo.service.VehicleService;
@@ -12,6 +14,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,10 +32,27 @@ public class EntryController {
     @GetMapping("/entry")
     @PreAuthorize("isAuthenticated()")
     public String userEntryPage(Authentication auth, Model model) {
+        var slotOverview = slotService.getSlotOverview();
         model.addAttribute("availableSlots", slotService.getAvailableSlots());
+        model.addAttribute("occupiedSlots", slotOverview.get("occupied"));
+        model.addAttribute("totalSlots", slotOverview.get("total"));
+        model.addAttribute("occupancyRate", slotOverview.get("occupancyRate"));
         model.addAttribute("userVehicles", vehicleService.getVehiclesByUser(auth.getName()));
         model.addAttribute("entryRequest", new EntryRequest());
+        model.addAttribute("vehicleRequest", new VehicleRequest());
         return "parking/entry";
+    }
+
+    @GetMapping(value = "/entry/vehicle-lookup", produces = "application/json")
+    @ResponseBody
+    @PreAuthorize("isAuthenticated()")
+    public Map<String, Object> lookupVehicle(@RequestParam String licensePlate) {
+        Map<String, Object> response = new HashMap<>();
+        vehicleService.findVehicleByLicensePlate(licensePlate).ifPresentOrElse(vehicle -> {
+            response.put("found", true);
+            response.put("vehicle", buildVehiclePayload(vehicle));
+        }, () -> response.put("found", false));
+        return response;
     }
 
     // POST /entry
@@ -47,6 +69,18 @@ public class EntryController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/entry";
         }
+    }
+
+    private Map<String, Object> buildVehiclePayload(Vehicle vehicle) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("licensePlate", vehicle.getLicensePlate());
+        payload.put("category", vehicle.getCategory() != null ? vehicle.getCategory().name() : "");
+        payload.put("make", vehicle.getMake() != null ? vehicle.getMake() : "");
+        payload.put("model", vehicle.getModel() != null ? vehicle.getModel() : "");
+        payload.put("color", vehicle.getColor() != null ? vehicle.getColor() : "");
+        payload.put("year", vehicle.getYear() != null ? vehicle.getYear() : "");
+        payload.put("ownerName", vehicle.getUser() != null && vehicle.getUser().getFullName() != null ? vehicle.getUser().getFullName() : "User");
+        return payload;
     }
 
     // ─── ADMIN ───────────────────────────────────────────────────────────────
