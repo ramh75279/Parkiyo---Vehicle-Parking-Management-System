@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Parkiyo | Submit feedback</title>
+    <th:block th:replace="~{feedback/fragments :: head-extra}"></th:block>
+</head>
+<body class="text-slate-100 font-display antialiased min-h-screen flex flex-col overflow-hidden">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+<div class="flex flex-1 overflow-hidden min-h-0">
+    <th:block th:replace="~{feedback/fragments :: sidebar ('new')}"></th:block>
+    <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial min-w-0">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-6 lg:px-10 bg-background-dark/30 premium-blur shrink-0">
+            <div>
+                <h1 class="text-xl font-black text-white">Submit feedback</h1>
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Complaints · Reviews · Suggestions · Issues</p>
+            </div>
+            <a th:href="@{/feedback}" class="text-sm font-bold text-slate-400 hover:text-white">← My reports</a>
+        </header>
+        <div class="flex-1 overflow-y-auto p-6 lg:p-10">
+            <form th:action="@{/feedback}" method="post" enctype="multipart/form-data" class="max-w-xl mx-auto glass-card rounded-[2rem] p-8 border border-white/[0.06] space-y-6">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Title</label>
+                    <input name="title" required maxlength="200" placeholder="Short summary"
+                           class="w-full rounded-xl bg-white/[0.04] border border-white/10 px-4 py-3 text-sm font-bold text-white placeholder:text-slate-600 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none"/>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Category</label>
+                    <select name="category" id="categorySelect" required
+                            class="w-full rounded-xl bg-white/[0.04] border border-white/10 px-4 py-3 text-sm font-bold text-white focus:border-primary/50 outline-none">
+                        <option th:each="c : ${categories}" th:value="${c.name()}" th:text="${c.displayLabel}">—</option>
+                    </select>
+                </div>
+                <div id="ratingRow" class="hidden">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Rating (1–5)</label>
+                    <select name="rating" id="ratingSelect"
+                            class="w-full rounded-xl bg-white/[0.04] border border-white/10 px-4 py-3 text-sm font-bold text-white focus:border-primary/50 outline-none">
+                        <option value="">Select…</option>
+                        <option value="5">5 — Excellent</option>
+                        <option value="4">4 — Good</option>
+                        <option value="3">3 — Average</option>
+                        <option value="2">2 — Poor</option>
+                        <option value="1">1 — Very poor</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Description</label>
+                    <textarea name="description" required rows="6" maxlength="8000" placeholder="Describe your experience or issue in detail…"
+                              class="w-full rounded-xl bg-white/[0.04] border border-white/10 px-4 py-3 text-sm font-semibold text-white placeholder:text-slate-600 focus:border-primary/50 outline-none resize-y min-h-[140px]"></textarea>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Photo (optional)</label>
+                    <input type="file" name="attachment" accept="image/*"
+                           class="w-full text-sm text-slate-400 file:mr-4 file:rounded-lg file:border-0 file:bg-primary/20 file:px-4 file:py-2 file:font-bold file:text-primary"/>
+                    <p class="text-[11px] text-slate-600 font-bold mt-2">Images only, max 10MB.</p>
+                </div>
+                <button type="submit" class="w-full flex items-center justify-center gap-2 bg-primary text-white font-black py-4 rounded-xl hover:bg-primary/85 text-sm shadow-[0_0_24px_rgba(31,104,249,0.3)]">
+                    <span class="material-symbols-outlined">send</span> Submit report
+                </button>
+            </form>
+        </div>
+    </main>
+</div>
+<script>
+    (function () {
+        var cat = document.getElementById('categorySelect');
+        var row = document.getElementById('ratingRow');
+        var rating = document.getElementById('ratingSelect');
+        function sync() {
+            var isReview = cat && cat.value === 'REVIEW';
+            if (row) row.classList.toggle('hidden', !isReview);
+            if (rating) {
+                rating.required = !!isReview;
+                rating.disabled = !isReview;
+            }
+        }
+        if (cat) cat.addEventListener('change', sync);
+        sync();
+    })();
+</script>
+</body>
+</html>
