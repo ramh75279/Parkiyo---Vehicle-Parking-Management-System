@@ -64,6 +64,14 @@ public class VehicleService {
     }
 
     @Transactional(readOnly = true)
+    public java.util.Optional<Vehicle> findVehicleByLicensePlate(String licensePlate) {
+        if (licensePlate == null || licensePlate.isBlank()) {
+            return java.util.Optional.empty();
+        }
+        return vehicleRepository.findByLicensePlate(licensePlate.trim().toUpperCase(Locale.ROOT));
+    }
+
+    @Transactional(readOnly = true)
     public Vehicle getVehicleByIdForView(Long id) {
         return vehicleRepository.findByIdWithUserAndWallet(id)
                 .orElseThrow(() -> new RuntimeException("Vehicle not found: " + id));
