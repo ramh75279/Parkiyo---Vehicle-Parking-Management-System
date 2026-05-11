@@ -43,7 +43,7 @@ public class PaymentService {
 
     @Transactional(readOnly = true)
     public Payment getPendingPayment(Long id, String email) {
-        Payment payment = paymentRepository.findById(id)
+        Payment payment = paymentRepository.findByIdWithReservationDetails(id)
                 .orElseThrow(() -> new RuntimeException("Payment not found."));
 
         if (payment.getUser() == null ||
