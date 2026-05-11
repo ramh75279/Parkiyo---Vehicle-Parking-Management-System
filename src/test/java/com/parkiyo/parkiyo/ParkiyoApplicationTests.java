@@ -76,6 +76,22 @@ class ParkiyoApplicationTests {
     }
 
     @Test
+    @WithMockUser(username = "admin@parkiyo.com", roles = "ADMIN")
+    void adminFeedbackHubRenders() throws Exception {
+        mockMvc.perform(get("/admin/feedback"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/feedback/dashboard"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin@parkiyo.com", roles = "ADMIN")
+    void userFeedbackMyReportsRenders() throws Exception {
+        mockMvc.perform(get("/feedback"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("feedback/my-reports"));
+    }
+
+    @Test
     @WithMockUser(username = "user@parkiyo.com", roles = "USER")
     void userCompatibilityRoutesResolve() throws Exception {
         mockMvc.perform(get("/payments"))
