@@ -93,6 +93,7 @@
 
         <div class="flex-1 overflow-y-auto p-10">
             <form th:action="@{/vehicles/create}" th:object="${vehicleRequest}" method="post" class="max-w-3xl mx-auto space-y-8">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <input type="hidden" id="categoryInput" th:field="*{category}" value="CAR"/>
 
                 <div class="glass-card rounded-[2.5rem] p-8">

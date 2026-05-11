@@ -205,6 +205,50 @@
             filter: brightness(1.06);
         }
 
+        .embedded-register-panel {
+            display: none;
+        }
+
+        .embedded-register-panel.visible {
+            display: block;
+        }
+
+        .floating-widget {
+            position: fixed;
+            right: 20px;
+            z-index: 60;
+            width: min(300px, calc(100vw - 40px));
+            pointer-events: auto;
+        }
+
+        .floating-mood-widget {
+            bottom: 20px;
+        }
+
+        .floating-fact-widget {
+            top: 58%;
+            transform: translateY(-50%);
+        }
+
+        @media (max-width: 768px) {
+            .floating-mood-widget,
+            .floating-fact-widget {
+                left: 20px;
+                right: 20px;
+                width: auto;
+                top: auto;
+                transform: none;
+            }
+
+            .floating-mood-widget {
+                bottom: 20px;
+            }
+
+            .floating-fact-widget {
+                bottom: 122px;
+            }
+        }
+
         ::-webkit-scrollbar {
             width: 5px;
             display: none;
@@ -317,10 +361,6 @@
                         <span class="material-symbols-outlined text-base">upload_file</span>
                         Import
                     </a>
-                    <a th:href="@{/vehicles/add}" class="top-nav-action primary">
-                        <span class="material-symbols-outlined text-base">add</span>
-                        Add Vehicle
-                    </a>
                 </div>
                 <div class="text-right hidden xl:block">
                     <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'User'">User</p>
@@ -333,6 +373,39 @@
                 </div>
             </div>
         </header>
+
+        <div id="entrySuccessBanner" th:if="${success}" class="notify-success mb-6 mx-auto max-w-2xl">
+            <span class="material-symbols-outlined text-xl">check_circle</span>
+            <div>
+                <p class="font-black">Vehicle registered successfully!</p>
+                <p class="text-emerald-500/80 text-xs mt-0.5" th:text="${success}">Vehicle registered successfully.</p>
+            </div>
+        </div>
+        <div th:if="${error}" class="notify-success mb-6 mx-auto max-w-2xl" style="background: rgba(244,63,94,0.08); border-color: rgba(244,63,94,0.18); color: #fecdd3;">
+            <span class="material-symbols-outlined text-xl">error</span>
+            <div>
+                <p class="font-black">Error</p>
+                <p class="text-rose-400 text-xs mt-0.5" th:text="${error}">Something went wrong.</p>
+            </div>
+        </div>
+
+        <div class="floating-widget floating-fact-widget">
+            <div class="glass-card rounded-2xl shadow-2xl shadow-black/30 border border-white/10 p-4">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="material-symbols-outlined text-amber-300 text-base">lightbulb</span>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Fun Fact</p>
+                </div>
+                <p id="parkingFunFact" class="text-sm text-slate-100 font-semibold leading-relaxed">Did you know? A car spends about 95% of its life parked.</p>
+            </div>
+        </div>
+
+        <div class="floating-widget floating-mood-widget">
+            <div id="parkingMoodCard" class="glass-card rounded-2xl shadow-2xl shadow-black/30 border border-white/10 p-4">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Parking Mood</p>
+                <p id="parkingMoodText" class="text-lg font-black text-white mt-1">—</p>
+                <p class="text-[10px] text-slate-500 mt-1">Available Slots: <span id="parkingAvailableCount">—</span> / <span id="parkingTotalCount">—</span></p>
+            </div>
+        </div>
 
         <div class="flex-1 overflow-y-auto p-10">
             <div class="max-w-2xl mx-auto space-y-8">
@@ -361,6 +434,10 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="parkingStats" th:data-available="${availableSlots != null ? availableSlots.size() : 0}" th:data-total="${totalSlots != null ? totalSlots : 0}" th:data-rate="${occupancyRate != null ? occupancyRate : 0}"></div>
+                   <div id="entryBootstrap"
+                       th:attr="data-show-register=${showVehicleRegistration != null ? showVehicleRegistration : false}, data-registered-plate=${registeredPlate != null ? registeredPlate : ''}"></div>
 
                 <!-- Form Wrapper -->
                 <form id="entryForm" th:action="@{/entry}" th:object="${entryRequest}" method="post">
@@ -489,10 +566,97 @@
                     </div>
                 </div>
 
+                <div id="vehicleNotFoundNotice" th:classappend="${showVehicleRegistration} ? ' visible' : ''" class="embedded-register-panel glass-card rounded-[2.5rem] p-8 border border-amber-400/20 bg-amber-500/5 mt-8">
+                    <div class="flex flex-wrap items-start justify-between gap-3 mb-5">
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-amber-300">Vehicle Not Found</p>
+                            <h3 id="vehicleNotFoundMessage" class="text-base font-black text-white mt-1">Vehicle not found. Register vehicle below.</h3>
+                        </div>
+                        <button type="button" onclick="hideVehicleRegistration()"
+                                class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition-all">
+                            Hide Form
+                        </button>
+                    </div>
+
+                    <form id="embeddedVehicleForm" th:action="@{/vehicles/create}" th:object="${vehicleRequest}" method="post" class="space-y-6">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <input type="hidden" id="registerUserId" th:field="*{userId}" />
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div class="sm:col-span-2">
+                                <label class="field-label">License Plate Number</label>
+                                <input id="registerPlateField" th:field="*{licensePlate}" type="text" required
+                                       placeholder="e.g. ABC-1234"
+                                       class="input-glass bg-white/5 px-4 h-12 rounded-2xl uppercase tracking-widest" />
+                            </div>
+                            <div>
+                                <label class="field-label">Vehicle Category</label>
+                                <select th:field="*{category}" class="input-glass px-4 h-12 rounded-2xl">
+                                    <option value="">Select category...</option>
+                                    <option value="CAR">Car</option>
+                                    <option value="MOTORCYCLE">Motorcycle</option>
+                                    <option value="TRUCK">Truck</option>
+                                    <option value="VAN">Van</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="field-label">Year</label>
+                                <input th:field="*{year}" type="number" placeholder="e.g. 2022"
+                                       class="input-glass bg-white/5 px-4 h-12 rounded-2xl" />
+                            </div>
+                            <div>
+                                <label class="field-label">Make</label>
+                                <input th:field="*{make}" type="text" placeholder="e.g. Toyota"
+                                       class="input-glass bg-white/5 px-4 h-12 rounded-2xl" />
+                            </div>
+                            <div>
+                                <label class="field-label">Model</label>
+                                <input th:field="*{model}" type="text" placeholder="e.g. Prius"
+                                       class="input-glass bg-white/5 px-4 h-12 rounded-2xl" />
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="field-label">Color</label>
+                                <select th:field="*{color}" class="input-glass px-4 h-12 rounded-2xl">
+                                    <option value="">Select color...</option>
+                                    <option value="White">White</option>
+                                    <option value="Black">Black</option>
+                                    <option value="Silver">Silver</option>
+                                    <option value="Blue">Blue</option>
+                                    <option value="Red">Red</option>
+                                    <option value="Grey">Grey</option>
+                                    <option value="Green">Green</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-black/20 border border-white/5 p-4">
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Owner / User</p>
+                                <p class="text-sm font-bold text-white" th:text="${#authentication != null ? #authentication.name : 'Logged-in user'}">Logged-in user</p>
+                            </div>
+                            <p class="text-[10px] font-bold text-slate-500">This will be linked to your account after save.</p>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-3">
+                            <button type="button" onclick="hideVehicleRegistration()"
+                                    class="px-5 py-3 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-black text-sm hover:bg-white/10 transition-all">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                    class="px-6 py-3 rounded-2xl bg-primary text-white font-black text-sm hover:bg-primary/80 transition-all shadow-[0_0_20px_rgba(31,104,249,0.3)] flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg">check</span> Register Vehicle
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
             </div>
         </div>
     </main>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <script>
     // Clock
     function updateClock() {
@@ -504,12 +668,64 @@
     let selectedSlotId = null;
     let selectedSlot = null;
 
-    function lookupPlate() {
-        const val = document.getElementById('plateField').value.trim();
+    const entryBootstrap = document.getElementById('entryBootstrap');
+    const lookupEndpoint = '/entry/vehicle-lookup';
+
+    async function lookupPlate(overridePlate) {
+        const val = (overridePlate || document.getElementById('plateField').value).trim().toUpperCase();
         if (!val) return;
-        document.getElementById('vehicleCard').classList.remove('hidden');
-        document.getElementById('foundPlate').textContent = val || 'ABC-1234';
-        document.getElementById('vehicleCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        try {
+            const response = await fetch(lookupEndpoint + '?licensePlate=' + encodeURIComponent(val), {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await response.json();
+
+            if (data.found) {
+                hideVehicleRegistration();
+                const vehicle = data.vehicle || {};
+                document.getElementById('vehicleCard').classList.remove('hidden');
+                document.getElementById('foundPlate').textContent = vehicle.licensePlate || val;
+                const details = [vehicle.make, vehicle.model].filter(Boolean).join(' ');
+                const owner = vehicle.ownerName ? vehicle.ownerName : 'User';
+                document.getElementById('foundDetails').textContent = [details || 'Vehicle', vehicle.color || '-', owner].join(' · ');
+                document.getElementById('plateField').value = vehicle.licensePlate || val;
+                document.getElementById('hiddenPlate').value = vehicle.licensePlate || val;
+                document.getElementById('vehicleCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return;
+            }
+
+            showVehicleRegistration(val);
+        } catch (error) {
+            showVehicleRegistration(val);
+        }
+    }
+
+    function showVehicleRegistration(plate) {
+        const registerPanel = document.getElementById('vehicleNotFoundNotice');
+        const registerPlateField = document.getElementById('registerPlateField');
+        const message = document.getElementById('vehicleNotFoundMessage');
+
+        document.getElementById('vehicleCard').classList.add('hidden');
+        if (registerPanel) {
+            registerPanel.classList.add('visible');
+        }
+        if (message) {
+            message.textContent = 'Vehicle not found. Register vehicle below.';
+        }
+        if (registerPlateField && plate) {
+            registerPlateField.value = plate;
+        }
+        if (registerPanel) {
+            registerPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    function hideVehicleRegistration() {
+        const registerPanel = document.getElementById('vehicleNotFoundNotice');
+        if (registerPanel) {
+            registerPanel.classList.remove('visible');
+        }
     }
 
     function selectSlot(el, id, code) {
@@ -534,10 +750,73 @@
     function resetForm() {
         document.getElementById('plateField').value = '';
         document.getElementById('vehicleCard').classList.add('hidden');
+        hideVehicleRegistration();
         document.getElementById('successCard').classList.add('hidden');
         document.getElementById('plateField').focus();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    // Parking mood, fun fact, and confetti for success
+    function renderParkingMoodAndFunFact() {
+        const statsEl = document.getElementById('parkingStats');
+        if (!statsEl) return;
+        const available = parseInt(statsEl.dataset.available || '0', 10);
+        const total = parseInt(statsEl.dataset.total || '0', 10);
+        const availablePct = total > 0 ? (available / total) * 100 : 100;
+
+        const moodEl = document.getElementById('parkingMoodText');
+        const availableEl = document.getElementById('parkingAvailableCount');
+        const totalEl = document.getElementById('parkingTotalCount');
+        const factEl = document.getElementById('parkingFunFact');
+
+        if (availableEl) availableEl.textContent = available;
+        if (totalEl) totalEl.textContent = total;
+
+        let mood = 'Chill 😌';
+        if (availablePct < 20) mood = 'Chaos 🔥';
+        else if (availablePct <= 50) mood = 'Busy 😵';
+        if (moodEl) moodEl.textContent = mood;
+
+        const facts = [
+            'Did you know? A car spends about 95% of its life parked.',
+            'The first parking meter was installed in 1935.',
+            'The average driver spends weeks of their life searching for parking.',
+            'Parking guidance systems can reduce congestion in crowded car parks.',
+            'Clearly marked parking zones improve flow and reduce entry delays.'
+        ];
+        if (factEl) factEl.textContent = facts[Math.floor(Math.random() * facts.length)];
+    }
+
+    function launchEntryConfetti() {
+        const banner = document.getElementById('entrySuccessBanner');
+        if (!banner || typeof confetti !== 'function') return;
+        const end = Date.now() + 2000;
+        const colors = ['#60a5fa', '#34d399', '#f59e0b', '#f472b6'];
+        (function frame() {
+            confetti({ particleCount: 3, angle: 60, spread: 70, origin: { x: 0 }, colors });
+            confetti({ particleCount: 3, angle: 120, spread: 70, origin: { x: 1 }, colors });
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        })();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        renderParkingMoodAndFunFact();
+        launchEntryConfetti();
+
+        const registeredPlate = entryBootstrap ? entryBootstrap.dataset.registeredPlate : '';
+        const showRegister = entryBootstrap ? entryBootstrap.dataset.showRegister === 'true' : false;
+
+        if (showRegister) {
+            showVehicleRegistration(document.getElementById('registerPlateField') ? document.getElementById('registerPlateField').value : '');
+        }
+
+        if (registeredPlate) {
+            document.getElementById('plateField').value = registeredPlate;
+            lookupPlate(registeredPlate);
+        }
+    });
 </script>
 </body>
 

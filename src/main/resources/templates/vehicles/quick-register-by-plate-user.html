@@ -19,6 +19,7 @@
             },
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Public Sans', sans-serif; background-color: #020617; }
         .premium-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
@@ -103,12 +104,20 @@
 
         <div class="flex-1 overflow-y-auto p-10">
             <div class="max-w-2xl mx-auto">
-                <div th:if="${success}" class="notify-success mb-6">
+                <div id="quickRegisterSuccessBanner" th:if="${success}" class="notify-success mb-6">
                     <span class="material-symbols-outlined text-xl">check_circle</span>
                     <div>
                         <p class="font-black">Vehicle registered successfully!</p>
                         <p class="text-emerald-500/80 text-xs mt-0.5" th:text="${success}">Vehicle registered successfully.</p>
                     </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-5 mb-6 border border-amber-400/20 bg-amber-500/5">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="material-symbols-outlined text-amber-300">lightbulb</span>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Parking Fun Fact</p>
+                    </div>
+                    <p id="quickRegisterFunFact" class="text-xs text-slate-200 font-bold">Did you know? A car spends about 95% of its life parked.</p>
                 </div>
 
                 <div th:if="${error}" class="notify-success mb-6" style="background: rgba(244, 63, 94, 0.1); border-color: rgba(244, 63, 94, 0.2); color: #fecdd3;">
@@ -232,5 +241,43 @@
         </div>
     </main>
 </div>
+<script>
+    function launchQuickRegisterConfetti() {
+        const successBanner = document.getElementById('quickRegisterSuccessBanner');
+        if (!successBanner || typeof confetti !== 'function') {
+            return;
+        }
+
+        const end = Date.now() + 2000;
+        const colors = ['#60a5fa', '#34d399', '#f59e0b', '#f472b6'];
+        (function frame() {
+            confetti({ particleCount: 3, angle: 60, spread: 70, origin: { x: 0 }, colors });
+            confetti({ particleCount: 3, angle: 120, spread: 70, origin: { x: 1 }, colors });
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        })();
+    }
+
+    function renderQuickRegisterFunFact() {
+        const factEl = document.getElementById('quickRegisterFunFact');
+        if (!factEl) {
+            return;
+        }
+        const facts = [
+            'Did you know? A car spends about 95% of its life parked.',
+            'The first parking meter was installed in 1935.',
+            'The average driver spends weeks of their life searching for parking.',
+            'Parking guidance systems can reduce congestion in crowded car parks.',
+            'Clearly marked parking zones improve flow and reduce entry delays.'
+        ];
+        factEl.textContent = facts[Math.floor(Math.random() * facts.length)];
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        renderQuickRegisterFunFact();
+        launchQuickRegisterConfetti();
+    });
+</script>
 </body>
 </html>
