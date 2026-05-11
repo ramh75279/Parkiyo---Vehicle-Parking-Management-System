@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html class="dark" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Parkiyo | Edit feedback</title>
+    <th:block th:replace="~{feedback/fragments :: head-extra}"></th:block>
+</head>
+<body class="text-slate-100 font-display antialiased min-h-screen flex flex-col overflow-hidden">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+<div class="flex flex-1 overflow-hidden min-h-0">
+    <th:block th:replace="~{feedback/fragments :: sidebar ('list')}"></th:block>
+    <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial min-w-0">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-6 lg:px-10 bg-background-dark/30 premium-blur shrink-0">
+            <div>
+                <h1 class="text-xl font-black text-white">Edit report</h1>
+                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Before an admin responds</p>
+            </div>
+            <a th:href="@{/feedback}" class="text-sm font-bold text-slate-400 hover:text-white">← Back</a>
+        </header>
+        <div class="flex-1 overflow-y-auto p-6 lg:p-10">
+            <form th:action="@{/feedback/{id}/edit(id=${report.id})}" method="post" enctype="multipart/form-data"
+                  class="max-w-xl mx-auto glass-card rounded-[2rem] p-8 border border-white/[0.06] space-y-6">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Title</label>
+                    <input name="title" required maxlength="200" th:value="${report.title}"
+                           class="w-full rounded-xl bg-white/[0.04] border border-white/10 px-4 py-3 text-sm font-bold text-white focus:border-primary/50 outline-none"/>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Category</label>
+                    <select name="category" id="categorySelect" required
+                            class="w-full rounded-xl bg-white/[0.04] border border-white/10 px-4 py-3 text-sm font-bold text-white focus:border-primary/50 outline-none">
+                        <option th:each="c : ${categories}" th:value="${c.name()}" th:selected="${c == report.category}" th:text="${c.displayLabel}">—</option>
+                    </select>
+                </div>
+                <div id="ratingRow" th:classappend="${report.category.name() == 'REVIEW'} ? '' : ' hidden'">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Rating (1–5)</label>
+                    <select name="rating" id="ratingSelect"
+                            class="w-full rounded-xl bg-white/[0.04] border border-white/10 px-4 py-3 text-sm font-bold text-white focus:border-primary/50 outline-none">
+                        <option th:each="n : ${#numbers.sequence(1,5)}" th:value="${n}" th:selected="${report.rating != null and report.rating == n}" th:text="${n}">1</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Description</label>
+                    <textarea name="description" required rows="6" maxlength="8000" th:text="${report.description}"
+                              class="w-full rounded-xl bg-white/[0.04] border border-white/10 px-4 py-3 text-sm font-semibold text-white focus:border-primary/50 outline-none resize-y min-h-[140px]"></textarea>
+                </div>
+                <div th:if="${report.attachmentPath != null}">
+                    <p class="text-[10px] font-black uppercase text-slate-500 mb-2">Current attachment</p>
+                    <a th:href="|/uploads/${report.attachmentPath}|" target="_blank" class="text-sm font-bold text-primary hover:underline">View image</a>
+                    <label class="flex items-center gap-2 mt-3 text-sm text-slate-400 font-bold cursor-pointer">
+                        <input type="checkbox" name="removeAttachment" value="true" class="rounded border-white/20 bg-white/5"/>
+                        Remove attachment
+                    </label>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Replace photo (optional)</label>
+                    <input type="file" name="attachment" accept="image/*"
+                           class="w-full text-sm text-slate-400 file:mr-4 file:rounded-lg file:border-0 file:bg-primary/20 file:px-4 file:py-2 file:font-bold file:text-primary"/>
+                </div>
+                <button type="submit" class="w-full bg-primary text-white font-black py-4 rounded-xl hover:bg-primary/85 text-sm">Save changes</button>
+            </form>
+        </div>
+    </main>
+</div>
+<script>
+    (function () {
+        var cat = document.getElementById('categorySelect');
+        var row = document.getElementById('ratingRow');
+        var rating = document.getElementById('ratingSelect');
+        function sync() {
+            var isReview = cat && cat.value === 'REVIEW';
+            if (row) row.classList.toggle('hidden', !isReview);
+            if (rating) {
+                rating.required = !!isReview;
+                rating.disabled = !isReview;
+            }
+        }
+        if (cat) cat.addEventListener('change', sync);
+        sync();
+    })();
+</script>
+</body>
+</html>
