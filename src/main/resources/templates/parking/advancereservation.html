@@ -522,7 +522,16 @@
                             <div class="text-center">
                                 <p th:text="${isCompleted} ? 'Paid' : (${isCancelled} ? 'Refund' : (${res.payment != null and res.payment.status.name() == 'PENDING'} ? 'Due' : 'Fee'))"
                                    class="text-[9px] font-black uppercase tracking-widest text-slate-500">Fee</p>
-                                <p th:if="${res.payment != null}"
+                                <th:block th:if="${res.payment != null and res.payment.status.name() == 'PENDING' and isConfirmed}">
+                                    <a th:href="@{/payments/pending/{id}(id=${res.payment.id})}"
+                                       class="mt-0.5 inline-flex flex-col items-center rounded-xl px-3 py-1.5 -mx-1 hover:bg-amber-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40 transition-colors"
+                                       title="Complete payment">
+                                        <span th:text="'Rs. ' + ${#numbers.formatDecimal(res.payment.amount, 1, 2)}"
+                                              class="text-sm font-black text-amber-400">Rs. 0.00</span>
+                                        <span class="text-[9px] font-black uppercase tracking-wider text-amber-400/70 mt-0.5">Pay now</span>
+                                    </a>
+                                </th:block>
+                                <p th:if="${res.payment != null and !(res.payment.status.name() == 'PENDING' and isConfirmed)}"
                                    th:text="'Rs. ' + ${#numbers.formatDecimal(res.payment.amount, 1, 2)}"
                                    th:classappend="${isCancelled or isExpired} ? ' text-slate-400' : (${res.payment.status.name() == 'PENDING'} ? ' text-amber-400' : ' text-emerald-400')"
                                    class="text-sm font-black mt-0.5">—</p>
@@ -530,9 +539,15 @@
                             </div>
 
                             <div class="flex gap-2">
+                                <a th:if="${isConfirmed and res.payment != null and res.payment.status.name() == 'PENDING'}"
+                                   th:href="@{/payments/pending/{id}(id=${res.payment.id})}"
+                                   class="h-9 w-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center hover:bg-amber-500/25 transition-all shrink-0"
+                                   title="Pay now">
+                                    <span class="material-symbols-outlined text-sm text-amber-300">payments</span>
+                                </a>
                                 <a th:if="${isConfirmed}"
                                    th:href="@{/reservations/{id}/edit(id=${res.id})}"
-                                   class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all"
+                                   class="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all shrink-0"
                                    title="Edit reservation">
                                     <span class="material-symbols-outlined text-sm text-slate-400">edit</span>
                                 </a>
