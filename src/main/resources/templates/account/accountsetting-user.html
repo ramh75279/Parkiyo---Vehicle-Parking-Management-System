@@ -33,27 +33,66 @@
 </head>
 <body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
 <div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
-<div class="flex flex-1 overflow-hidden">
+<div class="flex flex-1 min-h-0 overflow-hidden">
 
     <!-- Fixed: Thymeleaf sidebar, not JS-built -->
-    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
+    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col h-full min-h-0 shrink-0 z-50">
         <div class="p-6 mb-4 flex items-center">
             <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
                 <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
             </div>
             <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
         </div>
-        <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a th:href="@{/dashboard/user}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">dashboard</span><span class="nav-label text-sm">Dashboard</span></a>
-            <a th:href="@{/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">login</span><span class="nav-label text-sm">Vehicle Entry</span></a>
-            <a th:href="@{/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">logout</span><span class="nav-label text-sm">Vehicle Exit</span></a>
-            <a th:href="@{/vehicles}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">directions_car</span><span class="nav-label text-sm">Vehicles</span></a>
-            <a th:href="@{/parking}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">local_parking</span><span class="nav-label text-sm">Active Parking</span></a>
-            <a th:href="@{/reservations}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">event_available</span><span class="nav-label text-sm">Reservations</span></a>
-            <a th:href="@{/payments/history}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">payments</span><span class="nav-label text-sm">Payments</span></a>
-            <a th:href="@{/wallet}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">account_balance_wallet</span><span class="nav-label text-sm">Wallet</span></a>
-            <a th:href="@{/notifications}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all"><span class="material-symbols-outlined shrink-0">notifications</span><span class="nav-label text-sm">Notifications</span></a>
-            <a th:href="@{/settings/profile}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold"><span class="material-symbols-outlined shrink-0">settings</span><span class="nav-label text-sm">Account Settings</span></a>
+        <nav class="flex-1 min-h-0 px-3 space-y-1 overflow-y-auto">
+            <a th:href="@{/dashboard/user}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">dashboard</span>
+                <span class="nav-label text-sm">Dashboard</span>
+            </a>
+            <a th:href="@{/entry}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">login</span>
+                <span class="nav-label text-sm">Vehicle Entry</span>
+            </a>
+            <a th:href="@{/exit}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">logout</span>
+                <span class="nav-label text-sm">Vehicle Exit</span>
+            </a>
+            <a th:href="@{/vehicles}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">directions_car</span>
+                <span class="nav-label text-sm">Vehicles</span>
+            </a>
+            <a th:href="@{/parking}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">local_parking</span>
+                <span class="nav-label text-sm">Active Parking</span>
+            </a>
+            <a th:href="@{/reservation}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">event_available</span>
+                <span class="nav-label text-sm">Reservation</span>
+            </a>
+            <a th:href="@{/payments/history}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">payments</span>
+                <span class="nav-label text-sm">Payments</span>
+            </a>
+            <a th:href="@{/receipts}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">receipt_long</span>
+                <span class="nav-label text-sm">Receipts</span>
+            </a>
+            <a th:href="@{/wallet/overview}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">account_balance_wallet</span>
+                <span class="nav-label text-sm">Wallet</span>
+            </a>
+            <a th:href="@{/passes}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">confirmation_number</span>
+                <span class="nav-label text-sm">Parking Passes</span>
+            </a>
+            <a th:href="@{/notifications}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
+                <span class="material-symbols-outlined shrink-0">notifications</span>
+                <span class="nav-label text-sm">Notifications</span>
+            </a>
+            <!-- Active item for this page -->
+            <a th:href="@{/account/settings}" class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold">
+                <span class="material-symbols-outlined shrink-0">settings</span>
+                <span class="nav-label text-sm">Account Settings</span>
+            </a>
         </nav>
         <div class="p-4 border-t border-white/5">
             <a th:href="@{/logout}" class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">

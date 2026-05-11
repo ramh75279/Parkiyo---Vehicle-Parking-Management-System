@@ -153,9 +153,9 @@
 
 <body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
 <div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
-<div class="flex flex-1 overflow-hidden">
+<div class="flex flex-1 min-h-0 overflow-hidden">
 
-    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
+    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col h-full min-h-0 shrink-0 z-50">
         <th:block th:if="${isAdmin}">
             <a th:href="@{/admin/dashboard}"
                class="p-6 mb-4 flex items-center shrink-0 hover:opacity-90 transition-opacity">
@@ -174,7 +174,7 @@
                 <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
             </a>
         </th:block>
-        <nav class="flex-1 px-3 space-y-1 overflow-y-auto" id="sidebarNav"></nav>
+        <nav class="flex-1 min-h-0 px-3 space-y-1 overflow-y-auto" id="sidebarNav"></nav>
         <div class="p-4 border-t border-white/5">
             <a th:href="@{/logout}" class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
                 <span class="material-symbols-outlined shrink-0">power_settings_new</span>
@@ -544,8 +544,13 @@
             lnk('/dashboard/user', 'dashboard', 'Dashboard', false),
             lnk('/entry', 'login', 'Vehicle Entry', false),
             lnk('/exit', 'logout', 'Vehicle Exit', false),
-            lnk('/parking', 'local_parking', 'Parking', false),
+            lnk('/vehicles', 'directions_car', 'Vehicles', false),
+            lnk('/parking', 'local_parking', 'Active Parking', false),
+            lnk('/reservation', 'event_available', 'Reservation', false),
             lnk('/payments/history', 'payments', 'Payments', false),
+            lnk('/receipts', 'receipt_long', 'Receipts', false),
+            lnk('/wallet/overview', 'account_balance_wallet', 'Wallet', false),
+            lnk('/passes', 'confirmation_number', 'Parking Passes', false),
             lnk('/notifications', 'notifications', 'Notifications', false),
             lnk('/account/settings', 'settings', 'Account Settings', true),
         ];
