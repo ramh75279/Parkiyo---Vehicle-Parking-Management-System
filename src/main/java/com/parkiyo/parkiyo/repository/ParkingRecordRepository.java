@@ -20,8 +20,10 @@ public interface ParkingRecordRepository extends JpaRepository<ParkingRecord, Lo
     @Query("SELECT COUNT(pr) FROM ParkingRecord pr WHERE pr.exitTime IS NULL")
     long countActiveRecords();
 
-    @Query("SELECT COALESCE(SUM(pr.amount), 0) FROM ParkingRecord pr " +
-            "WHERE pr.exitTime IS NOT NULL AND DATE(pr.exitTime) = CURRENT_DATE")
+    /** Native SQL: Hibernate 6 rejects {@code DATE(localDateTime) = CURRENT_DATE} in HQL (type mismatch). */
+    @Query(value = "SELECT COALESCE(SUM(amount), 0) FROM parking_records "
+            + "WHERE exit_time IS NOT NULL AND CAST(exit_time AS DATE) = CURRENT_DATE",
+            nativeQuery = true)
     BigDecimal calculateTodayRevenue();
 
     /** Loads associations for admin dashboard / Live Ops (works with open-in-view disabled). */
