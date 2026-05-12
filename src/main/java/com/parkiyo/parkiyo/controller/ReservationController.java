@@ -46,7 +46,7 @@ public class ReservationController {
     private final UserService userService;
 
     /**
-     * Main Advance Reservations Page - Lists all user reservations
+     * Main Advance Reservations Page - Lists all user reservations.
      */
     @GetMapping("/reservations")
     public String reservations(Authentication auth, Model model) {
