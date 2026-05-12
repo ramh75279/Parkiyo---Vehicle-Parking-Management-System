@@ -1,5 +1,6 @@
 package com.parkiyo.parkiyo.model;
 
+import com.parkiyo.parkiyo.enums.SavedReportPeriod;
 import com.parkiyo.parkiyo.enums.SavedReportStatus;
 import com.parkiyo.parkiyo.enums.SavedReportType;
 import jakarta.persistence.*;
@@ -36,6 +37,11 @@ public class SavedReport {
     @Column(nullable = false, length = 32)
     private SavedReportStatus status;
 
+    /** Viewing / aggregation cadence (daily, monthly, yearly) — independent of {@link #reportType}. */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 32)
+    private SavedReportPeriod period = SavedReportPeriod.DAILY;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -43,4 +49,12 @@ public class SavedReport {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    @PreUpdate
+    void normalizePeriod() {
+        if (period == null) {
+            period = SavedReportPeriod.DAILY;
+        }
+    }
 }
