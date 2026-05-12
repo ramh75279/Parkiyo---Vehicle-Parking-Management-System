@@ -1,6 +1,7 @@
 package com.parkiyo.parkiyo.controller;
 
 import com.parkiyo.parkiyo.dto.SavedReportRequest;
+import com.parkiyo.parkiyo.enums.SavedReportPeriod;
 import com.parkiyo.parkiyo.enums.SavedReportStatus;
 import com.parkiyo.parkiyo.enums.SavedReportType;
 import com.parkiyo.parkiyo.service.AuditLogService;
@@ -41,9 +42,11 @@ public class ReportController {
         model.addAttribute("filterStatus", status);
         model.addAttribute("searchQuery", q != null ? q : "");
         model.addAttribute("reportTypes", SavedReportType.values());
+        model.addAttribute("reportPeriods", SavedReportPeriod.values());
         model.addAttribute("reportStatuses", SavedReportStatus.values());
         SavedReportRequest emptyForm = new SavedReportRequest();
         emptyForm.setReportType(SavedReportType.REVENUE);
+        emptyForm.setPeriod(SavedReportPeriod.DAILY);
         emptyForm.setStatus(SavedReportStatus.DRAFT);
         model.addAttribute("savedReportRequest", emptyForm);
         return "reports/repportshubpage";
@@ -63,6 +66,7 @@ public class ReportController {
             model.addAttribute("filterStatus", null);
             model.addAttribute("searchQuery", "");
             model.addAttribute("reportTypes", SavedReportType.values());
+            model.addAttribute("reportPeriods", SavedReportPeriod.values());
             model.addAttribute("reportStatuses", SavedReportStatus.values());
             model.addAttribute("error",
                     bindingResult.getFieldError() != null

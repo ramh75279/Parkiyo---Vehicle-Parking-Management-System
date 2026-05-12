@@ -1,5 +1,6 @@
 package com.parkiyo.parkiyo.dto;
 
+import com.parkiyo.parkiyo.enums.SavedReportPeriod;
 import com.parkiyo.parkiyo.enums.SavedReportStatus;
 import com.parkiyo.parkiyo.enums.SavedReportType;
 import jakarta.validation.constraints.NotBlank;
@@ -19,6 +20,9 @@ public class SavedReportRequest {
 
     @NotNull(message = "Report type is required")
     private SavedReportType reportType;
+
+    @NotNull(message = "Period is required")
+    private SavedReportPeriod period;
 
     @NotNull(message = "Status is required")
     private SavedReportStatus status;
