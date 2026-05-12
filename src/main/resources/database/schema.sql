@@ -214,6 +214,7 @@ CREATE TABLE IF NOT EXISTS saved_reports (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     report_type VARCHAR(32) NOT NULL,
+    period VARCHAR(32) NULL DEFAULT 'DAILY',
     status VARCHAR(32) NOT NULL,
     created_at DATETIME(6) NOT NULL,
     updated_at DATETIME(6) NOT NULL,

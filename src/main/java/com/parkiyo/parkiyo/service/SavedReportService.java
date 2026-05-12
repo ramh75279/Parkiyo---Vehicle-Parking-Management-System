@@ -54,6 +54,7 @@ public class SavedReportService {
                 .title(request.getTitle().trim())
                 .description(blankToNull(request.getDescription()))
                 .reportType(request.getReportType())
+                .period(request.getPeriod())
                 .status(request.getStatus())
                 .build();
         return savedReportRepository.save(entity);
@@ -65,6 +66,7 @@ public class SavedReportService {
         entity.setTitle(request.getTitle().trim());
         entity.setDescription(blankToNull(request.getDescription()));
         entity.setReportType(request.getReportType());
+        entity.setPeriod(request.getPeriod());
         entity.setStatus(request.getStatus());
         return savedReportRepository.save(entity);
     }
