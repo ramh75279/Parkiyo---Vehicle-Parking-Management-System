@@ -279,6 +279,7 @@
                         <tr>
                             <th class="px-5 py-4">Title</th>
                             <th class="px-5 py-4">Type</th>
+                            <th class="px-5 py-4">Period</th>
                             <th class="px-5 py-4">Status</th>
                             <th class="px-5 py-4">Updated</th>
                             <th class="px-5 py-4 text-right">Actions</th>
@@ -286,7 +287,7 @@
                         </thead>
                         <tbody class="divide-y divide-white/5">
                         <tr th:if="${savedReports == null or savedReports.isEmpty()}">
-                            <td colspan="5" class="px-5 py-16 text-center text-slate-500 font-medium">No saved reports yet. Click “New report” to create one.</td>
+                            <td colspan="6" class="px-5 py-16 text-center text-slate-500 font-medium">No saved reports yet. Click “New report” to create one.</td>
                         </tr>
                         <tr th:each="r : ${savedReports}" class="hover:bg-white/[0.02]"
                             th:data-id="${r.id}"
@@ -294,12 +295,15 @@
                             th:data-description="${r.description}"
                             th:data-type="${r.reportType.name()}"
                             th:data-type-label="${r.reportType.label}"
+                            th:data-period="${r.period != null ? r.period.name() : 'DAILY'}"
+                            th:data-period-label="${r.period != null ? r.period.label : 'Daily'}"
                             th:data-status="${r.status.name()}"
                             th:data-status-label="${r.status.label}"
                             th:data-updated="${#temporals.format(r.updatedAt, 'yyyy-MM-dd HH:mm')}"
                             th:data-live-href="@{/admin/reports/{seg}(seg=${r.reportType.pathSegment()})}">
                             <td class="px-5 py-4 font-bold text-white" th:text="${r.title}">—</td>
                             <td class="px-5 py-4 text-slate-300" th:text="${r.reportType.label}">—</td>
+                            <td class="px-5 py-4 text-slate-400 text-xs font-bold" th:text="${r.period != null ? r.period.label : 'Daily'}">—</td>
                             <td class="px-5 py-4">
                                 <span th:if="${r.status.name() == 'DRAFT'}"
                                       class="inline-flex items-center rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-wider bg-slate-500/20 text-slate-300 border border-slate-500/30">Draft</span>
@@ -454,6 +458,10 @@
                 <dd id="viewType" class="text-slate-200 font-bold mt-1">—</dd>
             </div>
             <div>
+                <dt class="text-[10px] font-black uppercase text-slate-500">Period</dt>
+                <dd id="viewPeriod" class="text-slate-200 font-bold mt-1">—</dd>
+            </div>
+            <div>
                 <dt class="text-[10px] font-black uppercase text-slate-500">Status</dt>
                 <dd id="viewStatus" class="text-slate-200 font-bold mt-1">—</dd>
             </div>
@@ -505,6 +513,12 @@
                 </select>
             </div>
             <div>
+                <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Period</label>
+                <select th:field="*{period}" class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white font-bold">
+                    <option th:each="p : ${reportPeriods}" th:value="${p.name()}" th:text="${p.label}"></option>
+                </select>
+            </div>
+            <div>
                 <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Status</label>
                 <select th:field="*{status}" class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white font-bold">
                     <option th:each="s : ${reportStatuses}" th:value="${s.name()}" th:text="${s.label}"></option>
@@ -543,6 +557,12 @@
                 <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Report type</label>
                 <select id="editReportType" name="reportType" class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white font-bold">
                     <option th:each="t : ${reportTypes}" th:value="${t.name()}" th:text="${t.label}"></option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-[10px] font-black uppercase text-slate-500 mb-2">Period</label>
+                <select id="editPeriod" name="period" class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white font-bold">
+                    <option th:each="p : ${reportPeriods}" th:value="${p.name()}" th:text="${p.label}"></option>
                 </select>
             </div>
             <div>
@@ -588,6 +608,7 @@
         const tr = btn.closest('tr');
         document.getElementById('viewTitle').textContent = tr.dataset.title || '';
         document.getElementById('viewType').textContent = tr.dataset.typeLabel || '';
+        document.getElementById('viewPeriod').textContent = tr.dataset.periodLabel || '—';
         document.getElementById('viewStatus').textContent = tr.dataset.statusLabel || '';
         document.getElementById('viewDescription').textContent = tr.dataset.description || '—';
         document.getElementById('viewUpdated').textContent = tr.dataset.updated || '';
@@ -603,6 +624,7 @@
         document.getElementById('editTitle').value = tr.dataset.title || '';
         document.getElementById('editDescription').value = tr.dataset.description || '';
         document.getElementById('editReportType').value = tr.dataset.type || 'REVENUE';
+        document.getElementById('editPeriod').value = tr.dataset.period || 'DAILY';
         document.getElementById('editStatus').value = tr.dataset.status || 'DRAFT';
         openModal('editModal');
     }

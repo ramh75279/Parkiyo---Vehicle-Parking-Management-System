@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parkiyo — Reports System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg0: #07080d;
+      --bg1: #0c0e15;
+      --bg2: #10131c;
+      --line: rgba(255,255,255,.08);
+      --line2: rgba(255,255,255,.12);
+      --text: #e8ebf2;
+      --muted: #7a8299;
+      --accent: #4a7cff;
+      --emerald: #00d68f;
+      --amber: #ffad0d;
+      --red: #ff5c6c;
+      --shadow: 0 8px 32px rgba(0,0,0,.45);
+      --spring: cubic-bezier(.34,1.4,.64,1);
+      --ease: cubic-bezier(.4,0,.2,1);
+      --trans-dur: 380ms;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg0);
+      color: var(--text);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Mesh + grain */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 15% 0%, rgba(74,124,255,.09) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 50% at 85% 100%, rgba(0,214,143,.06) 0%, transparent 50%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg0) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      opacity: .055;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .mono { font-family: 'DM Mono', ui-monospace, monospace; }
+
+    /* --- App shell --- */
+    #app {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+    }
+
+    .panel {
+      position: absolute;
+      inset: 0;
+      min-height: 100vh;
+      overflow-y: auto;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(.96);
+      transition: opacity var(--trans-dur) var(--ease), transform var(--trans-dur) var(--ease);
+    }
+    .panel.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+      z-index: 3;
+    }
+
+    /* Directional transitions */
+    #app[data-transition="list-create"] #panel-list { transform: translateX(-18%) scale(.94); opacity: 0; }
+    #app[data-transition="list-create"] #panel-create { transform: translateX(0); }
+    #app[data-transition="create-list"] #panel-create { transform: translateX(22%); opacity: 0; }
+    #app[data-transition="create-list"] #panel-list { transform: translateX(0); }
+
+    #app[data-transition="list-view"] #panel-list { opacity: 0; transform: scale(.92); }
+    #app[data-transition="list-view"] #panel-view { transform: scale(1); opacity: 1; }
+
+    #app[data-transition="view-list"] #panel-view { opacity: 0; transform: scale(.94); }
+    #app[data-transition="view-list"] #panel-list { transform: scale(1); opacity: 1; }
+
+    #app[data-transition="create-view"] #panel-create { opacity: 0; transform: translateX(-12%); }
+    #app[data-transition="view-create"] #panel-view { opacity: 0; }
+
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+    }
+
+    /* --- Header --- */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 16px 24px;
+      background: rgba(7,8,13,.82);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -.03em;
+    }
+    .brand span { color: var(--accent); }
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--emerald);
+      padding: 6px 12px;
+      border: 1px solid rgba(0,214,143,.35);
+      border-radius: 999px;
+      background: rgba(0,214,143,.08);
+    }
+    .live-badge .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      animation: pulse 1.8s ease infinite;
+      box-shadow: 0 0 12px var(--emerald);
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .65; transform: scale(.85); }
+    }
+    .clock {
+      margin-left: auto;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .btn {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: .02em;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 22px;
+      cursor: pointer;
+      transition: transform .2s var(--spring), box-shadow .2s, background .2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #4a7cff, #3868e8);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(74,124,255,.35);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(74,124,255,.45); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--line2);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,.2); }
+
+    /* --- Cards --- */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      transition: transform .35s var(--spring), border-color .25s, box-shadow .35s;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--card-accent, var(--accent));
+      border-radius: 14px 14px 0 0;
+    }
+
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 24px 0;
+    }
+    @media (max-width: 900px) {
+      .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+    }
+    .kpi-card {
+      padding: 20px;
+      transition: transform .3s var(--spring);
+    }
+    .kpi-card:hover { transform: translateY(-3px); }
+    .kpi-card .label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .kpi-card .val {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 800;
+    }
+    .kpi-card .delta {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .delta.up { color: var(--emerald); }
+    .delta.down { color: var(--red); }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .search {
+      flex: 1;
+      min-width: 200px;
+      background: var(--bg1);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .search:focus {
+      border-color: rgba(74,124,255,.5);
+      box-shadow: 0 0 0 3px rgba(74,124,255,.12);
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--bg1);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .25s var(--spring);
+    }
+    .chip.on {
+      border-color: var(--accent);
+      color: var(--text);
+      background: rgba(74,124,255,.12);
+    }
+    select.sort {
+      background: var(--bg1);
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    /* Report grid */
+    .grid-reports {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .report-card {
+      padding: 20px;
+      cursor: pointer;
+      --card-accent: var(--accent);
+    }
+    .report-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 48px rgba(0,0,0,.55), 0 0 0 1px color-mix(in srgb, var(--card-accent) 45%, transparent);
+    }
+    .report-card .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .report-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--line2);
+    }
+    .meta-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .spark {
+      width: 100%;
+      height: 44px;
+      margin-bottom: 12px;
+    }
+    .metric-snap {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--text);
+      opacity: .9;
+    }
+    .card-menu {
+      position: relative;
+      opacity: 0;
+      transition: opacity .25s;
+    }
+    .report-card:hover .card-menu { opacity: 1; }
+    .menu-btn {
+      background: var(--bg1);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+    }
+    .menu-dd {
+      display: none;
+      position: absolute;
+      right: 0; top: 100%;
+      margin-top: 6px;
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      min-width: 140px;
+      box-shadow: var(--shadow);
+      z-index: 10;
+    }
+    .menu-dd.open { display: block; }
+    .menu-dd button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 10px 14px;
+      border: none;
+      background: none;
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .menu-dd button:hover { background: rgba(255,255,255,.05); }
+
+    /* Create panel */
+    .create-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 28px;
+      padding-top: 8px;
+    }
+    @media (max-width: 900px) {
+      .create-layout { grid-template-columns: 1fr; }
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .form-card { padding: 24px; margin-bottom: 18px; }
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .field input, .field textarea, .field select {
+      width: 100%;
+      background: var(--bg1);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color: rgba(74,124,255,.5);
+      box-shadow: 0 0 0 3px rgba(74,124,255,.1);
+    }
+    textarea { min-height: 100px; resize: vertical; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 600px) { .form-row-2 { grid-template-columns: 1fr; } }
+
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 600px) { .type-grid { grid-template-columns: repeat(2, 1fr); } }
+    .type-pill {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--bg1);
+      transition: all .28s var(--spring);
+    }
+    .type-pill .ico { font-size: 22px; margin-bottom: 6px; }
+    .type-pill .lbl { font-size: 11px; font-weight: 600; color: var(--muted); }
+    .type-pill.on {
+      border-width: 2px;
+      transform: translateY(-2px);
+    }
+
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+    .status-btn, .prio-btn {
+      flex: 1;
+      min-width: 90px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--bg1);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .25s var(--spring);
+    }
+    .status-btn.on, .prio-btn.on {
+      color: var(--text);
+      border-color: var(--accent);
+      background: rgba(74,124,255,.15);
+    }
+
+    .tags-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 10px;
+      background: var(--bg1);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      min-height: 48px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(74,124,255,.15);
+      border: 1px solid rgba(74,124,255,.35);
+      color: #9db7ff;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .tag button {
+      border: none;
+      background: none;
+      color: inherit;
+      cursor: pointer;
+      opacity: .7;
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .sw {
+      position: relative;
+      width: 44px;
+      height: 26px;
+    }
+    .sw input { display: none; }
+    .sw span {
+      position: absolute;
+      inset: 0;
+      background: var(--bg1);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .sw span::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 18px; height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform .25s var(--spring);
+    }
+    .sw input:checked + span { background: rgba(74,124,255,.4); border-color: var(--accent); }
+    .sw input:checked + span::after { transform: translateX(18px); }
+
+    .preview-sticky {
+      position: sticky;
+      top: 88px;
+    }
+    .preview-inner { padding: 22px; }
+    .preview-rows > div {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .preview-rows .k { color: var(--muted); }
+    .stat-mini {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .stat-mini > div {
+      background: var(--bg1);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-mini .v { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.25rem; }
+
+    /* View panel */
+    .view-hero {
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .view-hero .row1 {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .view-hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.65rem;
+      font-weight: 800;
+      max-width: 560px;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .kpi-live {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 900px) { .kpi-live { grid-template-columns: repeat(2, 1fr); } }
+    .flash {
+      animation: kflash .55s ease;
+    }
+    @keyframes kflash {
+      0%,100% { filter: brightness(1); }
+      50% { filter: brightness(1.25); }
+    }
+
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 900px) { .charts-row { grid-template-columns: 1fr; } }
+    .chart-box { padding: 20px; min-height: 320px; }
+    .chart-box canvas { max-height: 280px; }
+
+    .gauge-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .gauge-wrap svg { max-width: 220px; }
+
+    .three-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 900px) { .three-row { grid-template-columns: 1fr; } }
+
+    table.zones {
+      width: 100%;
+      font-size: 13px;
+      border-collapse: collapse;
+    }
+    table.zones th {
+      text-align: left;
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 8px 0;
+    }
+    table.zones td { padding: 10px 0; border-top: 1px solid var(--line); }
+    .occ-bar {
+      height: 6px;
+      background: var(--bg1);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .occ-bar > div {
+      height: 100%;
+      border-radius: 999px;
+      transition: width .6s var(--ease), background .4s;
+    }
+
+    .src-bar {
+      margin-bottom: 12px;
+    }
+    .src-bar .lbl {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .src-bar .track {
+      height: 8px;
+      background: var(--bg1);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .src-bar .fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width .8s var(--spring);
+    }
+
+    .alerts-box {
+      max-height: 240px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+    .alert-item {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+    }
+    .alert-item strong { color: var(--text); }
+
+    .heatmap {
+      display: grid;
+      grid-template-columns: 100px repeat(7, 1fr);
+      gap: 6px;
+      font-size: 11px;
+      align-items: center;
+    }
+    .heatmap .cell {
+      aspect-ratio: 1.4;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      cursor: default;
+      transition: transform .2s var(--spring);
+    }
+    .heatmap .cell:hover { transform: scale(1.06); z-index: 2; }
+    .hm-label { color: var(--muted); font-weight: 600; }
+
+    .insights {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 900px) { .insights { grid-template-columns: 1fr; } }
+    .insight {
+      padding: 18px;
+      border-left: 4px solid var(--accent);
+    }
+    .insight.emerald { border-left-color: var(--emerald); }
+    .insight.amber { border-left-color: var(--amber); }
+    .insight h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .insight p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    .live-toggle {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .25s var(--spring);
+    }
+    .live-toggle.on {
+      border-color: var(--emerald);
+      box-shadow: 0 0 24px rgba(0,214,143,.25);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--emerald);
+      color: #031810;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all .4s var(--spring);
+      z-index: 200;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .new-card-enter {
+      animation: cardIn .65s var(--spring) both;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(-12px) scale(.96); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .empty-msg {
+      text-align: center;
+      padding: 48px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 768px) {
+      .wrap { padding: 0 16px 40px; }
+      .topbar { flex-wrap: wrap; }
+      .clock { width: 100%; margin-left: 0; order: 3; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app" data-transition="">
+    <!-- LIST -->
+    <section class="panel active" id="panel-list">
+      <header class="topbar">
+        <div class="brand">Park<span>iyo</span></div>
+        <span class="live-badge"><span class="dot"></span> Live</span>
+        <span class="clock mono" id="clock"></span>
+        <button type="button" class="btn btn-primary" id="btn-new-report">+ New Report</button>
+      </header>
+      <div class="wrap">
+        <div class="kpi-strip" id="list-kpis"></div>
+        <div class="toolbar">
+          <input type="search" class="search" id="report-search" placeholder="Search reports…" />
+          <div class="chips" id="filter-chips"></div>
+          <select class="sort" id="sort-select">
+            <option value="date-desc">Newest first</option>
+            <option value="date-asc">Oldest first</option>
+            <option value="title">Title A–Z</option>
+          </select>
+        </div>
+        <div class="grid-reports" id="report-grid"></div>
+      </div>
+    </section>
+
+    <!-- CREATE -->
+    <section class="panel" id="panel-create">
+      <header class="topbar">
+        <button type="button" class="btn btn-ghost" id="back-from-create">← Back</button>
+        <div class="brand">Park<span>iyo</span></div>
+        <span class="clock mono" id="clock2"></span>
+      </header>
+      <div class="wrap create-layout">
+        <div>
+          <div class="card form-card">
+            <div class="section-title">Report Details</div>
+            <div class="field">
+              <label>Report Title</label>
+              <input type="text" id="f-title" placeholder="e.g. Q2 Revenue Summary" maxlength="255" />
+            </div>
+            <div class="field">
+              <label>Description</label>
+              <textarea id="f-desc" placeholder="Optional notes…"></textarea>
+            </div>
+            <div class="form-row-2">
+              <div class="field">
+                <label>Date From</label>
+                <input type="date" id="f-from" />
+              </div>
+              <div class="field">
+                <label>Date To</label>
+                <input type="date" id="f-to" />
+              </div>
+            </div>
+          </div>
+
+          <div class="card form-card">
+            <div class="section-title">Report Type</div>
+            <div class="type-grid" id="type-grid"></div>
+          </div>
+
+          <div class="card form-card">
+            <div class="section-title">Status & Priority</div>
+            <div class="field">
+              <label>Status</label>
+              <div class="btn-row" id="status-btns"></div>
+            </div>
+            <div class="field">
+              <label>Priority</label>
+              <div class="btn-row" id="prio-btns"></div>
+            </div>
+          </div>
+
+          <div class="card form-card">
+            <div class="section-title">Filters</div>
+            <div class="form-row-2">
+              <div class="field">
+                <label>Parking Zone</label>
+                <select id="f-zone"><option value="">All Zones</option></select>
+              </div>
+              <div class="field">
+                <label>Vehicle Type</label>
+                <select id="f-vehicle">
+                  <option value="">All Vehicles</option>
+                  <option>Cars</option>
+                  <option>Motorcycles</option>
+                  <option>Trucks</option>
+                  <option>EVs</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Tags</label>
+              <div class="tags-box" id="tags-box">
+                <input type="text" id="tag-input" placeholder="Add tag, Enter…" style="flex:1;border:none;background:transparent;color:inherit;outline:none;min-width:120px" />
+              </div>
+            </div>
+          </div>
+
+          <div class="card form-card">
+            <div class="section-title">Output Options</div>
+            <div class="toggle-row">
+              <div><strong>Include Charts</strong><br/><span style="font-size:12px;color:var(--muted)">Visual data</span></div>
+              <label class="sw"><input type="checkbox" id="opt-charts" checked /><span></span></label>
+            </div>
+            <div class="toggle-row">
+              <div><strong>Export PDF</strong></div>
+              <label class="sw"><input type="checkbox" id="opt-pdf" /><span></span></label>
+            </div>
+            <div class="toggle-row">
+              <div><strong>Auto-Schedule</strong></div>
+              <label class="sw"><input type="checkbox" id="opt-sched" /><span></span></label>
+            </div>
+            <div class="form-row-2" style="margin-top:16px">
+              <div class="field">
+                <label>Format</label>
+                <select id="f-format"><option>Detailed</option><option>Summary</option><option>Executive</option></select>
+              </div>
+              <div class="field">
+                <label>Group By</label>
+                <select id="f-group"><option>Day</option><option>Week</option><option>Month</option></select>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-row" style="margin-bottom:40px">
+            <button type="button" class="btn btn-ghost" id="reset-form">Reset</button>
+            <button type="button" class="btn btn-primary" id="submit-create" style="flex:1">Create Report →</button>
+          </div>
+        </div>
+
+        <aside class="preview-sticky">
+          <div class="card preview-inner">
+            <div class="section-title" style="margin-bottom:12px">Live Preview</div>
+            <div class="preview-rows" id="live-preview"></div>
+            <div style="margin:16px 0;height:1px;background:var(--line)"></div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Quick Stats</div>
+            <div class="stat-mini" id="preview-stats"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- VIEW -->
+    <section class="panel" id="panel-view">
+      <header class="topbar">
+        <button type="button" class="btn btn-ghost" id="back-from-view">← Back</button>
+        <div class="brand">Park<span>iyo</span></div>
+        <span class="clock mono" id="clock3"></span>
+        <div style="margin-left:auto;display:flex;gap:10px;flex-wrap:wrap">
+          <button type="button" class="btn btn-ghost" id="btn-edit-view">Edit</button>
+          <button type="button" class="btn btn-ghost">Export PDF</button>
+          <button type="button" class="btn btn-ghost">Share</button>
+        </div>
+      </header>
+      <div class="wrap">
+        <div class="card view-hero" id="view-hero"></div>
+        <div class="kpi-live" id="view-kpis"></div>
+
+        <div class="charts-row">
+          <div class="card chart-box">
+            <div class="section-title">Revenue & Occupancy (24h)</div>
+            <canvas id="chart-main"></canvas>
+          </div>
+          <div class="card chart-box gauge-wrap">
+            <div class="section-title">Occupancy Gauge</div>
+            <svg id="gauge-svg" viewBox="0 0 200 120" width="200" height="120">
+              <path id="gauge-arc-bg" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="14" stroke-linecap="round"/>
+              <path id="gauge-arc-fill" fill="none" stroke-width="14" stroke-linecap="round"/>
+              <line id="gauge-needle" x1="100" y1="100" x2="100" y2="38" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+              <text id="gauge-pct" x="100" y="105" text-anchor="middle" fill="var(--text)" font-family="DM Mono" font-size="18" font-weight="600">0%</text>
+            </svg>
+            <p class="mono" id="gauge-sub" style="margin-top:8px;font-size:13px;color:var(--muted)">—</p>
+          </div>
+        </div>
+
+        <div class="three-row">
+          <div class="card" style="padding:20px">
+            <div class="section-title">Zone Breakdown</div>
+            <table class="zones" id="zone-table"></table>
+          </div>
+          <div class="card" style="padding:20px">
+            <div class="section-title">Revenue Sources</div>
+            <div id="rev-sources"></div>
+          </div>
+          <div class="card" style="padding:20px">
+            <div class="section-title">Live Alerts</div>
+            <div class="alerts-box" id="alerts-feed"></div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:24px;margin-bottom:18px">
+          <div class="section-title">Weekly Occupancy Heatmap</div>
+          <div class="heatmap" id="heatmap-el"></div>
+        </div>
+
+        <div class="insights" id="insights-el"></div>
+      </div>
+
+    </section>
+
+    <button type="button" class="live-toggle" id="live-toggle" aria-pressed="false" style="display:none">
+      <span style="font-size:18px">⚡</span> Live <span class="mono" id="live-state">OFF</span>
+    </button>
+  </div>
+
+  <div class="toast" id="toast">✓ Report created</div>
+
+  <script>
+(function () {
+  const TYPE_META = [
+    { key: 'Revenue', emoji: '💰', color: '#4a7cff' },
+    { key: 'Occupancy', emoji: '🅿️', color: '#00d68f' },
+    { key: 'Violations', emoji: '⚠️', color: '#ff5c6c' },
+    { key: 'Traffic Flow', emoji: '🚗', color: '#ffad0d' },
+    { key: 'Subscriptions', emoji: '🔖', color: '#4a7cff' },
+    { key: 'Summary', emoji: '📊', color: '#22d3ee' }
+  ];
+
+  const STATUS_OPTS = ['Draft', 'In Review', 'Final'];
+  const PRIO_OPTS = ['Low', 'Medium', 'High'];
+
+  function uid() { return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+  function sparkPath(seed) {
+    let x = 0, y = 50;
+    let d = 'M 0 ' + y;
+    for (let i = 1; i <= 24; i++) {
+      x += 100 / 24;
+      y = 50 + Math.sin(seed + i * 0.5) * 18 + (Math.random() - 0.5) * 8;
+      d += ' L ' + x.toFixed(1) + ' ' + y.toFixed(1);
+    }
+    return d;
+  }
+
+  const SAMPLE = [
+    { title: 'Morning Peak Analysis', type: 'Occupancy', status: 'Final', created: daysAgo(2), snap: 'LKR 84k · 78% occ', seed: 1 },
+    { title: 'Q1 Revenue Consolidated', type: 'Revenue', status: 'In Review', created: daysAgo(5), snap: 'LKR 1.2M · +12%', seed: 2 },
+    { title: 'Violation Trends — Lot B', type: 'Violations', status: 'Draft', created: daysAgo(8), snap: '34 incidents · ▲ 8%', seed: 3 },
+    { title: 'Weekend Traffic Flow', type: 'Traffic Flow', status: 'Final', created: daysAgo(12), snap: 'Peak 14:00 · 920 veh', seed: 4 },
+    { title: 'Executive Summary — April', type: 'Summary', status: 'In Review', created: daysAgo(15), snap: 'All zones · blended', seed: 5 }
+  ];
+
+  function daysAgo(n) {
+    const d = new Date();
+    d.setDate(d.getDate() - n);
+    return d.toISOString();
+  }
+
+  function enrichReport(base) {
+    const id = base.id || uid();
+    const occ = 55 + Math.floor(Math.random() * 35);
+    const rev = 120000 + Math.floor(Math.random() * 400000);
+    return {
+      id,
+      title: base.title,
+      type: base.type,
+      status: base.status || 'Draft',
+      priority: base.priority || 'Medium',
+      description: base.description || '',
+      dateFrom: base.dateFrom || '',
+      dateTo: base.dateTo || '',
+      zone: base.zone || '',
+      vehicle: base.vehicle || '',
+      tags: base.tags || [],
+      created: base.created || new Date().toISOString(),
+      snap: base.snap || ('LKR ' + Math.round(rev / 1000) + 'k · ' + occ + '% occ'),
+      seed: base.seed || Math.random() * 10,
+      metrics: {
+        revenueToday: base.metrics?.revenueToday ?? rev,
+        occupancy: base.metrics?.occupancy ?? occ,
+        sessions: base.metrics?.sessions ?? 180 + Math.floor(Math.random() * 120),
+        violations: base.metrics?.violations ?? Math.floor(Math.random() * 25)
+      },
+      zones: base.zones || [
+        { name: 'Zone A', occ: 72, rev: 420000, st: 'Busy' },
+        { name: 'Zone B', occ: 58, rev: 310000, st: 'Available' },
+        { name: 'Zone C', occ: 41, rev: 180000, st: 'Available' },
+        { name: 'Zone D', occ: 91, rev: 290000, st: 'Full' }
+      ],
+      sources: base.sources || [
+        { label: 'Hourly Parking', pct: 55, color: '#4a7cff' },
+        { label: 'Monthly Passes', pct: 25, color: '#00d68f' },
+        { label: 'Event Parking', pct: 12, color: '#ffad0d' },
+        { label: 'Violations', pct: 8, color: '#ff5c6c' }
+      ]
+    };
+  }
+
+  const APP = {
+    view: 'list',
+    reports: SAMPLE.map((s, i) => enrichReport({ ...s, id: 'seed' + i })),
+    selectedId: null,
+    liveMode: false,
+    filterChip: 'All',
+    search: '',
+    sort: 'date-desc',
+    draft: {
+      type: 'Revenue',
+      status: 'Draft',
+      priority: 'Medium',
+      tags: []
+    },
+    chart: null,
+    liveTimer: null,
+    heatLabels: ['Morning', 'Noon', 'Evening', 'Night'],
+    heatCols: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  };
+
+  /* ---------- DOM helpers ---------- */
+  function $(id) { return document.getElementById(id); }
+
+  function typeColor(type) {
+    const m = TYPE_META.find(t => t.key === type);
+    return m ? m.color : '#4a7cff';
+  }
+
+  function statusClass(st) {
+    if (st === 'Draft') return 'draft';
+    if (st === 'Final') return 'final';
+    return 'review';
+  }
+
+  function renderListKpis() {
+    const rs = filteredReports();
+    const revC = rs.filter(r => r.type === 'Revenue').length;
+    const occAvg = rs.length ? Math.round(rs.reduce((a, r) => a + r.metrics.occupancy, 0) / rs.length) : 0;
+    const sess = rs.reduce((a, r) => a + r.metrics.sessions, 0);
+    const data = [
+      { label: 'Total Reports', val: rs.length, delta: '+2 this week', up: true },
+      { label: 'Revenue Reports', val: revC, delta: '+1 vs avg', up: true },
+      { label: 'Avg Occupancy', val: occAvg + '%', delta: '▲ 3%', up: true },
+      { label: 'Active Sessions', val: sess.toLocaleString(), delta: 'Live est.', up: true }
+    ];
+    const accents = ['#4a7cff', '#00d68f', '#ffad0d', '#4a7cff'];
+    $('list-kpis').innerHTML = data.map((k, i) =>
+      `<div class="card kpi-card" style="--card-accent:${accents[i]}">
+        <div class="label">${k.label}</div>
+        <div class="val mono">${k.val}</div>
+        <div class="delta ${k.up ? 'up' : 'down'}">${k.delta}</div>
+      </div>`
+    ).join('');
+  }
+
+  function filteredReports() {
+    let rs = [...APP.reports];
+    if (APP.filterChip !== 'All') {
+      const map = {
+        'Revenue': 'Revenue',
+        'Occupancy': 'Occupancy',
+        'Violations': 'Violations',
+        'Summary': 'Summary'
+      };
+      const want = map[APP.filterChip];
+      if (want) rs = rs.filter(r => r.type === want);
+    }
+    if (APP.search.trim()) {
+      const q = APP.search.toLowerCase();
+      rs = rs.filter(r => r.title.toLowerCase().includes(q));
+    }
+    rs.sort((a, b) => {
+      if (APP.sort === 'title') return a.title.localeCompare(b.title);
+      const da = new Date(a.created), db = new Date(b.created);
+      return APP.sort === 'date-asc' ? da - db : db - da;
+    });
+    return rs;
+  }
+
+  function renderGrid() {
+    const rs = filteredReports();
+    const g = $('report-grid');
+    if (!rs.length) {
+      g.innerHTML = '<div class="empty-msg card" style="padding:40px">No reports match.</div>';
+      return;
+    }
+    g.innerHTML = rs.map(r => {
+      const col = typeColor(r.type);
+      const path = sparkPath(r.seed);
+      return `<article class="card report-card" data-id="${r.id}" style="--card-accent:${col}">
+        <div class="head">
+          <h3>${escapeHtml(r.title)}</h3>
+          <div class="card-menu">
+            <button type="button" class="menu-btn" aria-label="Menu" data-menu="${r.id}">⋯</button>
+            <div class="menu-dd" id="menu-${r.id}">
+              <button type="button" data-act="view" data-id="${r.id}">View</button>
+              <button type="button" data-act="edit" data-id="${r.id}">Edit</button>
+              <button type="button" data-act="del" data-id="${r.id}">Delete</button>
+            </div>
+          </div>
+        </div>
+        <div class="meta-row">
+          <span class="badge" style="border-color:${col};color:${col}">${escapeHtml(r.type)}</span>
+          <span class="badge">${escapeHtml(r.status)}</span>
+          <span>${formatDate(r.created)}</span>
+        </div>
+        <svg class="spark" viewBox="0 0 100 60" preserveAspectRatio="none">
+          <path d="${path}" fill="none" stroke="${col}" stroke-width="1.5" opacity=".85"/>
+        </svg>
+        <div class="metric-snap">${escapeHtml(r.snap)}</div>
+      </article>`;
+    }).join('');
+
+    g.querySelectorAll('.report-card').forEach(card => {
+      card.addEventListener('click', e => {
+        if (e.target.closest('.card-menu')) return;
+        openView(card.dataset.id);
+      });
+    });
+    g.querySelectorAll('.menu-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = btn.dataset.menu;
+        const dd = $('menu-' + id);
+        document.querySelectorAll('.menu-dd').forEach(x => { if (x !== dd) x.classList.remove('open'); });
+        dd.classList.toggle('open');
+      });
+    });
+    g.querySelectorAll('.menu-dd button').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        const act = btn.dataset.act;
+        btn.closest('.menu-dd').classList.remove('open');
+        if (act === 'view') openView(id);
+        else if (act === 'edit') { openView(id); /* could switch to edit mode */ }
+        else if (act === 'del') {
+          APP.reports = APP.reports.filter(r => r.id !== id);
+          renderAll();
+        }
+      });
+    });
+  }
+
+  function escapeHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function renderChips() {
+    const chips = ['All', 'Revenue', 'Occupancy', 'Violations', 'Summary'];
+    $('filter-chips').innerHTML = chips.map(c =>
+      `<button type="button" class="chip ${APP.filterChip === c ? 'on' : ''}" data-chip="${c}">${c}</button>`
+    ).join('');
+    $('filter-chips').querySelectorAll('.chip').forEach(el => {
+      el.addEventListener('click', () => {
+        APP.filterChip = el.dataset.chip;
+        renderChips();
+        renderAll();
+      });
+    });
+  }
+
+  function renderAll() {
+    renderListKpis();
+    renderGrid();
+  }
+
+  /* ---------- Navigation ---------- */
+  function setTransition(name) {
+    const app = $('app');
+    app.dataset.transition = name;
+    setTimeout(() => { app.dataset.transition = ''; }, 420);
+  }
+
+  function showPanel(which) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    $(which === 'list' ? 'panel-list' : which === 'create' ? 'panel-create' : 'panel-view').classList.add('active');
+    APP.view = which;
+    if (which === 'view') {
+      $('live-toggle').style.display = 'flex';
+      initOrUpdateChart();
+      renderViewPanel();
+    } else {
+      $('live-toggle').style.display = 'none';
+      stopLive();
+    }
+  }
+
+  function goList() {
+    setTransition(APP.view === 'create' ? 'create-list' : 'view-list');
+    setTimeout(() => showPanel('list'), 50);
+  }
+
+  function goCreate() {
+    setTransition('list-create');
+    setTimeout(() => showPanel('create'), 50);
+    syncPreview();
+  }
+
+  function openView(id) {
+    APP.selectedId = id;
+    setTransition('list-view');
+    setTimeout(() => showPanel('view'), 50);
+  }
+
+  /* ---------- Create form ---------- */
+  function buildCreateChrome() {
+    $('type-grid').innerHTML = TYPE_META.map(t =>
+      `<button type="button" class="type-pill ${APP.draft.type === t.key ? 'on' : ''}" data-type="${t.key}" style="--tw:${t.color}">
+        <div class="ico">${t.emoji}</div>
+        <div class="lbl">${t.key}</div>
+      </button>`
+    ).join('');
+    $('type-grid').querySelectorAll('.type-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        $('type-grid').querySelectorAll('.type-pill').forEach(b => {
+          b.classList.remove('on');
+          b.style.borderColor = '';
+        });
+        btn.classList.add('on');
+        APP.draft.type = btn.dataset.type;
+        btn.style.borderColor = typeColor(APP.draft.type);
+        syncPreview();
+      });
+    });
+    $('type-grid').querySelectorAll('.type-pill.on').forEach(btn => {
+      btn.style.borderColor = typeColor(btn.dataset.type);
+      btn.style.borderWidth = '2px';
+    });
+
+    $('status-btns').innerHTML = STATUS_OPTS.map(s =>
+      `<button type="button" class="status-btn ${APP.draft.status === s ? 'on' : ''}" data-s="${s}">${s}</button>`
+    ).join('');
+    $('status-btns').querySelectorAll('.status-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        $('status-btns').querySelectorAll('.status-btn').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        APP.draft.status = btn.dataset.s;
+        syncPreview();
+      });
+    });
+
+    $('prio-btns').innerHTML = PRIO_OPTS.map(p =>
+      `<button type="button" class="prio-btn ${APP.draft.priority === p ? 'on' : ''}" data-p="${p}">${p}</button>`
+    ).join('');
+    $('prio-btns').querySelectorAll('.prio-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        $('prio-btns').querySelectorAll('.prio-btn').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        APP.draft.priority = btn.dataset.p;
+        syncPreview();
+      });
+    });
+
+    const z = $('f-zone');
+    ['Zone A — Main', 'Zone B — East', 'Zone C — Underground', 'Zone D — Overflow'].forEach(name => {
+      const o = document.createElement('option');
+      o.textContent = name;
+      o.value = name;
+      z.appendChild(o);
+    });
+  }
+
+  function syncPreview() {
+    const title = $('f-title').value.trim() || 'Untitled Report';
+    const from = $('f-from').value;
+    const to = $('f-to').value;
+    const zone = $('f-zone').value || 'All Zones';
+    $('live-preview').innerHTML = `
+      <div><span class="k">Title</span><span>${escapeHtml(title)}</span></div>
+      <div><span class="k">Type</span><span>${escapeHtml(APP.draft.type)}</span></div>
+      <div><span class="k">Status</span><span>${escapeHtml(APP.draft.status)}</span></div>
+      <div><span class="k">Priority</span><span>${escapeHtml(APP.draft.priority)}</span></div>
+      <div><span class="k">Date Range</span><span>${from && to ? escapeHtml(from + ' → ' + to) : 'Not set'}</span></div>
+      <div><span class="k">Zone</span><span>${escapeHtml(zone)}</span></div>
+    `;
+    $('preview-stats').innerHTML = `
+      <div><div class="v" style="color:#4a7cff">247</div><div style="font-size:11px;color:var(--muted)">Sessions</div></div>
+      <div><div class="v" style="color:#00d68f">LKR 84k</div><div style="font-size:11px;color:var(--muted)">Revenue est.</div></div>
+      <div><div class="v" style="color:#ffad0d">78%</div><div style="font-size:11px;color:var(--muted)">Occupancy</div></div>
+      <div><div class="v" style="color:#ff5c6c">12</div><div style="font-size:11px;color:var(--muted)">Violations</div></div>
+    `;
+  }
+
+  function readTagsFromDom() {
+    return [...document.querySelectorAll('#tags-box .tag .tag-text')].map(el => el.textContent.trim()).filter(Boolean);
+  }
+
+  function submitCreate() {
+    const title = $('f-title').value.trim();
+    if (!title) {
+      $('f-title').style.outline = '2px solid var(--red)';
+      setTimeout(() => { $('f-title').style.outline = ''; }, 1200);
+      return;
+    }
+    const tags = readTagsFromDom();
+    const rep = enrichReport({
+      title,
+      type: APP.draft.type,
+      status: APP.draft.status,
+      priority: APP.draft.priority,
+      description: $('f-desc').value,
+      dateFrom: $('f-from').value,
+      dateTo: $('f-to').value,
+      zone: $('f-zone').value,
+      vehicle: $('f-vehicle').value,
+      tags,
+      created: new Date().toISOString()
+    });
+    APP.reports.unshift(rep);
+    $('toast').classList.add('show');
+    setTimeout(() => $('toast').classList.remove('show'), 2200);
+    setTransition('create-list');
+    setTimeout(() => {
+      showPanel('list');
+      renderAll();
+      const first = document.querySelector('.grid-reports .report-card');
+      if (first) {
+        first.classList.add('new-card-enter');
+        setTimeout(() => first.classList.remove('new-card-enter'), 700);
+      }
+    }, 50);
+    resetFormFields();
+  }
+
+  function resetFormFields() {
+    $('f-title').value = '';
+    $('f-desc').value = '';
+    $('f-from').value = '';
+    $('f-to').value = '';
+    $('f-zone').value = '';
+    $('f-vehicle').value = '';
+    APP.draft = { type: 'Revenue', status: 'Draft', priority: 'Medium', tags: [] };
+    $('tags-box').querySelectorAll('.tag').forEach(t => t.remove());
+    buildCreateChrome();
+    syncPreview();
+  }
+
+  /* ---------- View panel ---------- */
+  function selectedReport() {
+    return APP.reports.find(r => r.id === APP.selectedId);
+  }
+
+  function renderViewPanel() {
+    const r = selectedReport();
+    if (!r) return;
+    const col = typeColor(r.type);
+    $('view-hero').innerHTML = `
+      <div class="row1">
+        <div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+            <span class="badge" style="border-color:${col};color:${col}">${escapeHtml(r.type)}</span>
+            <span class="badge">${escapeHtml(r.status)}</span>
+            <span style="font-size:13px;color:var(--muted)">${formatDate(r.created)}</span>
+          </div>
+          <h1>${escapeHtml(r.title)}</h1>
+        </div>
+      </div>`;
+
+    const m = r.metrics;
+    const mkpi = (label, val, sub, up) => `
+      <div class="card kpi-card flash" style="--card-accent:#4a7cff">
+        <div class="label">${label}</div>
+        <div class="val mono">${val}</div>
+        <div class="delta ${up ? 'up' : 'down'}">${sub}</div>
+      </div>`;
+    $('view-kpis').innerHTML =
+      mkpi('Revenue Today', 'LKR ' + Math.round(m.revenueToday / 1000) + 'k', '▲ 4.2%', true) +
+      mkpi('Occupancy Rate', m.occupancy + '%', (m.occupancy > 70 ? '▲' : '▼') + ' vs avg', m.occupancy > 65) +
+      mkpi('Active Sessions', m.sessions.toLocaleString(), 'Live', true) +
+      mkpi('Violations', m.violations, '▼ 2 today', false);
+
+    renderZones(r);
+    renderSources(r);
+    renderHeatmap();
+    renderInsights(r);
+    drawGauge(m.occupancy);
+    $('gauge-sub').textContent = Math.round(m.sessions * m.occupancy / 100) + ' / ' + m.sessions + ' spots (est.)';
+    renderAlerts(r);
+  }
+
+  function renderZones(r) {
+    $('zone-table').innerHTML = `
+      <thead><tr><th>Zone</th><th>Occupancy</th><th>Revenue</th><th>Status</th></tr></thead>
+      <tbody>
+        ${r.zones.map(z => {
+          const c = z.occ > 85 ? '#ff5c6c' : z.occ > 65 ? '#ffad0d' : '#00d68f';
+          return `<tr>
+            <td><strong>${escapeHtml(z.name)}</strong></td>
+            <td>
+              <div class="mono">${z.occ}%</div>
+              <div class="occ-bar"><div style="width:${z.occ}%;background:${c}"></div></div>
+            </td>
+            <td class="mono">LKR ${(z.rev / 1000).toFixed(0)}k</td>
+            <td><span class="badge">${escapeHtml(z.st)}</span></td>
+          </tr>`;
+        }).join('')}
+      </tbody>`;
+  }
+
+  function renderSources(r) {
+    $('rev-sources').innerHTML = r.sources.map(s =>
+      `<div class="src-bar">
+        <div class="lbl"><span>${escapeHtml(s.label)}</span><span class="mono">${s.pct}%</span></div>
+        <div class="track"><div class="fill" style="width:${s.pct}%;background:${s.color};transition:width .8s cubic-bezier(.34,1.4,.64,1)"></div></div>
+      </div>`
+    ).join('');
+  }
+
+  function heatColor(v) {
+    if (v > 0.75) return 'rgba(255,92,108,.85)';
+    if (v > 0.5) return 'rgba(255,173,13,.75)';
+    return 'rgba(0,214,143,.55)';
+  }
+
+  function renderHeatmap() {
+    const el = $('heatmap-el');
+    let html = '<div></div>';
+    APP.heatCols.forEach(d => { html += `<div class="hm-label" style="text-align:center">${d}</div>`; });
+    APP.heatLabels.forEach((row, ri) => {
+      html += `<div class="hm-label">${row}</div>`;
+      for (let ci = 0; ci < 7; ci++) {
+        const v = Math.random() * 0.45 + 0.35 + (ci >= 5 ? 0.12 : 0);
+        const h = heatColor(Math.min(1, v));
+        html += `<div class="cell" style="background:${h}" title="${row} ${APP.heatCols[ci]} · ${Math.round(v * 100)}%">●</div>`;
+      }
+    });
+    el.innerHTML = html;
+  }
+
+  function renderInsights(r) {
+    const occ = r.metrics.occupancy;
+    $('insights-el').innerHTML = `
+      <div class="card insight">
+        <h4>📈 Trend</h4>
+        <p>Peak revenue window is <strong>18:00–20:00</strong>, contributing ~34% of daily total based on current lot telemetry.</p>
+      </div>
+      <div class="card insight emerald">
+        <h4>🅿️ Zones</h4>
+        <p>Zone C is at <strong>${r.zones[2].occ}%</strong> occupancy — consider dynamic pricing or signage to balance load.</p>
+      </div>
+      <div class="card insight amber">
+        <h4>⚡ Operations</h4>
+        <p>Violations tracked at <strong>${r.metrics.violations}</strong> for this snapshot — patrol density optimal during noon peak.</p>
+      </div>`;
+  }
+
+  let alertSeq = 0;
+  function renderAlerts(r) {
+    const feed = $('alerts-feed');
+    const base = [
+      { t: 'System', m: `Occupancy holding at ${r.metrics.occupancy}% facility-wide.` },
+      { t: 'Revenue', m: `Spike +${5 + Math.floor(Math.random() * 8)}% vs rolling average in last hour.` },
+      { t: 'Violations', m: `${r.metrics.violations} open incidents across monitored zones.` }
+    ];
+    feed.innerHTML = base.map(a =>
+      `<div class="alert-item"><span class="mono">${new Date().toLocaleTimeString()}</span> · <strong>${escapeHtml(a.t)}</strong> — ${escapeHtml(a.m)}</div>`
+    ).join('');
+  }
+
+  function pushAlert(msg) {
+    const feed = $('alerts-feed');
+    const row = document.createElement('div');
+    row.className = 'alert-item';
+    row.innerHTML = `<span class="mono">${new Date().toLocaleTimeString()}</span> · <strong>Live</strong> — ${escapeHtml(msg)}`;
+    feed.insertBefore(row, feed.firstChild);
+    while (feed.children.length > 12) feed.removeChild(feed.lastChild);
+  }
+
+  /* Gauge SVG arc */
+  function describeArc(cx, cy, r, startAngle, endAngle) {
+    const p = [];
+    const steps = 40;
+    for (let i = 0; i <= steps; i++) {
+      const a = startAngle + (endAngle - startAngle) * (i / steps);
+      const x = cx + r * Math.cos(a);
+      const y = cy + r * Math.sin(a);
+      p.push((i ? 'L' : 'M') + x.toFixed(2) + ' ' + y.toFixed(2));
+    }
+    return p.join(' ');
+  }
+
+  function drawGauge(pct) {
+    const cx = 100, cy = 100, R = 72;
+    const start = Math.PI, end = 2 * Math.PI;
+    const bg = $('gauge-arc-bg');
+    const fill = $('gauge-arc-fill');
+    bg.setAttribute('d', describeArc(cx, cy, R, start, end));
+    const mid = start + (end - start) * (pct / 100);
+    fill.setAttribute('d', describeArc(cx, cy, R, start, mid));
+    const col = pct > 85 ? '#ff5c6c' : pct > 65 ? '#ffad0d' : '#00d68f';
+    fill.setAttribute('stroke', col);
+    $('gauge-pct').textContent = pct + '%';
+    const needle = $('gauge-needle');
+    const angle = Math.PI + (Math.PI * pct / 100);
+    const nx = 100 + 52 * Math.cos(angle);
+    const ny = 100 + 52 * Math.sin(angle);
+    needle.setAttribute('x2', nx);
+    needle.setAttribute('y2', ny);
+  }
+
+  /* Chart.js */
+  function initOrUpdateChart() {
+    const r = selectedReport();
+    if (!r) return;
+    const labels = [];
+    const rev = [];
+    const occ = [];
+    for (let h = 0; h < 24; h++) {
+      labels.push(h + ':00');
+      rev.push(Math.round((r.metrics.revenueToday / 24) * (0.6 + Math.random() * 0.8)));
+      occ.push(Math.min(100, Math.round(r.metrics.occupancy + (Math.random() - 0.5) * 15)));
+    }
+    const ctx = $('chart-main').getContext('2d');
+    if (APP.chart) APP.chart.destroy();
+    APP.chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Revenue (LKR)',
+            data: rev,
+            borderColor: '#4a7cff',
+            backgroundColor: 'rgba(74,124,255,.08)',
+            yAxisID: 'y',
+            tension: .42,
+            fill: true,
+            pointRadius: 0
+          },
+          {
+            label: 'Occupancy %',
+            data: occ,
+            borderColor: '#00d68f',
+            backgroundColor: 'transparent',
+            yAxisID: 'y1',
+            tension: .42,
+            pointRadius: 0
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { labels: { color: '#7a8299', font: { family: 'DM Sans' } } },
+          tooltip: {
+            backgroundColor: '#10131c',
+            borderColor: 'rgba(255,255,255,.1)',
+            borderWidth: 1,
+            titleFont: { family: 'Syne' },
+            bodyFont: { family: 'DM Mono' }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(255,255,255,.06)' },
+            ticks: { color: '#7a8299', maxTicksLimit: 8, font: { size: 10 } }
+          },
+          y: {
+            position: 'left',
+            grid: { color: 'rgba(255,255,255,.06)' },
+            ticks: { color: '#4a7cff', font: { family: 'DM Mono', size: 10 } }
+          },
+          y1: {
+            position: 'right',
+            grid: { drawOnChartArea: false },
+            min: 0,
+            max: 100,
+            ticks: { color: '#00d68f', font: { family: 'DM Mono', size: 10 } }
+          }
+        }
+      }
+    });
+  }
+
+  function nudgeLiveData() {
+    const r = selectedReport();
+    if (!r || !APP.liveMode) return;
+    r.metrics.revenueToday += Math.round((Math.random() - 0.45) * 8000);
+    r.metrics.occupancy = Math.max(30, Math.min(98, r.metrics.occupancy + Math.round((Math.random() - 0.5) * 4)));
+    r.metrics.sessions += Math.round((Math.random() - 0.5) * 6);
+    r.metrics.violations = Math.max(0, r.metrics.violations + (Math.random() > 0.85 ? 1 : 0));
+    renderViewPanel();
+    initOrUpdateChart();
+    $('view-kpis').querySelectorAll('.kpi-card').forEach(el => {
+      el.classList.remove('flash');
+      void el.offsetWidth;
+      el.classList.add('flash');
+    });
+    const msgs = [
+      'Occupancy crossed threshold on north cameras.',
+      'Revenue uptick detected on hourly lane.',
+      'Violation cleared — patrol Unit 3.'
+    ];
+    if (Math.random() > 0.5) pushAlert(msgs[Math.floor(Math.random() * msgs.length)]);
+  }
+
+  function stopLive() {
+    APP.liveMode = false;
+    $('live-toggle').classList.remove('on');
+    $('live-state').textContent = 'OFF';
+    $('live-toggle').setAttribute('aria-pressed', 'false');
+    if (APP.liveTimer) clearInterval(APP.liveTimer);
+    APP.liveTimer = null;
+  }
+
+  function startLive() {
+    APP.liveMode = true;
+    $('live-toggle').classList.add('on');
+    $('live-state').textContent = 'ON';
+    $('live-toggle').setAttribute('aria-pressed', 'true');
+    if (APP.liveTimer) clearInterval(APP.liveTimer);
+    APP.liveTimer = setInterval(nudgeLiveData, 2000);
+  }
+
+  /* Clock */
+  function tickClock() {
+    const s = new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    ['clock', 'clock2', 'clock3'].forEach(id => { const el = $(id); if (el) el.textContent = s; });
+  }
+
+  /* Tags */
+  function addTagInput(e) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const v = $('tag-input').value.trim();
+    if (!v) return;
+    const span = document.createElement('span');
+    span.className = 'tag';
+    span.innerHTML = `<span class="tag-text">${escapeHtml(v)}</span><button type="button" aria-label="Remove">✕</button>`;
+    span.querySelector('button').addEventListener('click', () => span.remove());
+    $('tags-box').insertBefore(span, $('tag-input'));
+    $('tag-input').value = '';
+  }
+
+  /* Boot */
+  function boot() {
+    tickClock();
+    setInterval(tickClock, 1000);
+    renderChips();
+    renderAll();
+    buildCreateChrome();
+    $('btn-new-report').addEventListener('click', goCreate);
+    $('back-from-create').addEventListener('click', goList);
+    $('back-from-view').addEventListener('click', goList);
+    $('report-search').addEventListener('input', e => { APP.search = e.target.value; renderAll(); });
+    $('sort-select').addEventListener('change', e => { APP.sort = e.target.value; renderAll(); });
+    $('f-title').addEventListener('input', syncPreview);
+    $('f-desc').addEventListener('input', syncPreview);
+    $('f-from').addEventListener('input', syncPreview);
+    $('f-to').addEventListener('input', syncPreview);
+    $('f-zone').addEventListener('change', syncPreview);
+    $('tag-input').addEventListener('keydown', addTagInput);
+    $('submit-create').addEventListener('click', submitCreate);
+    $('reset-form').addEventListener('click', resetFormFields);
+    $('live-toggle').addEventListener('click', () => APP.liveMode ? stopLive() : startLive());
+    $('btn-edit-view').addEventListener('click', () => {
+      goCreate();
+      const r = selectedReport();
+      if (!r) return;
+      $('f-title').value = r.title;
+      $('f-desc').value = r.description || '';
+      APP.draft.type = r.type;
+      APP.draft.status = r.status;
+      APP.draft.priority = r.priority || 'Medium';
+      buildCreateChrome();
+      syncPreview();
+    });
+
+    /* Gauge bg path once */
+    const bg = $('gauge-arc-bg');
+    bg.setAttribute('d', describeArc(100, 100, 72, Math.PI, 2 * Math.PI));
+
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.menu-dd.open').forEach(m => m.classList.remove('open'));
+    });
+  }
+
+  boot();
+})();
+  </script>
+</body>
+</html>
