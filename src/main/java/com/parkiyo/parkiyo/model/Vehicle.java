@@ -41,6 +41,21 @@ public class Vehicle {
     @JoinColumn(name = "user_id")
     private User user;   // Can be null for quick/visitor registration
 
+    @Column(name = "owner_first_name")
+    private String ownerFirstName;
+
+    @Column(name = "owner_last_name")
+    private String ownerLastName;
+
+    @Column(name = "owner_email")
+    private String ownerEmail;
+
+    @Column(name = "owner_phone")
+    private String ownerPhone;
+
+    @Column(name = "notes", columnDefinition = "TEXT")
+    private String notes;
+
     @OneToMany(mappedBy = "vehicle", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ParkingRecord> parkingRecords = new ArrayList<>();
 
@@ -59,6 +74,23 @@ public class Vehicle {
         if (make == null && model == null) return licensePlate;
         return (make != null ? make : "") + " " +
                 (model != null ? model : "") + " (" + licensePlate + ")";
+    }
+
+    public String getOwnerDisplayName() {
+        String first = ownerFirstName != null ? ownerFirstName.trim() : "";
+        String last = ownerLastName != null ? ownerLastName.trim() : "";
+
+        String fullName = (first + " " + last).trim();
+
+        if (!fullName.isBlank()) {
+            return fullName;
+        }
+
+        if (user != null) {
+            return user.getFullName();
+        }
+
+        return "Visitor";
     }
 
     public boolean isRegisteredToUser() {

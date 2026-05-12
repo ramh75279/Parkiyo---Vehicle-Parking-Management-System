@@ -8,27 +8,19 @@ import com.parkiyo.parkiyo.model.Vehicle;
 import com.parkiyo.parkiyo.repository.ParkingRecordRepository;
 import com.parkiyo.parkiyo.repository.UserRepository;
 import com.parkiyo.parkiyo.repository.VehicleRepository;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -46,16 +38,24 @@ public class VehicleService {
 
         if (search != null && !search.isBlank()) {
             String q = search.toLowerCase();
+
             vehicles = vehicles.stream()
                     .filter(v -> v.getLicensePlate().toLowerCase().contains(q)
                             || (v.getMake() != null && v.getMake().toLowerCase().contains(q))
-                            || (v.getModel() != null && v.getModel().toLowerCase().contains(q)))
+                            || (v.getModel() != null && v.getModel().toLowerCase().contains(q))
+                            || (v.getOwnerEmail() != null && v.getOwnerEmail().toLowerCase().contains(q))
+                            || (v.getOwnerFirstName() != null && v.getOwnerFirstName().toLowerCase().contains(q))
+                            || (v.getOwnerLastName() != null && v.getOwnerLastName().toLowerCase().contains(q)))
                     .toList();
         }
+
         if (category != null && !category.isBlank()) {
             VehicleCategory cat = VehicleCategory.valueOf(category.toUpperCase());
-            vehicles = vehicles.stream().filter(v -> v.getCategory() == cat).toList();
+            vehicles = vehicles.stream()
+                    .filter(v -> v.getCategory() == cat)
+                    .toList();
         }
+
         return vehicles;
     }
 
@@ -65,11 +65,14 @@ public class VehicleService {
     }
 
     @Transactional(readOnly = true)
-    public java.util.Optional<Vehicle> findVehicleByLicensePlate(String licensePlate) {
+    public Optional<Vehicle> findVehicleByLicensePlate(String licensePlate) {
         if (licensePlate == null || licensePlate.isBlank()) {
-            return java.util.Optional.empty();
+            return Optional.empty();
         }
-        return vehicleRepository.findByLicensePlate(licensePlate.trim().toUpperCase(Locale.ROOT));
+
+        return vehicleRepository.findByLicensePlate(
+                licensePlate.trim().toUpperCase(Locale.ROOT)
+        );
     }
 
     @Transactional(readOnly = true)
@@ -84,12 +87,19 @@ public class VehicleService {
 
     @Transactional(readOnly = true)
     public List<Vehicle> getVehiclesByCategory(String category) {
-        if (category == null || category.isBlank()) return vehicleRepository.findAll();
-        return vehicleRepository.findByCategory(VehicleCategory.valueOf(category.toUpperCase()));
+        if (category == null || category.isBlank()) {
+            return vehicleRepository.findAll();
+        }
+
+        return vehicleRepository.findByCategory(
+                VehicleCategory.valueOf(category.toUpperCase())
+        );
     }
 
     public List<String> getAllCategories() {
-        return Arrays.stream(VehicleCategory.values()).map(Enum::name).toList();
+        return Arrays.stream(VehicleCategory.values())
+                .map(Enum::name)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -99,112 +109,174 @@ public class VehicleService {
 
     @Transactional
     public void createVehicle(VehicleRequest request) {
-        if (vehicleRepository.existsByLicensePlate(request.getLicensePlate())) {
-            throw new RuntimeException("License plate already registered: " + request.getLicensePlate());
+        String plate = request.getLicensePlate().trim().toUpperCase(Locale.ROOT);
+
+        if (vehicleRepository.existsByLicensePlate(plate)) {
+            throw new RuntimeException("License plate already registered: " + plate);
         }
-        User user = request.getUserId() != null
-                ? userRepository.findById(request.getUserId()).orElse(null)
-                : null;
+
+        User user = resolveVehicleOwner(request);
+
+        boolean active = request.getActive() == null || request.getActive();
 
         Vehicle vehicle = Vehicle.builder()
-                .licensePlate(request.getLicensePlate().toUpperCase())
+                .licensePlate(plate)
                 .category(request.getCategory())
-                .make(request.getMake())
-                .model(request.getModel())
-                .color(request.getColor())
+                .make(normalizeNullable(request.getMake()))
+                .model(normalizeNullable(request.getModel()))
+                .color(normalizeNullable(request.getColor()))
                 .year(request.getYear())
                 .user(user)
-                .active(true)
+                .ownerFirstName(normalizeNullable(request.getOwnerFirstName()))
+                .ownerLastName(normalizeNullable(request.getOwnerLastName()))
+                .ownerEmail(normalizeNullable(request.getOwnerEmail()))
+                .ownerPhone(normalizeNullable(request.getOwnerPhone()))
+                .notes(normalizeNullable(request.getNotes()))
+                .active(active)
                 .build();
+
         vehicleRepository.save(vehicle);
     }
 
     @Transactional
     public void updateVehicle(Long id, VehicleRequest request) {
         Vehicle vehicle = getVehicleById(id);
-        vehicle.setLicensePlate(request.getLicensePlate().toUpperCase());
+
+        vehicle.setLicensePlate(request.getLicensePlate().trim().toUpperCase(Locale.ROOT));
         vehicle.setCategory(request.getCategory());
-        vehicle.setMake(request.getMake());
-        vehicle.setModel(request.getModel());
-        vehicle.setColor(request.getColor());
+        vehicle.setMake(normalizeNullable(request.getMake()));
+        vehicle.setModel(normalizeNullable(request.getModel()));
+        vehicle.setColor(normalizeNullable(request.getColor()));
         vehicle.setYear(request.getYear());
+
+        vehicle.setOwnerFirstName(normalizeNullable(request.getOwnerFirstName()));
+        vehicle.setOwnerLastName(normalizeNullable(request.getOwnerLastName()));
+        vehicle.setOwnerEmail(normalizeNullable(request.getOwnerEmail()));
+        vehicle.setOwnerPhone(normalizeNullable(request.getOwnerPhone()));
+        vehicle.setNotes(normalizeNullable(request.getNotes()));
+
+        if (request.getActive() != null) {
+            vehicle.setActive(request.getActive());
+        }
+
+        User user = resolveVehicleOwner(request);
+        vehicle.setUser(user);
+
         vehicleRepository.save(vehicle);
     }
 
     @Transactional
     public void deleteVehicle(Long id) {
         Vehicle vehicle = getVehicleById(id);
-
-        vehicle.setActive(false); // soft delete instead of actual delete
+        vehicle.setActive(false);
         vehicleRepository.save(vehicle);
     }
 
     @Transactional(readOnly = true)
     public boolean isVehicleCurrentlyParked(Long vehicleId) {
         List<ParkingRecord> history = parkingRecordRepository
-            .findParkingHistoryForVehicle(vehicleId);
+                .findParkingHistoryForVehicle(vehicleId);
 
         return history.stream().anyMatch(ParkingRecord::isActive);
     }
-    
 
-    /**
-     * For reservations entered with a plate + type only: reuse the user's vehicle with that plate,
-     * attach an orphan plate to the user, or create a new vehicle on the user's account.
-     */
     @Transactional
-    public Vehicle getOrCreateVehicleForUserReservation(String userEmail, String licensePlate, VehicleCategory category) {
+    public Vehicle getOrCreateVehicleForUserReservation(
+            String userEmail,
+            String licensePlate,
+            VehicleCategory category
+    ) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found."));
+
         String plate = licensePlate.trim().toUpperCase(Locale.ROOT);
+
         Optional<Vehicle> existing = vehicleRepository.findByLicensePlate(plate);
+
         if (existing.isPresent()) {
-            Vehicle v = existing.get();
-            if (v.getUser() != null && !v.getUser().getId().equals(user.getId())) {
+            Vehicle vehicle = existing.get();
+
+            if (vehicle.getUser() != null && !vehicle.getUser().getId().equals(user.getId())) {
                 throw new RuntimeException("This plate is already registered to another account.");
             }
-            if (v.getUser() == null) {
-                v.setUser(user);
+
+            if (vehicle.getUser() == null) {
+                vehicle.setUser(user);
             }
-            v.setCategory(category);
-            return vehicleRepository.save(v);
+
+            vehicle.setCategory(category);
+
+            if (vehicle.getOwnerEmail() == null) {
+                vehicle.setOwnerEmail(user.getEmail());
+            }
+
+            if (vehicle.getOwnerFirstName() == null) {
+                vehicle.setOwnerFirstName(user.getFirstName());
+            }
+
+            if (vehicle.getOwnerLastName() == null) {
+                vehicle.setOwnerLastName(user.getLastName());
+            }
+
+            if (vehicle.getOwnerPhone() == null) {
+                vehicle.setOwnerPhone(user.getPhone());
+            }
+
+            return vehicleRepository.save(vehicle);
         }
+
         Vehicle created = Vehicle.builder()
                 .licensePlate(plate)
                 .category(category)
                 .user(user)
+                .ownerFirstName(user.getFirstName())
+                .ownerLastName(user.getLastName())
+                .ownerEmail(user.getEmail())
+                .ownerPhone(user.getPhone())
                 .active(true)
                 .build();
+
         return vehicleRepository.save(created);
     }
 
     @Transactional
     public void quickRegisterByPlate(String licensePlate, String category) {
-        if (vehicleRepository.existsByLicensePlate(licensePlate)) {
-            throw new RuntimeException("License plate already registered: " + licensePlate);
+        String plate = licensePlate.trim().toUpperCase(Locale.ROOT);
+
+        if (vehicleRepository.existsByLicensePlate(plate)) {
+            throw new RuntimeException("License plate already registered: " + plate);
         }
-        VehicleCategory cat = (category != null && !category.isBlank())
+
+        VehicleCategory cat = category != null && !category.isBlank()
                 ? VehicleCategory.valueOf(category.toUpperCase())
                 : VehicleCategory.CAR;
 
         Vehicle vehicle = Vehicle.builder()
-                .licensePlate(licensePlate.toUpperCase())
+                .licensePlate(plate)
                 .category(cat)
                 .active(true)
                 .build();
+
         vehicleRepository.save(vehicle);
     }
 
     public void uploadImportFile(MultipartFile file, HttpSession session) {
-        if (file.isEmpty()) throw new RuntimeException("Uploaded file is empty.");
+        if (file.isEmpty()) {
+            throw new RuntimeException("Uploaded file is empty.");
+        }
 
-        String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "vehicles-import";
+        String originalFilename = file.getOriginalFilename() != null
+                ? file.getOriginalFilename()
+                : "vehicles-import";
+
         String extension = getFileExtension(originalFilename);
+
         if (!"csv".equals(extension) && !"xlsx".equals(extension)) {
             throw new RuntimeException("Unsupported file format. Please upload a .csv or .xlsx file.");
         }
 
         List<StagedVehicleRow> stagedRows = importVehiclesFromFile(file, extension);
+
         if (stagedRows.isEmpty()) {
             throw new RuntimeException("No data rows found in file.");
         }
@@ -214,37 +286,46 @@ public class VehicleService {
                 formatFileSize(file.getSize()),
                 stagedRows
         );
+
         session.setAttribute(IMPORT_SESSION_KEY, pending);
     }
 
     @Transactional
-    public int confirmImport(HttpSession session,
-                             boolean skipDuplicates,
-                             boolean importWithWarnings,
-                             boolean setAllActive) {
+    public int confirmImport(
+            HttpSession session,
+            boolean skipDuplicates,
+            boolean importWithWarnings,
+            boolean setAllActive
+    ) {
         PendingVehicleImport pending = getPendingImport(session);
+
         if (pending == null || pending.rows().isEmpty()) {
             throw new RuntimeException("No staged import data found.");
         }
 
         int importedCount = 0;
+
         for (StagedVehicleRow row : pending.rows()) {
             if ("ERROR".equals(row.status())) {
                 continue;
             }
+
             if ("WARN".equals(row.status()) && !importWithWarnings) {
                 continue;
             }
 
             String plate = row.licensePlate();
+
             if (vehicleRepository.existsByLicensePlate(plate)) {
                 if (skipDuplicates) {
                     continue;
                 }
+
                 continue;
             }
 
             User user = null;
+
             if (row.ownerEmail() != null && !row.ownerEmail().isBlank()) {
                 user = userRepository.findByEmail(row.ownerEmail()).orElse(null);
             }
@@ -257,6 +338,10 @@ public class VehicleService {
                     .color(row.color())
                     .year(row.year())
                     .user(user)
+                    .ownerEmail(normalizeNullable(row.ownerEmail()))
+                    .ownerFirstName(user != null ? user.getFirstName() : null)
+                    .ownerLastName(user != null ? user.getLastName() : null)
+                    .ownerPhone(user != null ? user.getPhone() : null)
                     .active(setAllActive)
                     .build();
 
@@ -265,6 +350,7 @@ public class VehicleService {
         }
 
         session.removeAttribute(IMPORT_SESSION_KEY);
+
         return importedCount;
     }
 
@@ -274,6 +360,7 @@ public class VehicleService {
 
     public Map<String, Object> getImportPreview(HttpSession session) {
         PendingVehicleImport pending = getPendingImport(session);
+
         if (pending == null) {
             return Map.of();
         }
@@ -281,6 +368,7 @@ public class VehicleService {
         List<Map<String, Object>> validationRows = pending.rows().stream()
                 .map(row -> {
                     Map<String, Object> vm = new HashMap<>();
+
                     vm.put("rowNum", row.rowNum());
                     vm.put("plate", row.licensePlate());
                     vm.put("makeModel", buildMakeModel(row.make(), row.model()));
@@ -289,13 +377,22 @@ public class VehicleService {
                     vm.put("status", row.status());
                     vm.put("badgeLabel", "WARN".equals(row.status()) ? "Duplicate" : null);
                     vm.put("message", row.message());
+
                     return vm;
                 })
                 .toList();
 
-        long readyCount = pending.rows().stream().filter(r -> "OK".equals(r.status())).count();
-        long warnCount = pending.rows().stream().filter(r -> "WARN".equals(r.status())).count();
-        long errorCount = pending.rows().stream().filter(r -> "ERROR".equals(r.status())).count();
+        long readyCount = pending.rows().stream()
+                .filter(r -> "OK".equals(r.status()))
+                .count();
+
+        long warnCount = pending.rows().stream()
+                .filter(r -> "WARN".equals(r.status()))
+                .count();
+
+        long errorCount = pending.rows().stream()
+                .filter(r -> "ERROR".equals(r.status()))
+                .count();
 
         Map<String, Object> uploadedFile = new HashMap<>();
         uploadedFile.put("name", pending.fileName());
@@ -308,12 +405,15 @@ public class VehicleService {
         data.put("warnCount", warnCount);
         data.put("errorCount", errorCount);
         data.put("totalRows", pending.rows().size());
+
         return data;
     }
 
     private List<StagedVehicleRow> importVehiclesFromFile(MultipartFile file, String extension) {
         try {
-            return "xlsx".equals(extension) ? parseExcel(file) : parseCsv(file);
+            return "xlsx".equals(extension)
+                    ? parseExcel(file)
+                    : parseCsv(file);
         } catch (IOException e) {
             throw new RuntimeException("Failed to parse import file.", e);
         }
@@ -326,13 +426,16 @@ public class VehicleService {
                 new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
 
             String headerLine = reader.readLine();
+
             if (headerLine == null) {
                 return List.of();
             }
 
             Map<String, Integer> headerIndex = buildHeaderIndex(parseCsvLine(headerLine));
+
             String line;
             int rowNum = 2;
+
             while ((line = reader.readLine()) != null) {
                 if (line.isBlank()) {
                     rowNum++;
@@ -340,6 +443,7 @@ public class VehicleService {
                 }
 
                 List<String> cols = parseCsvLine(line);
+
                 rawRows.add(new RawVehicleRow(
                         rowNum,
                         getColumn(cols, headerIndex, "licensePlate", "plate", "license_plate"),
@@ -350,6 +454,7 @@ public class VehicleService {
                         getColumn(cols, headerIndex, "year"),
                         getColumn(cols, headerIndex, "ownerEmail", "email", "userEmail", "owner")
                 ));
+
                 rowNum++;
             }
         }
@@ -361,22 +466,32 @@ public class VehicleService {
         List<RawVehicleRow> rawRows = new ArrayList<>();
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
-            Sheet sheet = workbook.getNumberOfSheets() > 0 ? workbook.getSheetAt(0) : null;
+            Sheet sheet = workbook.getNumberOfSheets() > 0
+                    ? workbook.getSheetAt(0)
+                    : null;
+
             if (sheet == null || sheet.getPhysicalNumberOfRows() == 0) {
                 return List.of();
             }
 
             DataFormatter formatter = new DataFormatter();
             Row headerRow = sheet.getRow(sheet.getFirstRowNum());
+
             Map<String, Integer> headerIndex = new HashMap<>();
+
             for (Cell cell : headerRow) {
-                headerIndex.put(normalizeHeader(formatter.formatCellValue(cell)), cell.getColumnIndex());
+                headerIndex.put(
+                        normalizeHeader(formatter.formatCellValue(cell)),
+                        cell.getColumnIndex()
+                );
             }
 
             int first = sheet.getFirstRowNum() + 1;
             int last = sheet.getLastRowNum();
+
             for (int rowNum = first; rowNum <= last; rowNum++) {
                 Row row = sheet.getRow(rowNum);
+
                 if (row == null) {
                     continue;
                 }
@@ -399,7 +514,16 @@ public class VehicleService {
                     continue;
                 }
 
-                rawRows.add(new RawVehicleRow(rowNum + 1, plate, category, make, model, color, year, ownerEmail));
+                rawRows.add(new RawVehicleRow(
+                        rowNum + 1,
+                        plate,
+                        category,
+                        make,
+                        model,
+                        color,
+                        year,
+                        ownerEmail
+                ));
             }
         }
 
@@ -411,7 +535,10 @@ public class VehicleService {
         Set<String> fileSeenPlates = new HashSet<>();
 
         for (RawVehicleRow raw : rawRows) {
-            String plate = raw.licensePlate() != null ? raw.licensePlate().trim().toUpperCase(Locale.ROOT) : "";
+            String plate = raw.licensePlate() != null
+                    ? raw.licensePlate().trim().toUpperCase(Locale.ROOT)
+                    : "";
+
             String status = "OK";
             String message = null;
 
@@ -421,8 +548,12 @@ public class VehicleService {
             }
 
             VehicleCategory category = null;
+
             if (!"ERROR".equals(status)) {
-                String categoryText = raw.category() != null ? raw.category().trim().toUpperCase(Locale.ROOT) : "";
+                String categoryText = raw.category() != null
+                        ? raw.category().trim().toUpperCase(Locale.ROOT)
+                        : "";
+
                 if (categoryText.isBlank()) {
                     category = VehicleCategory.CAR;
                 } else {
@@ -439,6 +570,7 @@ public class VehicleService {
                 status = "ERROR";
                 message = "Duplicate plate in import file.";
             }
+
             fileSeenPlates.add(plate);
 
             if ("OK".equals(status) && vehicleRepository.existsByLicensePlate(plate)) {
@@ -447,6 +579,7 @@ public class VehicleService {
             }
 
             Integer year = null;
+
             if (raw.year() != null && !raw.year().isBlank()) {
                 try {
                     year = Integer.valueOf(raw.year().trim());
@@ -473,11 +606,33 @@ public class VehicleService {
         return staged;
     }
 
+    private User resolveVehicleOwner(VehicleRequest request) {
+        if (request.getUserId() != null) {
+            return userRepository.findById(request.getUserId()).orElse(null);
+        }
+
+        String linkedUserSearch = normalizeNullable(request.getLinkedUserSearch());
+
+        if (linkedUserSearch != null && linkedUserSearch.contains("@")) {
+            return userRepository.findByEmail(linkedUserSearch).orElse(null);
+        }
+
+        String ownerEmail = normalizeNullable(request.getOwnerEmail());
+
+        if (ownerEmail != null) {
+            return userRepository.findByEmail(ownerEmail).orElse(null);
+        }
+
+        return null;
+    }
+
     private String normalizeNullable(String value) {
         if (value == null) {
             return null;
         }
+
         String trimmed = value.trim();
+
         return trimmed.isBlank() ? null : trimmed;
     }
 
@@ -485,28 +640,35 @@ public class VehicleService {
         if (make == null && model == null) {
             return "-";
         }
+
         if (make == null) {
             return model;
         }
+
         if (model == null) {
             return make;
         }
+
         return make + " " + model;
     }
 
     private PendingVehicleImport getPendingImport(HttpSession session) {
         Object obj = session.getAttribute(IMPORT_SESSION_KEY);
+
         if (obj instanceof PendingVehicleImport pending) {
             return pending;
         }
+
         return null;
     }
 
     private String getFileExtension(String filename) {
         int idx = filename.lastIndexOf('.');
+
         if (idx < 0 || idx == filename.length() - 1) {
             return "";
         }
+
         return filename.substring(idx + 1).toLowerCase(Locale.ROOT);
     }
 
@@ -514,44 +676,58 @@ public class VehicleService {
         if (bytes < 1024) {
             return bytes + " B";
         }
+
         if (bytes < 1024 * 1024) {
             return (bytes / 1024) + " KB";
         }
+
         return String.format(Locale.ROOT, "%.1f MB", bytes / (1024.0 * 1024.0));
     }
 
     private Map<String, Integer> buildHeaderIndex(List<String> headers) {
         Map<String, Integer> map = new HashMap<>();
+
         for (int i = 0; i < headers.size(); i++) {
             map.put(normalizeHeader(headers.get(i)), i);
         }
+
         return map;
     }
 
     private String normalizeHeader(String header) {
-        return header == null ? "" : header.replace("_", "").replace(" ", "").trim().toLowerCase(Locale.ROOT);
+        return header == null
+                ? ""
+                : header.replace("_", "")
+                .replace(" ", "")
+                .trim()
+                .toLowerCase(Locale.ROOT);
     }
 
     private String getColumn(List<String> cols, Map<String, Integer> headerIndex, String... names) {
         for (String name : names) {
             Integer idx = headerIndex.get(normalizeHeader(name));
+
             if (idx != null && idx >= 0 && idx < cols.size()) {
                 return cols.get(idx);
             }
         }
+
         return null;
     }
 
     private String getColumn(Row row, DataFormatter formatter, Map<String, Integer> headerIndex, String... names) {
         for (String name : names) {
             Integer idx = headerIndex.get(normalizeHeader(name));
+
             if (idx != null) {
                 Cell cell = row.getCell(idx);
+
                 if (cell != null) {
                     return formatter.formatCellValue(cell);
                 }
             }
         }
+
         return null;
     }
 
@@ -562,6 +738,7 @@ public class VehicleService {
 
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
+
             if (c == '"') {
                 if (inQuotes && i + 1 < line.length() && line.charAt(i + 1) == '"') {
                     current.append('"');
@@ -576,7 +753,9 @@ public class VehicleService {
                 current.append(c);
             }
         }
+
         cols.add(current.toString().trim());
+
         return cols;
     }
 

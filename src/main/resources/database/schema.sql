@@ -28,18 +28,25 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS vehicles (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT,
-    license_plate VARCHAR(255) NOT NULL UNIQUE,
-    category VARCHAR(30) NOT NULL,
-    make VARCHAR(255),
-    model VARCHAR(255),
-    color VARCHAR(255),
-    manufacture_year INT,
-    active BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at DATETIME(6),
-    updated_at DATETIME(6),
-    CONSTRAINT fk_vehicle_user FOREIGN KEY (user_id) REFERENCES users(id)
+                                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                        user_id BIGINT,
+                                        license_plate VARCHAR(255) NOT NULL UNIQUE,
+                                        category VARCHAR(30) NOT NULL,
+                                        make VARCHAR(255),
+                                        model VARCHAR(255),
+                                        color VARCHAR(255),
+                                        manufacture_year INT,
+
+                                        owner_first_name VARCHAR(255),
+                                        owner_last_name VARCHAR(255),
+                                        owner_email VARCHAR(255),
+                                        owner_phone VARCHAR(255),
+                                        notes TEXT,
+
+                                        active BOOLEAN NOT NULL DEFAULT TRUE,
+                                        created_at DATETIME(6),
+                                        updated_at DATETIME(6),
+                                        CONSTRAINT fk_vehicle_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS parking_slots (

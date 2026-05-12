@@ -106,6 +106,313 @@
     </aside>
 </div>
 
+<th:block th:fragment="parkiyoMascot">
+    <style>
+        .parkiyo-mascot {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 1050;
+            width: 126px;
+            height: 154px;
+            pointer-events: none;
+            filter: drop-shadow(0 22px 28px rgba(0, 0, 0, 0.34));
+        }
+
+        .parkiyo-mascot .mascot-robot {
+            position: absolute;
+            inset: 18px 16px 12px;
+            transform-origin: 50% 86%;
+        }
+
+        .parkiyo-mascot .robot-head {
+            position: relative;
+            width: 82px;
+            height: 66px;
+            margin: 0 auto;
+            border-radius: 28px;
+            background: linear-gradient(145deg, #ffffff 0%, #eefcff 48%, #c7f5f4 100%);
+            border: 1px solid rgba(125, 211, 252, 0.55);
+            box-shadow: inset 0 8px 14px rgba(255, 255, 255, 0.92), inset 0 -10px 18px rgba(15, 118, 110, 0.12), 0 0 22px rgba(45, 212, 191, 0.32);
+        }
+
+        .parkiyo-mascot .robot-head::before,
+        .parkiyo-mascot .robot-head::after {
+            content: "";
+            position: absolute;
+            top: -9px;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: #67e8f9;
+            box-shadow: 0 0 14px rgba(45, 212, 191, 0.85);
+        }
+
+        .parkiyo-mascot .robot-head::before { left: 15px; }
+        .parkiyo-mascot .robot-head::after { right: 15px; }
+
+        .parkiyo-mascot .robot-face {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            top: 14px;
+            height: 34px;
+            border-radius: 15px;
+            background: linear-gradient(180deg, #020617 0%, #07111f 100%);
+            box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.25), 0 0 18px rgba(56, 189, 248, 0.2);
+        }
+
+        .parkiyo-mascot .eyes {
+            position: absolute;
+            left: 15px;
+            right: 15px;
+            top: 10px;
+            height: 8px;
+        }
+
+        .parkiyo-mascot .eyes::before,
+        .parkiyo-mascot .eyes::after {
+            content: "";
+            position: absolute;
+            width: 12px;
+            height: 8px;
+            border-radius: 999px;
+            background: #67e8f9;
+            box-shadow: 0 0 10px rgba(103, 232, 249, 0.95);
+        }
+
+        .parkiyo-mascot .eyes::before { left: 0; }
+        .parkiyo-mascot .eyes::after { right: 0; }
+
+        .parkiyo-mascot .mouth {
+            position: absolute;
+            left: 50%;
+            bottom: 7px;
+            width: 20px;
+            height: 8px;
+            border-bottom: 3px solid #67e8f9;
+            border-radius: 0 0 20px 20px;
+            transform: translateX(-50%);
+            filter: drop-shadow(0 0 5px rgba(103, 232, 249, 0.85));
+        }
+
+        .parkiyo-mascot .robot-body {
+            position: relative;
+            width: 64px;
+            height: 58px;
+            margin: -3px auto 0;
+            border-radius: 22px 22px 24px 24px;
+            background: linear-gradient(145deg, #f8ffff 0%, #dffafa 52%, #b9eee9 100%);
+            border: 1px solid rgba(125, 211, 252, 0.48);
+            box-shadow: inset 0 8px 12px rgba(255, 255, 255, 0.9), inset 0 -9px 16px rgba(15, 118, 110, 0.12);
+        }
+
+        .parkiyo-mascot .robot-body::before {
+            content: "P";
+            position: absolute;
+            left: 50%;
+            top: 13px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #0891b2, #2563eb);
+            color: white;
+            font-size: 14px;
+            font-weight: 900;
+            line-height: 24px;
+            text-align: center;
+            box-shadow: 0 0 14px rgba(56, 189, 248, 0.45);
+        }
+
+        .parkiyo-mascot .robot-arm,
+        .parkiyo-mascot .robot-leg {
+            position: absolute;
+            background: linear-gradient(180deg, #efffff, #a7f3d0);
+            border: 1px solid rgba(45, 212, 191, 0.45);
+            box-shadow: 0 0 12px rgba(45, 212, 191, 0.22);
+        }
+
+        .parkiyo-mascot .robot-arm {
+            top: 7px;
+            width: 16px;
+            height: 42px;
+            border-radius: 999px;
+            transform-origin: 50% 10%;
+        }
+
+        .parkiyo-mascot .left-arm { left: -13px; transform: rotate(14deg); }
+        .parkiyo-mascot .right-arm { right: -13px; transform: rotate(-14deg); }
+
+        .parkiyo-mascot .robot-leg {
+            bottom: -17px;
+            width: 18px;
+            height: 25px;
+            border-radius: 8px 8px 12px 12px;
+        }
+
+        .parkiyo-mascot .left-leg { left: 13px; }
+        .parkiyo-mascot .right-leg { right: 13px; }
+
+        .parkiyo-mascot .mascot-bubble {
+            position: absolute;
+            right: 88px;
+            top: 12px;
+            min-width: 42px;
+            padding: 6px 9px;
+            border-radius: 12px 12px 4px 12px;
+            background: rgba(2, 6, 23, 0.84);
+            border: 1px solid rgba(45, 212, 191, 0.38);
+            color: #a7f3d0;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.02em;
+            text-align: center;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.26);
+        }
+
+        .parkiyo-mascot.mascot-wave .mascot-robot { animation: parkiyoRobotFloat 2.4s ease-in-out infinite; }
+        .parkiyo-mascot.mascot-wave .right-arm { animation: parkiyoRobotWave 0.9s ease-in-out infinite; }
+        .parkiyo-mascot.mascot-smile .mascot-robot { animation: parkiyoRobotFloat 2.8s ease-in-out infinite; }
+        .parkiyo-mascot.mascot-smile .eyes::before,
+        .parkiyo-mascot.mascot-smile .eyes::after { animation: parkiyoRobotBlink 4s ease-in-out infinite; }
+        .parkiyo-mascot.mascot-sleep .mascot-robot { animation: parkiyoRobotSleep 2.8s ease-in-out infinite; }
+        .parkiyo-mascot.mascot-snooze .mascot-robot { animation: parkiyoRobotSnooze 3.2s ease-in-out infinite; }
+        .parkiyo-mascot.mascot-dance .mascot-robot { animation: parkiyoRobotDance 0.8s ease-in-out infinite; }
+        .parkiyo-mascot.mascot-dance .left-arm { animation: parkiyoRobotLeftDance 0.8s ease-in-out infinite; }
+        .parkiyo-mascot.mascot-dance .right-arm { animation: parkiyoRobotRightDance 0.8s ease-in-out infinite; }
+
+        .parkiyo-mascot.mascot-sleep .eyes::before,
+        .parkiyo-mascot.mascot-sleep .eyes::after,
+        .parkiyo-mascot.mascot-snooze .eyes::before,
+        .parkiyo-mascot.mascot-snooze .eyes::after {
+            height: 3px;
+            top: 3px;
+            background: transparent;
+            border-top: 3px solid #67e8f9;
+            box-shadow: none;
+        }
+
+        .parkiyo-mascot.mascot-sleep .mouth,
+        .parkiyo-mascot.mascot-snooze .mouth {
+            width: 9px;
+            height: 9px;
+            border: 2px solid #67e8f9;
+            border-radius: 50%;
+        }
+
+        @keyframes parkiyoRobotFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes parkiyoRobotWave {
+            0%, 100% { transform: rotate(-20deg); }
+            50% { transform: rotate(-72deg) translateY(-4px); }
+        }
+
+        @keyframes parkiyoRobotBlink {
+            0%, 92%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.25); }
+        }
+
+        @keyframes parkiyoRobotSleep {
+            0%, 100% { transform: rotate(-5deg) translateY(0); }
+            50% { transform: rotate(-5deg) translateY(4px); }
+        }
+
+        @keyframes parkiyoRobotSnooze {
+            0%, 100% { transform: rotate(7deg) translateY(0) scale(1); }
+            50% { transform: rotate(7deg) translateY(5px) scale(0.98); }
+        }
+
+        @keyframes parkiyoRobotDance {
+            0%, 100% { transform: rotate(-7deg) translateY(0); }
+            50% { transform: rotate(7deg) translateY(-6px); }
+        }
+
+        @keyframes parkiyoRobotLeftDance {
+            0%, 100% { transform: rotate(48deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        @keyframes parkiyoRobotRightDance {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(-52deg); }
+        }
+
+        @media (max-width: 768px) {
+            .parkiyo-mascot {
+                right: 10px;
+                bottom: 10px;
+                width: 96px;
+                height: 122px;
+                transform: scale(0.86);
+                transform-origin: right bottom;
+            }
+
+            .parkiyo-mascot .mascot-bubble {
+                right: 68px;
+                top: 5px;
+                max-width: 54px;
+                padding: 5px 7px;
+                font-size: 10px;
+            }
+        }
+    </style>
+
+    <div id="parkiyoMascot" class="parkiyo-mascot mascot-wave" aria-live="polite">
+        <div class="mascot-robot" aria-hidden="true">
+            <div class="robot-head">
+                <div class="robot-face">
+                    <div class="eyes"></div>
+                    <div class="mouth"></div>
+                </div>
+            </div>
+            <div class="robot-body">
+                <div class="robot-arm left-arm"></div>
+                <div class="robot-arm right-arm"></div>
+                <div class="robot-leg left-leg"></div>
+                <div class="robot-leg right-leg"></div>
+            </div>
+        </div>
+        <div class="mascot-bubble" id="mascotBubble">Hi!</div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const mascot = document.getElementById("parkiyoMascot");
+            const bubble = document.getElementById("mascotBubble");
+
+            if (!mascot || !bubble) {
+                return;
+            }
+
+            const mascotStates = [
+                { name: "wave", bubble: "Hi!" },
+                { name: "smile", bubble: ":)" },
+                { name: "sleep", bubble: "Zzz" },
+                { name: "snooze", bubble: "zzz" },
+                { name: "dance", bubble: "ta-da" }
+            ];
+
+            const stateClasses = mascotStates.map(state => "mascot-" + state.name);
+            let index = 0;
+
+            function updateMascotState() {
+                const state = mascotStates[index];
+                mascot.classList.remove(...stateClasses);
+                mascot.classList.add("mascot-" + state.name);
+                bubble.textContent = state.bubble;
+                index = (index + 1) % mascotStates.length;
+            }
+
+            updateMascotState();
+            setInterval(updateMascotState, 5000);
+        });
+    </script>
+</th:block>
+
 <div th:fragment="siteFooter()">
     <footer class="border-t border-white/5 bg-background-dark pt-24 pb-12">
         <div class="container mx-auto px-6 lg:px-12">

@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,28 +48,38 @@ public class UserVehicleController {
         return "vehicles/quick-register-by-plate-user";
     }
 
-    @GetMapping("/vehicles")
+    @GetMapping({"/vehicles", "/vehicles/registry"})
     @PreAuthorize("isAuthenticated()")
     public String userVehicleRegistry(@RequestParam(required = false) String search,
                                       @RequestParam(required = false) String category,
+                                      @RequestParam(required = false) String status,
                                       Authentication auth,
                                       Model model) {
         User currentUser = userService.getUserByEmail(auth.getName());
-        List<Vehicle> allVehicles = vehicleService.getVehiclesByUser(auth.getName());
-        List<Vehicle> filteredVehicles = allVehicles.stream()
+        List<Vehicle> userVehicles = vehicleService.getVehiclesByUser(auth.getName());
+        boolean demoMode = userVehicles.isEmpty();
+        List<Map<String, Object>> vehicleRows = demoMode
+                ? demoVehicleRows(currentUser).stream()
+                .filter(row -> matchesDemoSearch(row, search))
+                .filter(row -> matchesDemoCategory(row, category))
+                .filter(row -> matchesRegistryStatus(row, status))
+                .toList()
+                : userVehicles.stream()
                 .filter(vehicle -> matchesSearch(vehicle, search))
                 .filter(vehicle -> matchesCategory(vehicle, category))
+                .map(this::toRegistryVehicleRow)
+                .filter(row -> matchesRegistryStatus(row, status))
                 .toList();
-        List<Map<String, Object>> displayVehicles = new ArrayList<>(filteredVehicles.stream().map(this::toVehicleRow).toList());
-        if (displayVehicles.isEmpty()) {
-            displayVehicles.addAll(starterVehicleRows(currentUser));
-        }
 
         model.addAttribute("currentUser", currentUser);
-        model.addAttribute("vehicles", displayVehicles);
+        model.addAttribute("vehicles", vehicleRows);
         model.addAttribute("categories", vehicleService.getAllCategories());
-        model.addAttribute("stats", buildVehicleStats(allVehicles, displayVehicles.size()));
-        return "vehicles/vehicle-list-user";
+        model.addAttribute("stats", demoMode ? buildRegistryVehicleStatsFromRows(vehicleRows) : buildRegistryVehicleStats(userVehicles));
+        model.addAttribute("demoMode", demoMode);
+        model.addAttribute("currentPage", 1);
+        model.addAttribute("totalPages", 1);
+        model.addAttribute("pageNumbers", List.of(1));
+        return "vehicles/vehicle-registry-user";
     }
 
     @GetMapping("/vehicles/export")
@@ -102,6 +112,8 @@ public class UserVehicleController {
                                     Model model,
                                     Authentication auth,
                                     RedirectAttributes redirectAttributes) {
+        validateEntryVehicleRegistration(request, bindingResult);
+
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("error", "Please complete the required vehicle details.");
             redirectAttributes.addFlashAttribute("showVehicleRegistration", true);
@@ -148,62 +160,108 @@ public class UserVehicleController {
         }
     }
 
-    private Map<String, Object> toVehicleRow(Vehicle vehicle) {
+    private Map<String, Object> toRegistryVehicleRow(Vehicle vehicle) {
         Map<String, Object> row = new HashMap<>();
         row.put("id", vehicle.getId());
+        row.put("demo", false);
         row.put("plate", vehicle.getLicensePlate());
-        row.put("ownerName", vehicle.getUser() != null ? vehicle.getUser().getFullName() : "You");
+        row.put("ownerName", vehicle.getUser() != null && vehicle.getUser().getFullName() != null
+                ? vehicle.getUser().getFullName()
+                : "You");
         row.put("category", vehicle.getCategory() != null ? formatCategory(vehicle.getCategory().name()) : "-");
+        row.put("make", valueOrDash(vehicle.getMake()));
+        row.put("model", valueOrDash(vehicle.getModel()));
         row.put("makeModel", buildMakeModel(vehicle.getMake(), vehicle.getModel()));
+        row.put("year", vehicle.getYear() != null ? vehicle.getYear() : "-");
         row.put("color", vehicle.getColor() != null && !vehicle.getColor().isBlank() ? vehicle.getColor() : "-");
         row.put("colorHex", colorToHex(vehicle.getColor()));
-        row.put("status", vehicle.isActive() ? "Active" : "Blocked");
-        row.put("registeredOn", vehicle.getCreatedAt() != null ? vehicle.getCreatedAt().toLocalDate().toString() : "-");
+        row.put("status", vehicle.isActive() ? "Active" : "Inactive");
+        row.put("parkingStatus", vehicleService.isVehicleCurrentlyParked(vehicle.getId()) ? "Parked" : "Not Parked");
+        row.put("registeredOn", vehicle.getCreatedAt() != null
+                ? vehicle.getCreatedAt().toLocalDate().format(DateTimeFormatter.ISO_DATE)
+                : "-");
         return row;
     }
 
-    private Map<String, Object> buildVehicleStats(List<Vehicle> vehicles, int totalDisplayVehicles) {
-        long activeCount = vehicles.stream().filter(Vehicle::isActive).count();
-        long blockedCount = vehicles.size() - activeCount;
-
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("total", totalDisplayVehicles);
-        stats.put("parked", 0);
-        stats.put("active", activeCount == 0 ? totalDisplayVehicles - 1 : activeCount);
-        stats.put("blocked", blockedCount == 0 && totalDisplayVehicles > 0 ? 1 : blockedCount);
-        return stats;
-    }
-
-    private List<Map<String, Object>> starterVehicleRows(User currentUser) {
+    private List<Map<String, Object>> demoVehicleRows(User currentUser) {
         String ownerName = currentUser != null && currentUser.getFullName() != null && !currentUser.getFullName().isBlank()
                 ? currentUser.getFullName()
-                : "You";
-
-        List<Map<String, Object>> rows = new ArrayList<>();
-        rows.add(starterVehicleRow(ownerName, "CAB-2401", "Car", "Toyota Yaris", "White", "#f8fafc", "Active"));
-        rows.add(starterVehicleRow(ownerName, "KLL-9981", "Motorcycle", "Yamaha FZ", "Blue", "#3b82f6", "Active"));
-        rows.add(starterVehicleRow(ownerName, "NCP-7720", "Van", "Nissan Caravan", "Silver", "#94a3b8", "Blocked"));
-        return rows;
+                : "Current User";
+        return List.of(
+                demoVehicleRow("CAB-4589", "Car", "Toyota", "Prius", "2022", "White", "Active", ownerName),
+                demoVehicleRow("BIK-2241", "Motorcycle", "Yamaha", "FZ", "2021", "Blue", "Active", ownerName),
+                demoVehicleRow("VAN-7782", "Van", "Nissan", "Caravan", "2020", "Silver", "Inactive", ownerName),
+                demoVehicleRow("TRK-9021", "Truck", "Isuzu", "Elf", "2019", "Black", "Active", ownerName)
+        );
     }
 
-    private Map<String, Object> starterVehicleRow(String ownerName,
-                                                  String plate,
-                                                  String category,
-                                                  String makeModel,
-                                                  String color,
-                                                  String colorHex,
-                                                  String status) {
+    private Map<String, Object> demoVehicleRow(String plate,
+                                               String category,
+                                               String make,
+                                               String model,
+                                               String year,
+                                               String color,
+                                               String status,
+                                               String ownerName) {
         Map<String, Object> row = new HashMap<>();
-        row.put("id", null);
+        row.put("id", "demo-" + plate);
+        row.put("demo", true);
         row.put("plate", plate);
         row.put("ownerName", ownerName);
         row.put("category", category);
-        row.put("makeModel", makeModel);
+        row.put("make", make);
+        row.put("model", model);
+        row.put("makeModel", make + " " + model);
+        row.put("year", year);
         row.put("color", color);
-        row.put("colorHex", colorHex);
+        row.put("colorHex", colorToHex(color));
         row.put("status", status);
-        row.put("registeredOn", "Starter");
+        row.put("parkingStatus", "Not Parked");
+        row.put("registeredOn", "Demo");
         return row;
+    }
+
+    private void validateEntryVehicleRegistration(VehicleRequest request, BindingResult bindingResult) {
+        if (request.getMake() == null || request.getMake().isBlank()) {
+            bindingResult.rejectValue("make", "vehicle.make.required", "Make is required.");
+        }
+        if (request.getModel() == null || request.getModel().isBlank()) {
+            bindingResult.rejectValue("model", "vehicle.model.required", "Model is required.");
+        }
+        if (request.getOwnerFirstName() == null || request.getOwnerFirstName().isBlank()) {
+            bindingResult.rejectValue("ownerFirstName", "vehicle.owner.required", "Owner name is required.");
+        }
+    }
+
+    private Map<String, Object> buildRegistryVehicleStats(List<Vehicle> vehicles) {
+        long activeCount = vehicles.stream().filter(Vehicle::isActive).count();
+        long inactiveCount = vehicles.size() - activeCount;
+        long parkedCount = vehicles.stream()
+                .filter(vehicle -> vehicle.getId() != null && vehicleService.isVehicleCurrentlyParked(vehicle.getId()))
+                .count();
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("total", vehicles.size());
+        stats.put("parked", parkedCount);
+        stats.put("active", activeCount);
+        stats.put("inactive", inactiveCount);
+        return stats;
+    }
+
+    private Map<String, Object> buildRegistryVehicleStatsFromRows(List<Map<String, Object>> rows) {
+        long activeCount = rows.stream()
+                .filter(row -> "Active".equalsIgnoreCase(String.valueOf(row.get("status"))))
+                .count();
+        long parkedCount = rows.stream()
+                .filter(row -> "Parked".equalsIgnoreCase(String.valueOf(row.get("parkingStatus"))))
+                .count();
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("total", rows.size());
+        stats.put("parked", parkedCount);
+        stats.put("active", activeCount);
+        stats.put("inactive", rows.size() - activeCount);
+        return stats;
     }
 
     private String csvSafe(String value) {
@@ -231,6 +289,34 @@ public class UserVehicleController {
         return vehicle.getCategory() != null && vehicle.getCategory().name().equalsIgnoreCase(category);
     }
 
+    private boolean matchesDemoSearch(Map<String, Object> row, String search) {
+        if (search == null || search.isBlank()) {
+            return true;
+        }
+        String q = search.toLowerCase(Locale.ROOT);
+        return String.valueOf(row.getOrDefault("plate", "")).toLowerCase(Locale.ROOT).contains(q)
+                || String.valueOf(row.getOrDefault("make", "")).toLowerCase(Locale.ROOT).contains(q)
+                || String.valueOf(row.getOrDefault("model", "")).toLowerCase(Locale.ROOT).contains(q);
+    }
+
+    private boolean matchesDemoCategory(Map<String, Object> row, String category) {
+        if (category == null || category.isBlank()) {
+            return true;
+        }
+        String displayCategory = String.valueOf(row.getOrDefault("category", ""));
+        return displayCategory.equalsIgnoreCase(category) || displayCategory.replace(" ", "_").equalsIgnoreCase(category);
+    }
+
+    private boolean matchesRegistryStatus(Map<String, Object> row, String status) {
+        if (status == null || status.isBlank()) {
+            return true;
+        }
+        String requested = status.trim().toLowerCase(Locale.ROOT);
+        String activeStatus = String.valueOf(row.getOrDefault("status", "")).toLowerCase(Locale.ROOT);
+        String parkingStatus = String.valueOf(row.getOrDefault("parkingStatus", "")).toLowerCase(Locale.ROOT);
+        return activeStatus.equals(requested) || parkingStatus.equals(requested);
+    }
+
     private String buildMakeModel(String make, String model) {
         boolean hasMake = make != null && !make.isBlank();
         boolean hasModel = model != null && !model.isBlank();
@@ -238,6 +324,10 @@ public class UserVehicleController {
         if (!hasMake) return model;
         if (!hasModel) return make;
         return make + " " + model;
+    }
+
+    private String valueOrDash(String value) {
+        return value != null && !value.isBlank() ? value : "-";
     }
 
     private String formatCategory(String category) {
