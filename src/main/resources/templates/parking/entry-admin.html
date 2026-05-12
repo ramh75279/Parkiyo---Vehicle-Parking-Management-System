@@ -18,7 +18,7 @@
                 extend: {
                     colors: { primary: "#1f68f9", "background-dark": "#020617" },
                     fontFamily: { display: ["Public Sans", "sans-serif"] },
-                    borderRadius: { squircle: "14px" },
+                    borderRadius: { squircle: "14px", xl: "1.5rem", "2xl": "2.1rem", "3xl": "3rem" },
                 },
             },
         }
@@ -58,12 +58,70 @@
 
         .nav-label {
             opacity: 0;
-            transition: opacity 0.3s ease;
-            margin-left: 1rem;
+            transition: opacity 0.3s ease, margin 0.3s ease, width 0.3s ease;
+            margin-left: 0;
+            width: 0;
+            min-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
         .sidebar-container:hover .nav-label {
             opacity: 1;
+            width: auto;
+            margin-left: 1rem;
+        }
+
+        .sidebar-container:not(:hover) nav a {
+            justify-content: center;
+            gap: 0;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .sidebar-container:hover nav a {
+            justify-content: flex-start;
+            gap: 0.75rem;
+        }
+
+        .sidebar-container:not(:hover) .sidebar-logo-row {
+            justify-content: center;
+        }
+
+        .sidebar-container:hover .sidebar-logo-row {
+            justify-content: flex-start;
+        }
+
+        .sidebar-container:not(:hover) .sidebar-brand-row {
+            justify-content: center;
+        }
+
+        .sidebar-container:hover .sidebar-brand-row {
+            justify-content: flex-start;
+        }
+
+        .sidebar-container:not(:hover) .mt-auto a {
+            justify-content: center;
+            gap: 0;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .sidebar-container:hover .mt-auto a {
+            justify-content: flex-start;
+            gap: 0.75rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .sidebar-container:not(:hover) .sidebar-logout-row {
+            justify-content: center;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .sidebar-container:hover .sidebar-logout-row {
+            justify-content: flex-start;
         }
 
         .plate-input {
@@ -178,16 +236,6 @@
             display: block;
         }
 
-        .notify-success {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 14px;
-            padding: 14px 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
         ::-webkit-scrollbar {
             width: 5px;
             display: none;
@@ -206,91 +254,9 @@
 <div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
 <div class="flex flex-1 overflow-hidden">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar-container border-r border-white/5 premium-blur flex flex-col shrink-0 z-50">
-        <div class="p-6 mb-4 flex items-center">
-            <div
-                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-squircle bg-primary text-white shadow-[0_0_15px_rgba(31,104,249,0.3)]">
-                <span class="material-symbols-outlined font-bold text-xl">local_parking</span>
-            </div>
-            <span class="nav-label text-xl font-black tracking-tighter text-white uppercase">Parkiyo</span>
-        </div>
-        <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-            <a th:href="@{/admin/dashboard}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
-                <span class="material-symbols-outlined shrink-0">dashboard</span>
-                <span class="nav-label text-sm">Dashboard</span>
-            </a>
-            <a th:href="@{/admin/entry}"
-               class="flex items-center px-4 py-4 rounded-xl text-primary bg-primary/10 border-r-4 border-primary font-bold group">
-                <span class="material-symbols-outlined shrink-0">login</span>
-                <span class="nav-label text-sm">Vehicle Entry</span>
-            </a>
-            <a th:href="@{/admin/exit}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
-                <span class="material-symbols-outlined shrink-0">logout</span>
-                <span class="nav-label text-sm">Vehicle Exit</span>
-            </a>
-            <a th:href="@{/admin/slots/overview}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
-                <span class="material-symbols-outlined shrink-0">grid_view</span>
-                <span class="nav-label text-sm">Parking Slots</span>
-            </a>
-            <a th:href="@{/admin/vehicles}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
-                <span class="material-symbols-outlined shrink-0">directions_car</span>
-                <span class="nav-label text-sm">Vehicles</span>
-            </a>
-            <a th:href="@{/admin/users}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
-                <span class="material-symbols-outlined shrink-0">group</span>
-                <span class="nav-label text-sm">Users</span>
-            </a>
-            <a th:href="@{/admin/payments}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
-                <span class="material-symbols-outlined shrink-0">payments</span>
-                <span class="nav-label text-sm">Payments</span>
-            </a>
-            <a th:href="@{/admin/pass-plans}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
-                <span class="material-symbols-outlined shrink-0">confirmation_number</span><span class="nav-label text-sm">Pass Plans</span>
-            </a>
-            <a th:href="@{/admin/wallet-receipts}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
-                <span class="material-symbols-outlined shrink-0">receipt_long</span><span class="nav-label text-sm">Wallet Top-Ups</span>
-            </a>
-            <a th:href="@{/admin/feedback}" class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all">
-                <span class="material-symbols-outlined shrink-0">support_agent</span><span class="nav-label text-sm">Feedback Hub</span>
-            </a>
-            <a th:href="@{/admin/reports}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
-                <span class="material-symbols-outlined shrink-0">bar_chart</span>
-                <span class="nav-label text-sm">Reports</span>
-            </a>
-            <a th:href="@{/admin/notifications}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
-                <span class="material-symbols-outlined shrink-0">notifications</span>
-                <span class="nav-label text-sm">Notifications</span>
-            </a>
-            <a th:href="@{/admin/system-status}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
-                <span class="material-symbols-outlined shrink-0">monitor_heart</span>
-                <span class="nav-label text-sm">System Status</span>
-            </a>
-            <a th:href="@{/admin/settings}"
-               class="flex items-center px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-bold transition-all group">
-                <span class="material-symbols-outlined shrink-0">settings</span>
-                <span class="nav-label text-sm">Settings</span>
-            </a>
-        </nav>
-        <div class="p-4 border-t border-white/5">
-            <a th:href="@{/logout}"
-               class="flex items-center w-full px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-xl text-sm font-black transition-all">
-                <span class="material-symbols-outlined shrink-0">power_settings_new</span>
-                <span class="nav-label">Logout</span>
-            </a>
-        </div>
-    </aside>
+    <div th:replace="~{common/fragments :: adminSidebar('entry')}"></div>
 
-    <main class="flex-1 min-h-0 flex flex-col overflow-hidden bg-subtle-radial">
+    <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
         <!-- TOPBAR -->
         <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
             <div>
@@ -298,43 +264,34 @@
                 <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Register a vehicle entering the facility</p>
             </div>
 
-            <!-- Profile: name + avatar grouped together -->
-            <div class="flex items-center gap-3">
-                <div class="text-right">
-                    <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Admin'"></p>
-                    <p class="text-[10px] text-primary font-bold uppercase tracking-tighter" th:text="${currentUser?.role} ?: 'ADMIN'"></p>
-                </div>
-                <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-blue-400 p-[2px] shrink-0">
-                    <div class="h-full w-full rounded-full overflow-hidden flex items-center justify-center bg-[#1e2535]">
-                        <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
-                             th:src="@{${currentUser.profilePicturePath}}"
-                             class="h-full w-full object-cover rounded-full"
-                             alt="Profile"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
-                        <span th:class="${currentUser != null and currentUser.profilePicturePath != null} ? 'material-symbols-outlined text-white/70 text-2xl items-center justify-center h-full w-full hidden' : 'material-symbols-outlined text-white/70 text-2xl flex items-center justify-center h-full w-full'">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="text-right">
+                        <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Admin'"></p>
+                        <p class="text-[10px] text-primary font-bold uppercase tracking-tighter" th:text="${currentUser?.role} ?: 'ADMIN'"></p>
+                    </div>
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-blue-400 p-[2px] shrink-0">
+                        <div class="h-full w-full rounded-full overflow-hidden flex items-center justify-center bg-[#1e2535]">
+                            <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
+                                 th:src="@{${currentUser.profilePicturePath}}"
+                                 class="h-full w-full object-cover rounded-full"
+                                 alt="Profile"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+                            <span th:class="${currentUser != null and currentUser.profilePicturePath != null} ? 'material-symbols-outlined text-white/70 text-2xl items-center justify-center h-full w-full hidden' : 'material-symbols-outlined text-white/70 text-2xl flex items-center justify-center h-full w-full'">
                     person
                 </span>
+                        </div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <div th:if="${success}" class="notify-success mb-6 mx-auto max-w-2xl">
-            <span class="material-symbols-outlined text-xl">check_circle</span>
-            <div>
-                <p class="font-black">Success</p>
-                <p class="text-emerald-500/80 text-xs mt-0.5" th:text="${success}">Vehicle registered successfully.</p>
-            </div>
-        </div>
-        <div th:if="${error}" class="notify-success mb-6 mx-auto max-w-2xl" style="background: rgba(244,63,94,0.08); border-color: rgba(244,63,94,0.18); color: #fecdd3;">
-            <span class="material-symbols-outlined text-xl">error</span>
-            <div>
-                <p class="font-black">Error</p>
-                <p class="text-rose-400 text-xs mt-0.5" th:text="${error}">Something went wrong.</p>
-            </div>
-        </div>
+        <div class="flex-1 overflow-y-auto p-10">
 
-        <div class="flex-1 min-h-0 overflow-y-auto p-10">
+            <div th:if="${success}" class="mb-6 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-3 text-sm font-bold text-emerald-200"
+                 th:text="${success}"></div>
+            <div th:if="${error}" class="mb-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-5 py-3 text-sm font-bold text-rose-200"
+                 th:text="${error}"></div>
             <div class="max-w-3xl mx-auto flex flex-col gap-8">
 
                 <!-- Availability strip -->
