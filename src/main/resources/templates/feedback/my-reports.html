@@ -28,7 +28,7 @@
                 <span class="material-symbols-outlined text-5xl text-slate-600">forum</span>
                 <p class="mt-4 text-lg font-black text-white">No feedback yet</p>
                 <p class="text-slate-500 text-sm font-bold mt-2">Share a review, suggestion, or report an issue on site.</p>
-                <a th:href="@{/feedback/new}" class="inline-flex mt-8 items-center gap-2 bg-primary text-white font-black px-6 py-3 rounded-xl text-sm">Submit feedback</a>
+                <a th:href="@{/feedback/new}" class="inline-flex mt-8 items-center gap-2 bg-primary text-white font-black px-6 py-3 rounded-xl text-sm"><span class="material-symbols-outlined text-lg">add</span>New report</a>
             </div>
 
             <div th:unless="${#lists.isEmpty(reports)}" class="space-y-4 max-w-4xl mx-auto">
