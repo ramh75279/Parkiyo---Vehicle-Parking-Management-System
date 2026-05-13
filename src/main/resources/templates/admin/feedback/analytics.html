@@ -4,49 +4,81 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Parkiyo Admin | Feedback analytics</title>
-    <th:block th:replace="~{feedback/fragments :: head-extra}"></th:block>
+    <th:block th:replace="~{admin/feedback/fragments :: admin-layout-head}"></th:block>
 </head>
-<body class="text-slate-100 font-display antialiased min-h-screen bg-subtle-radial">
-<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary"></div>
-<div class="border-b border-white/5 bg-background-dark/40 premium-blur px-6 py-4 flex items-center justify-between">
-    <div class="flex items-center gap-4">
-        <a th:href="@{/admin/feedback}" class="text-sm font-bold text-slate-400 hover:text-white">← Feedback Hub</a>
-        <h1 class="text-lg font-black text-white">Analytics</h1>
-    </div>
-</div>
+<body class="text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
+<div class="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-primary shrink-0"></div>
+<div class="flex flex-1 overflow-hidden">
 
-<div class="p-6 lg:p-10 max-w-4xl mx-auto space-y-10">
-    <div class="grid md:grid-cols-3 gap-4">
-        <div class="glass-card rounded-2xl p-6 border border-white/[0.06]">
-            <p class="text-[10px] font-black uppercase text-slate-500">Total reports</p>
-            <p class="text-3xl font-black text-white mt-2" th:text="${total}">0</p>
-        </div>
-        <div class="glass-card rounded-2xl p-6 border border-emerald-500/15">
-            <p class="text-[10px] font-black uppercase text-slate-500">Resolution rate</p>
-            <p class="text-3xl font-black text-emerald-300 mt-2"><span th:text="${resolutionRatePct}">0</span>%</p>
-        </div>
-        <div class="glass-card rounded-2xl p-6 border border-amber-500/15">
-            <p class="text-[10px] font-black uppercase text-slate-500">Avg star rating</p>
-            <p class="text-3xl font-black text-amber-200 mt-2" th:text="${avgRating}">0</p>
-        </div>
-    </div>
+    <div th:replace="~{common/fragments :: adminSidebar('feedback')}"></div>
 
-    <div class="glass-card rounded-[2rem] p-8 border border-white/[0.06]">
-        <h2 class="text-base font-black text-white mb-6">Top categories (volume)</h2>
-        <div class="space-y-4" th:if="${!#lists.isEmpty(topCategories)}">
-            <div th:each="row : ${topCategories}" class="space-y-1" th:with="cnt=${row['count']}">
-                <div class="flex justify-between text-xs font-black">
-                    <span class="text-slate-300" th:text="${row['category'].displayLabel}">Cat</span>
-                    <span class="text-primary" th:text="${cnt}">0</span>
+    <main class="flex-1 flex flex-col overflow-hidden bg-subtle-radial">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-background-dark/30 premium-blur shrink-0">
+            <div class="flex items-center gap-4">
+                <a th:href="@{/admin/feedback}" class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all shrink-0">
+                    <span class="material-symbols-outlined text-slate-400">arrow_back</span>
+                </a>
+                <div>
+                    <h2 class="text-xl font-black text-white">Analytics</h2>
+                    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-500 font-black mt-1">Feedback volume and resolution</p>
                 </div>
-                <div class="h-2 rounded-full bg-white/5 overflow-hidden">
-                    <div class="h-full rounded-full bg-gradient-to-r from-primary to-blue-400"
-                         th:style="|width: ${total > 0 ? (100 * cnt / total) : 0}%|"></div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden sm:block">
+                    <p class="text-xs font-black text-white uppercase tracking-widest" th:text="${currentUser?.fullName} ?: 'Admin'">Admin</p>
+                    <p class="text-[10px] text-primary font-bold uppercase tracking-tighter" th:text="${currentUser?.role} ?: 'ADMIN'">ADMIN</p>
+                </div>
+                <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-blue-400 p-[2px] shrink-0">
+                    <div class="h-full w-full rounded-full overflow-hidden flex items-center justify-center bg-[#1e2535]">
+                        <img th:if="${currentUser != null and currentUser.profilePicturePath != null}"
+                             th:src="@{${currentUser.profilePicturePath}}"
+                             class="h-full w-full object-cover rounded-full"
+                             alt="Profile"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+                        <span th:class="${currentUser != null and currentUser.profilePicturePath != null} ? 'material-symbols-outlined text-white/70 text-2xl items-center justify-center h-full w-full hidden' : 'material-symbols-outlined text-white/70 text-2xl flex items-center justify-center h-full w-full'">
+                            person
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 lg:p-10">
+            <div class="max-w-4xl mx-auto space-y-10">
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="glass-card rounded-2xl p-6 border border-white/[0.06]">
+                        <p class="text-[10px] font-black uppercase text-slate-500">Total reports</p>
+                        <p class="text-3xl font-black text-white mt-2" th:text="${total}">0</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-6 border border-emerald-500/15">
+                        <p class="text-[10px] font-black uppercase text-slate-500">Resolution rate</p>
+                        <p class="text-3xl font-black text-emerald-300 mt-2"><span th:text="${resolutionRatePct}">0</span>%</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-6 border border-amber-500/15">
+                        <p class="text-[10px] font-black uppercase text-slate-500">Avg star rating</p>
+                        <p class="text-3xl font-black text-amber-200 mt-2" th:text="${avgRating}">0</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-[2rem] p-8 border border-white/[0.06]">
+                    <h2 class="text-base font-black text-white mb-6">Top categories (volume)</h2>
+                    <div class="space-y-4" th:if="${!#lists.isEmpty(topCategories)}">
+                        <div th:each="row : ${topCategories}" class="space-y-1" th:with="cnt=${row['count']}">
+                            <div class="flex justify-between text-xs font-black">
+                                <span class="text-slate-300" th:text="${row['category'].displayLabel}">Cat</span>
+                                <span class="text-primary" th:text="${cnt}">0</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-white/5 overflow-hidden">
+                                <div class="h-full rounded-full bg-gradient-to-r from-primary to-blue-400"
+                                     th:style="|width: ${total > 0 ? (100 * cnt / total) : 0}%|"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p th:if="${#lists.isEmpty(topCategories)}" class="text-slate-500 font-bold text-sm">No category data yet.</p>
                 </div>
             </div>
         </div>
-        <p th:if="${#lists.isEmpty(topCategories)}" class="text-slate-500 font-bold text-sm">No category data yet.</p>
-    </div>
+    </main>
 </div>
 </body>
 </html>
